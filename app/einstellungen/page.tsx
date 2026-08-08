@@ -51,9 +51,10 @@ export default function SettingsPage() {
       <section className="space-y-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70">
         <h2 className="text-lg font-bold">Beispieldaten</h2>
         <p className="text-sm text-slate-600">
-          Legt 3 Personen und 8 Aufgaben mit gemischten Tags, Prioritäten und generierten
-          Beispielfotos an – praktisch, um den Ablauf einmal durchzuspielen. Bestehende Daten
-          bleiben erhalten.
+          Legt 6 Personen und 14 Aufgaben mit gemischten Tags, Prioritäten und thematisch
+          passenden Beispielfotos an – praktisch, um den Ablauf einmal durchzuspielen. Die Fotos
+          werden online gesucht (kostenlose Openverse-Bildersuche); ohne Internetverbindung wird
+          automatisch ein Platzhalterbild verwendet. Bestehende Daten bleiben erhalten.
         </p>
         <Button
           type="button"

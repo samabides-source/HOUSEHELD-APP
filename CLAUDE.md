@@ -49,6 +49,13 @@ lib/
   demo-data.ts          Beispieldaten (lazy geladen)
 ```
 
+**Demo-Daten und Netzwerk:** `demo-data.ts` versucht für jedes Beispielfoto ein passendes,
+offen lizenziertes Bild über die Openverse-API (kostenlos, kein Key) zu laden. Schlägt das fehl
+(offline, keine Treffer, Timeout) fällt die jeweilige Aufgabe automatisch auf ein generiertes
+Farb-Platzhalterbild zurück – der Demo-Button darf dadurch nie hängen bleiben oder fehlschlagen.
+Das ist die **einzige** Stelle in der App, die einen externen Netzwerkaufruf macht; die reguläre
+Nutzung (eigene Aufgaben, eigene Fotos) bleibt vollständig lokal/offline-fähig.
+
 ### Persistenz
 
 Alle Daten liegen in **IndexedDB** (Datenbank `hausheld`), Fotos als `Blob` im Store
