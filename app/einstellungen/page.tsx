@@ -5,13 +5,10 @@ import { useState } from "react";
 import { Button } from "@/components/Button";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { useStore } from "@/lib/store";
-import { formatBytes } from "@/lib/utils";
 
 export default function SettingsPage() {
   const { tasks, persons, tags, photos, loadDemoData, resetEverything } = useStore();
   const [busy, setBusy] = useState<string | null>(null);
-
-  const photoBytes = photos.reduce((sum, photo) => sum + photo.size, 0);
 
   const run = async (label: string, action: () => Promise<void>) => {
     setBusy(label);
@@ -52,9 +49,7 @@ export default function SettingsPage() {
         <h2 className="text-lg font-bold">Beispieldaten</h2>
         <p className="text-sm text-slate-600">
           Legt 6 Personen und 14 Aufgaben mit gemischten Tags, Prioritäten und thematisch
-          passenden Beispielfotos an – praktisch, um den Ablauf einmal durchzuspielen. Die Fotos
-          werden online gesucht (kostenlose Openverse-Bildersuche); ohne Internetverbindung wird
-          automatisch ein Platzhalterbild verwendet. Bestehende Daten bleiben erhalten.
+          passenden Beispielfotos an – praktisch, um den Ablauf einmal durchzuspielen.
         </p>
         <Button
           type="button"
@@ -64,16 +59,6 @@ export default function SettingsPage() {
         >
           {busy === "demo" ? "Wird geladen …" : "Beispieldaten laden"}
         </Button>
-      </section>
-
-      <section className="space-y-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70">
-        <h2 className="text-lg font-bold">Speicherort</h2>
-        <p className="text-sm text-slate-600">
-          Alle Daten liegen ausschliesslich in diesem Browser (IndexedDB, Datenbank „hausheld“) –
-          es gibt keinen Server, keine Cloud und keine externen Dienste. Fotos belegen aktuell{" "}
-          <strong>{formatBytes(photoBytes)}</strong>. Ein anderer Browser oder ein anderes Gerät hat
-          folglich einen eigenen, unabhängigen Datenbestand.
-        </p>
       </section>
 
       <section className="space-y-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-red-200">
