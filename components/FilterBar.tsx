@@ -45,8 +45,8 @@ function FilterChip({
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="w-20 shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-400">
+    <div className="space-y-1.5">
+      <span className="block text-xs font-semibold uppercase tracking-wide text-slate-400">
         {label}
       </span>
       <div className="flex flex-wrap gap-1.5">{children}</div>

@@ -12,7 +12,7 @@ import { Modal } from "./Modal";
 const ACCEPT = "image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif";
 
 /** Bild aus IndexedDB. Fehlt die Datei, wird das Foto als nicht verfügbar markiert. */
-function PhotoImage({
+export function PhotoImage({
   photo,
   className,
   imageClassName,
@@ -47,17 +47,40 @@ function PhotoImage({
   return <img src={url} alt={photo.fileName} className={cn("object-cover", className, imageClassName)} />;
 }
 
-/** Thumbnail-Reihe für Aufgabenkarten (nur Anzeige). */
-export function PhotoStrip({ photos, max = 4 }: { photos: Photo[]; max?: number }) {
+/**
+ * Thumbnail-Reihe für Aufgabenkarten. Mit `onSelect` wird jedes Thumbnail
+ * klickbar, um das Foto vergrössert anzuzeigen.
+ */
+export function PhotoStrip({
+  photos,
+  max = 4,
+  onSelect,
+}: {
+  photos: Photo[];
+  max?: number;
+  onSelect?: (photo: Photo) => void;
+}) {
   if (photos.length === 0) return null;
   const visible = photos.slice(0, max);
   const rest = photos.length - visible.length;
 
   return (
     <div className="flex items-center gap-2">
-      {visible.map((photo) => (
-        <PhotoImage key={photo.id} photo={photo} className="size-14 rounded-xl border border-slate-200" />
-      ))}
+      {visible.map((photo) =>
+        onSelect ? (
+          <button
+            key={photo.id}
+            type="button"
+            onClick={() => onSelect(photo)}
+            className="overflow-hidden rounded-xl border border-slate-200 transition hover:opacity-80"
+            aria-label={`Foto ${photo.fileName} vergrössern`}
+          >
+            <PhotoImage photo={photo} className="size-14" />
+          </button>
+        ) : (
+          <PhotoImage key={photo.id} photo={photo} className="size-14 rounded-xl border border-slate-200" />
+        ),
+      )}
       {rest > 0 && (
         <span className="flex size-14 items-center justify-center rounded-xl bg-slate-100 text-xs font-semibold text-slate-500">
           +{rest}

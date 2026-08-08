@@ -313,10 +313,9 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
                   type="button"
                   onClick={() => setTagIds((current) => toggle(current, tag.id))}
                   className={cn(
-                    "rounded-full px-2.5 py-1 text-xs font-medium transition",
-                    active
-                      ? TAG_CATEGORY_STYLE[tag.category].chip
-                      : "bg-white text-slate-500 ring-1 ring-inset ring-slate-200 hover:bg-slate-100",
+                    "rounded-full px-2.5 py-1 text-xs font-medium ring-2 ring-offset-1 transition",
+                    TAG_CATEGORY_STYLE[tag.category].chip,
+                    active ? "ring-indigo-500" : "opacity-60 ring-transparent hover:opacity-100",
                   )}
                 >
                   {tag.name}

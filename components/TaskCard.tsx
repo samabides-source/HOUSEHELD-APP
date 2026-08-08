@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
+
 import { useStore } from "@/lib/store";
 import { PRIORITY_STYLE } from "@/lib/theme";
-import { STATUSES, STATUS_LABEL, type Status, type Task } from "@/lib/types";
+import { STATUSES, STATUS_LABEL, type Photo, type Status, type Task } from "@/lib/types";
 import { cn, formatDate } from "@/lib/utils";
 import { EmptyAvatar, PersonAvatar, PriorityPill, TagChip } from "./Chips";
 import { ConfirmButton } from "./ConfirmButton";
-import { PhotoStrip } from "./Photos";
+import { Modal } from "./Modal";
+import { PhotoImage, PhotoStrip } from "./Photos";
 
 export function TaskCard({
   task,
@@ -18,6 +21,7 @@ export function TaskCard({
   compact?: boolean;
 }) {
   const { personById, tagById, photosForTask, updateTask, deleteTask } = useStore();
+  const [previewPhoto, setPreviewPhoto] = useState<Photo | null>(null);
 
   const persons = task.assigneeIds.map(personById).filter((person) => person !== undefined);
   const tags = task.tagIds.map(tagById).filter((tag) => tag !== undefined);
@@ -57,7 +61,9 @@ export function TaskCard({
           </div>
         )}
 
-        {photos.length > 0 && <PhotoStrip photos={photos} max={compact ? 3 : 4} />}
+        {photos.length > 0 && (
+          <PhotoStrip photos={photos} max={compact ? 3 : 4} onSelect={setPreviewPhoto} />
+        )}
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
           <span className="flex items-center gap-1.5">
@@ -115,6 +121,20 @@ export function TaskCard({
           </div>
         </div>
       </div>
+
+      <Modal
+        open={previewPhoto !== null}
+        title={previewPhoto?.fileName ?? "Foto"}
+        onClose={() => setPreviewPhoto(null)}
+      >
+        {previewPhoto && (
+          <PhotoImage
+            photo={previewPhoto}
+            className="max-h-[70vh] w-full rounded-2xl"
+            imageClassName="object-contain"
+          />
+        )}
+      </Modal>
     </article>
   );
 }
