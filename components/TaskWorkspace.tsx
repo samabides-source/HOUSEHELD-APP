@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { EMPTY_FILTERS, applyFilters, sortTasks, type Filters, type SortKey } from "@/lib/filters";
 import { STATUS_STYLE } from "@/lib/theme";
 import { STATUSES, STATUS_LABEL, type Task } from "@/lib/types";
+import { useLocalState } from "@/lib/use-local-state";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
 import { FilterBar } from "./FilterBar";
@@ -13,20 +14,33 @@ import { TaskDialog } from "./TaskDialog";
 
 type View = "liste" | "board";
 
+const PERSON_FILTER_STORAGE_KEY = "hausheld.taskFilters.personIds";
+
 /**
- * Gemeinsame Arbeitsfläche für „Alle Aufgaben“ und „Meine Aufgaben“:
- * Filterleiste, Ansichtswechsel (Liste ist Standard, PRD 5.5) und Dialog.
+ * Arbeitsfläche für die Aufgaben-Übersicht: Filterleiste, Ansichtswechsel
+ * (Liste ist Standard, PRD 5.5) und Dialog. Der Personen-Filter wird lokal
+ * gemerkt, damit man beim erneuten Öffnen nicht jedes Mal neu auf sich selbst
+ * filtern muss; die übrigen Filter setzen sich pro Sitzung zurück.
  */
 export function TaskWorkspace({
   tasks,
-  showPersonFilter = true,
   emptyHint = "Noch keine Aufgaben erfasst.",
 }: {
   tasks: Task[];
-  showPersonFilter?: boolean;
   emptyHint?: string;
 }) {
-  const [filters, setFilters] = useState<Filters>({ ...EMPTY_FILTERS });
+  const [personIds, setPersonIds] = useLocalState<string[]>(PERSON_FILTER_STORAGE_KEY, []);
+  const [otherFilters, setOtherFilters] = useState<Omit<Filters, "personIds">>({
+    tagIds: EMPTY_FILTERS.tagIds,
+    statuses: EMPTY_FILTERS.statuses,
+    priorities: EMPTY_FILTERS.priorities,
+    search: EMPTY_FILTERS.search,
+  });
+  const filters: Filters = useMemo(() => ({ ...otherFilters, personIds }), [otherFilters, personIds]);
+  const handleFiltersChange = ({ personIds: nextPersonIds, ...rest }: Filters) => {
+    setPersonIds(nextPersonIds);
+    setOtherFilters(rest);
+  };
   const [sort, setSort] = useState<SortKey>("dueDate");
   const [view, setView] = useState<View>("liste");
   const [dialogTask, setDialogTask] = useState<Task | null>(null);
@@ -76,13 +90,7 @@ export function TaskWorkspace({
         </div>
       </div>
 
-      <FilterBar
-        filters={filters}
-        onChange={setFilters}
-        sort={sort}
-        onSortChange={setSort}
-        showPersonFilter={showPersonFilter}
-      />
+      <FilterBar filters={filters} onChange={handleFiltersChange} sort={sort} onSortChange={setSort} />
 
       {visible.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-500">

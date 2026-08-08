@@ -8,8 +8,6 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/", label: "Aufgaben" },
-  { href: "/meine-aufgaben", label: "Meine Aufgaben" },
   { href: "/personen", label: "Personen" },
   { href: "/tags", label: "Tags" },
   { href: "/einstellungen", label: "Einstellungen" },
@@ -30,7 +28,19 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="text-xl font-extrabold tracking-tight">Hausheld</span>
           </Link>
 
-          <nav className="scrollbar-none -mx-1 flex gap-1 overflow-x-auto px-1">
+          <nav className="scrollbar-none -mx-1 flex items-center gap-2 overflow-x-auto px-1">
+            <Link
+              href="/"
+              className={cn(
+                "whitespace-nowrap rounded-full px-4 py-2 text-base font-extrabold transition",
+                pathname === "/"
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
+              )}
+            >
+              Aufgaben
+            </Link>
+
             {NAV.map((item) => {
               const active = pathname === item.href;
               return (

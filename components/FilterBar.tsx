@@ -63,13 +63,11 @@ export function FilterBar({
   onChange,
   sort,
   onSortChange,
-  showPersonFilter = true,
 }: {
   filters: Filters;
   onChange: (filters: Filters) => void;
   sort: SortKey;
   onSortChange: (sort: SortKey) => void;
-  showPersonFilter?: boolean;
 }) {
   const { persons, tags } = useStore();
   const [showAllTags, setShowAllTags] = useState(false);
@@ -157,29 +155,27 @@ export function FilterBar({
         ))}
       </Section>
 
-      {showPersonFilter && (
-        <Section label="Person">
-          {persons.map((person) => (
-            <FilterChip
-              key={person.id}
-              active={filters.personIds.includes(person.id)}
-              onClick={() =>
-                onChange({ ...filters, personIds: toggleValue(filters.personIds, person.id) })
-              }
-            >
-              {person.name}
-            </FilterChip>
-          ))}
+      <Section label="Person">
+        {persons.map((person) => (
           <FilterChip
-            active={filters.personIds.includes(UNASSIGNED)}
+            key={person.id}
+            active={filters.personIds.includes(person.id)}
             onClick={() =>
-              onChange({ ...filters, personIds: toggleValue(filters.personIds, UNASSIGNED) })
+              onChange({ ...filters, personIds: toggleValue(filters.personIds, person.id) })
             }
           >
-            Nicht zugewiesen
+            {person.name}
           </FilterChip>
-        </Section>
-      )}
+        ))}
+        <FilterChip
+          active={filters.personIds.includes(UNASSIGNED)}
+          onClick={() =>
+            onChange({ ...filters, personIds: toggleValue(filters.personIds, UNASSIGNED) })
+          }
+        >
+          Nicht zugewiesen
+        </FilterChip>
+      </Section>
 
       <div className="space-y-2">
         <div className={cn("space-y-2 overflow-hidden", !showAllTags && "max-h-24")}>

@@ -31,8 +31,7 @@ und keine API-Routen** – alle Seiten sind statisch, die gesamte Logik läuft i
 
 ```
 app/                    Seiten (alle "use client")
-  page.tsx              Alle Aufgaben (Liste + Board)
-  meine-aufgaben/       Aufgaben pro Person
+  page.tsx              Alle Aufgaben (Liste + Board), Personen-Filter lokal gemerkt
   personen/             Personenverwaltung
   tags/                 Tagverwaltung inkl. Löschwarnung
   einstellungen/        Statistik, Beispieldaten, Reset

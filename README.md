@@ -37,7 +37,7 @@ Danach http://localhost:3000 öffnen. Unter **Einstellungen → Beispieldaten la
 - Aufgaben mit Titel, Beschreibung, Fälligkeitsdatum, Priorität und Status
 - Mehrere Fotos pro Aufgabe (max. 10, je max. 10 MB), jederzeit ergänz- und entfernbar; beim
   Upload automatisch verkleinert und komprimiert
-- Zuweisung an keine, eine oder mehrere Personen; Ansicht „Meine Aufgaben“ pro Person
+- Zuweisung an keine, eine oder mehrere Personen; Personen-Filter wird lokal gemerkt
 - Globale Tags mit 31 vordefinierten Einträgen, frei erweiterbar, mit Warnung beim Löschen
   verwendeter Tags
 - Filter nach Status, Priorität, Person und Tag (innerhalb einer Kategorie ODER, zwischen
