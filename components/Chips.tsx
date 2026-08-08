@@ -1,0 +1,122 @@
+"use client";
+
+import { PRIORITY_STYLE, STATUS_STYLE, TAG_CATEGORY_STYLE } from "@/lib/theme";
+import {
+  PRIORITY_LABEL,
+  STATUS_LABEL,
+  type Person,
+  type Priority,
+  type Status,
+  type Tag,
+} from "@/lib/types";
+import { cn, initials, personColor } from "@/lib/utils";
+
+export function TagChip({
+  tag,
+  onRemove,
+  className,
+}: {
+  tag: Tag;
+  onRemove?: () => void;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
+        TAG_CATEGORY_STYLE[tag.category].chip,
+        className,
+      )}
+    >
+      {tag.name}
+      {onRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          className="-mr-1 rounded-full px-1 leading-none opacity-60 transition hover:opacity-100"
+          aria-label={`Tag ${tag.name} entfernen`}
+        >
+          ×
+        </button>
+      )}
+    </span>
+  );
+}
+
+export function PriorityPill({ priority }: { priority: Priority }) {
+  const style = PRIORITY_STYLE[priority];
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+        style.pill,
+      )}
+    >
+      <span className={cn("size-1.5 rounded-full", style.dot)} />
+      {PRIORITY_LABEL[priority]}
+    </span>
+  );
+}
+
+export function StatusBadge({ status }: { status: Status }) {
+  const style = STATUS_STYLE[status];
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
+        style.badge,
+      )}
+    >
+      <span className={cn("size-1.5 rounded-full", style.dot)} />
+      {STATUS_LABEL[status]}
+    </span>
+  );
+}
+
+/**
+ * Initialen-Kreis mit stabiler Farbe pro Person. `decorative` unterdrückt den
+ * Namen für Screenreader – dafür, wenn der Name direkt daneben ohnehin
+ * sichtbar ist.
+ */
+export function PersonAvatar({
+  person,
+  size = "sm",
+  decorative = false,
+}: {
+  person: Person;
+  size?: "sm" | "md";
+  decorative?: boolean;
+}) {
+  const avatar = (
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white",
+        personColor(person.id),
+        size === "sm" ? "size-7 text-[11px]" : "size-10 text-sm",
+      )}
+      aria-hidden="true"
+    >
+      {initials(person.name)}
+    </span>
+  );
+
+  if (decorative) return avatar;
+
+  return (
+    <span className="inline-flex" title={person.name}>
+      {avatar}
+      <span className="sr-only">{person.name}</span>
+    </span>
+  );
+}
+
+export function EmptyAvatar({ label = "Nicht zugewiesen" }: { label?: string }) {
+  return (
+    <span
+      className="inline-flex size-7 items-center justify-center rounded-full border border-dashed border-slate-300 text-[11px] text-slate-400"
+      title={label}
+    >
+      –
+    </span>
+  );
+}
