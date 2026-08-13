@@ -23,19 +23,32 @@ Video-Walkthrough:	Folgt noch. Aufzeichnung mit Teams. samuel@codecrush.ch einla
 
 
 ## Entwicklungsprozess APP
-Von der Idee zum PRD
-Zu Beginn nutzte ich das LLM von Claude für die grundlegende Ideenfindung. Ich beschrieb den Kontext (Ausbildung CAS) sowie meine Aufgabe, eine App mittels Vibe Coding zu erstellen. Inspiriert von Claude's Vorschläge, entwickelte ich eine eigene Idee für eine App zur Erfassung und Verwaltung von anstehenden Haushaltsaufgaben.
-In einem zweiten Schritt liess ich mir einen ausführlichen App-Beschrieb inkl. Features und technischem Grobentwurf generieren sowie ein zugehöriges PRD-File.
-Zur Verfeinerung des PRD-Files machte ich mehrere Kontroll-/Rückfragen-/Feedback-Runden mit Claude und zusätzliche mit ChatGPT, bis ich schliesslich das finale PRD-File hatte (siehe Link).
 
-Vom PRD zur App
-App gemäss Workflow von Claude Code erstellen lassen und ausführlich getestet. Alle Funktionen ausprobiert.
-Erste Feedbackrunde mit Rückmeldungen zu Farbgebung Tags, Foto-Handling und Lesbarkeit Text. Änderungen tiptop umgesetzt.
-Zweite Feedbackrunde zum Hauptproblem: Datenbank lokal, also Datenbestand pro Browser/Gerät und nicht zwischen Haushaltmitgliedern geteilt. Als Endnutzer gedacht und Claude konkret mein Problem beschrieben. In Absprache mit Samuel lassen wir es bei der bereits installierten Möglichkeit, Beispieldaten zu generieren.
-Weitere Feedbackrunden mit Detailarbeiten an Gestaltung, Bedienung und Struktur.
+**Meilensteine**
 
-Zum Abschluss in neuem Chat: Security-Checkliste
-Viele Iterationen inkl. Screenshots nötig, damit die Liste bestmöglich ausgefüllt werden kann (von Claude). Betraf vor allem GitHub und Vercel.
+Nach dem finalen PRD liess ich die App in einer ersten Session vollständig mit Claude Code umsetzen: Next.js 15 (App Router), React 19, Tailwind CSS v4, TypeScript. Dabei wich Claude bewusst vom PRD ab, das ein Backend mit Node.js/Express und der Datenbank lowdb vorsah – da die App auf Vercel (serverless, read-only Dateisystem) deployt werden sollte, wurde die Persistenz clientseitig über IndexedDB umgesetzt. Konsequenz, die von Anfang an transparent kommuniziert wurde: Der Datenbestand liegt pro Browser/Gerät, nicht geräteübergreifend geteilt. Alle PRD-Kernfunktionen (Aufgaben, Fotos, Personen, Tags, Filter, Löschbestätigung) wurden anschliessend im Browser end-to-end durchgetestet, inkl. Build/Lint/Typecheck.
+
+In einer späteren, grösseren Session wurde die App auf SEO/AEO/GEO geprüft und auf Wunsch zusätzlich vollständig zweisprachig gemacht (DE/EN). Umgesetzt wurden u. a. robots.ts, sitemap.ts (mit hreflang-Alternates), ein Web App Manifest, JSON-LD (SoftwareApplication) pro Sprache, dynamische Open-Graph-/Apple-Touch-Icons sowie llms.txt für generative Suchmaschinen. Für die Übersetzung entstand ein eigenes i18n-System (lib/i18n/): Deutsch bleibt ohne URL-Präfix erreichbar, Englisch liegt unter /en/…, intern per middleware.ts umgeschrieben, damit bestehende Links gültig bleiben.
+
+Zum Abschluss wurde in einer separaten Session eine vorgegebene Security-Checkliste für vibe-gecodete Apps durchgearbeitet (siehe eigener Abschnitt weiter unten im Dokument). Ergebnis: keine Secrets im Code, kein Server-/API-Code, der klassische Angriffsflächen böte; im Gespräch wurden zusätzlich GitHub-Repo-Einstellungen (Secret Scanning, Push Protection, Dependabot, Branch Protection) und die Vercel-Konfiguration (Deployment Protection, Environment Variables) gemeinsam geprüft und gehärtet.
+
+**Wichtige Anpassungen**
+
+Über mehrere Feedbackrunden hinweg wurden u. a. folgende Änderungen umgesetzt:
+- Tag-Farben im Dialog „Neue Aufgabe" an die Kategorie-Farben aus der Tag-Verwaltung angeglichen (vorher nur einheitliches Grau).
+- Fotos in der Aufgabenübersicht (Liste und Board) anklickbar/vergrösserbar gemacht (Modal), analog zur bereits bestehenden Ansicht im Bearbeiten-Dialog.
+- Ein abgeschnittenes Filter-Label („Aussenbereich") behoben: Ursache war eine feste Breite kombiniert mit overflow-hidden des Einklapp-Containers; das Label steht seither auf einer eigenen Zeile.
+- Beispieldaten von 3 Personen/8 Aufgaben auf 6 Personen/14 Aufgaben erweitert und um thematisch passende Symbolbilder ergänzt: Diese werden beim Laden der Beispieldaten über die kostenlose, keyless Openverse-API gesucht, mit automatischem Fallback auf ein generiertes Farb-Platzhalterbild, falls kein Internet verfügbar ist oder die Suche nichts liefert.
+- Die Seite „Meine Aufgaben" wurde nach kurzer Rückfrage entfernt (redundant zum Personen-Filter auf der Aufgaben-Seite); stattdessen merkt sich die Aufgaben-Seite die zuletzt gewählte Person jetzt selbst lokal im Browser. Die Navigation wurde gleichzeitig so angepasst, dass „Aufgaben" optisch präsenter ist als „Personen", „Tags" und „Einstellungen".
+- Texte auf der Einstellungen-Seite mehrfach gekürzt bzw. entfernt (u. a. der ganze Abschnitt „Speicherort" inkl. Speicherplatzanzeige), um die Seite schlanker zu halten.
+- Das README wurde zwischendurch für Endnutzer:innen der App deutlich gekürzt (separat von diesem Kursdokumentations-Abschnitt).
+
+**Bugfixes**
+
+- Performance/Robustheit bei den Beispieldaten: Der erste Versuch, alle Symbolbilder gleichzeitig von Openverse zu laden, schlug in der Praxis grösstenteils fehl (zu viele parallele Verbindungen). Fix: Downloads auf maximal 3 gleichzeitige Anfragen begrenzt – dadurch zuverlässig und sogar schneller als der ursprüngliche Ansatz.
+- Tags wurden beim Sprachwechsel nicht übersetzt: Ursache war, dass Next.js beim Sprachwechsel die Client-Komponenten neu mountet, wodurch ein zur Erkennung genutzter useRef jedes Mal zurückgesetzt wurde. Fix: Die zuletzt aktive Sprache wird seither in IndexedDB gespeichert (meta.lastLocale) statt im React-State, wodurch die Übersetzung der 31 vordefinierten Tags zuverlässig bei jedem Sprachwechsel greift.
+- Folgebug, entdeckt nach dem ersten Fix: Nach „Alle Daten löschen" wurde auch der lastLocale-Marker gelöscht, wodurch der nächste Sprachwechsel die Tags nicht mehr übersetzte (erst der übernächste Wechsel „reparierte" es wieder) – reproduziert sowohl im Dev- als auch im Produktions-Build. Fix: resetEverything() setzt den Marker nach dem Neu-Seeding jetzt explizit wieder.
+- Geprüft, aber bewusst nicht umgesetzt: eine echte automatische Übersetzung von frei eingegebenen Aufgaben-Titeln/-Beschreibungen. Recherchiert wurden die neue, rein lokale „Built-in Translator API" von Chrome/Edge (nur Desktop-Chrome/Edge) sowie externe Dienste wie MyMemory und LibreTranslate. Verworfen, weil externe Dienste Aufgabendaten an Dritte senden würden – ein Widerspruch zum Kernprinzip „alle Daten bleiben lokal im Browser". Als bekannte Einschränkung im README dokumentiert.
 
 ## Entwicklungsprozess SITE
 Mittels simplem Prompt, Verlinkung zur App und einigen technischen Angaben habe ich mir eine erste Fassung der Marketing-Seite erstellen lassen. Design und beschriebene Funktionen stimmen mit der App überein.
@@ -422,7 +435,5 @@ App ohne Server, ohne Datenbank, ohne Auth, ohne Secrets) strukturell nicht anwe
 
 
 ## Notes Sandro
-KOMMENTARE / WICHITGE AUSSAGEN CLAUDE
-Persistenz weicht ab (wie eingangs erklärt): statt Express + lowdb + Dateisystem liegt alles clientseitig in IndexedDB. Auf Vercel ginge die PRD-Variante nicht — Uploads und JSON-Datei wären nach jedem Request weg. Konsequenz: Der Datenbestand ist pro Browser/Gerät, nicht zwischen Haushaltsmitgliedern geteilt. In CLAUDE.md ist dokumentiert, wie lib/db.ts gegen eine echte DB getauscht wird, ohne die Store-Schnittstelle anzufassen.
-
-LÖSUNG: EINBAU TESTDATEN GENERIEREN.
+Noch bestehende Bugs: Symbolbilder bei Beispieldaten unpassend.
+Bereits für Ideenfindung Claude benutzt.
