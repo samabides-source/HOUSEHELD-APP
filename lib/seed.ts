@@ -1,98 +1,122 @@
-import { STORE, getOne, putMany, putValue } from "./db";
+import { STORE, getAll, getOne, putMany, putValue } from "./db";
 import type { Locale } from "./i18n/config";
 import type { Tag, TagCategory } from "./types";
-import { newId, nowIso } from "./utils";
+import { newId, normalizeTagName, nowIso } from "./utils";
 
 /**
- * Vordefinierte Tags gemäss PRD 5.4 (32 Stück), je Sprache. Nach dem Seeding
- * sind sie ganz normale Tags – sie können umbenannt und gelöscht werden und
- * haben keine Sonderrechte. Welche Sprachversion angelegt wird, hängt davon
- * ab, in welcher Sprache die App beim ersten Start geöffnet wurde; einmal
- * gespeicherte Tag-Namen werden bei einem späteren Sprachwechsel nicht
- * nachträglich übersetzt (sie sind ab dann normale Nutzdaten).
+ * Vordefinierte Tags gemäss PRD 5.4 (31 Stück), als eine Liste mit beiden
+ * Sprachvarianten pro Eintrag. Das ist die einzige Quelle für `PREDEFINED_TAGS`
+ * (Seeding) UND für `translateKnownTagName()` (Übersetzung beim Sprachwechsel,
+ * siehe `lib/store.tsx`): Ein vordefinierter Tag lässt sich anhand seines
+ * Namens in jeder Sprache eindeutig demselben Eintrag zuordnen und damit in
+ * die jeweils andere Sprache übersetzen. Nach dem Seeding sind es ganz normale
+ * Tags – sie können umbenannt und gelöscht werden und haben keine
+ * Sonderrechte; werden sie umbenannt, hört die automatische Übersetzung für
+ * diesen Tag auf (der neue Name ist kein bekannter vordefinierter Name mehr).
  */
+type SeedTagEntry = { category: TagCategory; de: string; en: string };
+
+const PREDEFINED_TAG_ENTRIES: SeedTagEntry[] = [
+  { category: "raum", de: "Küche", en: "Kitchen" },
+  { category: "raum", de: "Wohnzimmer", en: "Living Room" },
+  { category: "raum", de: "Schlafzimmer", en: "Bedroom" },
+  { category: "raum", de: "Bad EG", en: "Bathroom (Ground Floor)" },
+  { category: "raum", de: "Bad OG", en: "Bathroom (Upper Floor)" },
+  { category: "raum", de: "Kinderzimmer 1", en: "Kids' Room 1" },
+  { category: "raum", de: "Kinderzimmer 2", en: "Kids' Room 2" },
+  { category: "raum", de: "Büro", en: "Home Office" },
+  { category: "raum", de: "Keller", en: "Basement" },
+  { category: "raum", de: "Garage", en: "Garage" },
+  { category: "raum", de: "Reduit", en: "Utility Room" },
+
+  { category: "aussen", de: "Garten", en: "Garden" },
+  { category: "aussen", de: "Terrasse", en: "Patio" },
+  { category: "aussen", de: "Balkon OG", en: "Balcony (Upper Floor)" },
+
+  { category: "typ", de: "Reparatur", en: "Repair" },
+  { category: "typ", de: "Reinigung", en: "Cleaning" },
+  { category: "typ", de: "Einkauf", en: "Shopping" },
+  { category: "typ", de: "Wartung", en: "Maintenance" },
+  { category: "typ", de: "Entsorgung", en: "Disposal" },
+  { category: "typ", de: "Organisation", en: "Organizing" },
+  { category: "typ", de: "Pflanzenpflege", en: "Plant Care" },
+  { category: "typ", de: "Wäsche", en: "Laundry" },
+  { category: "typ", de: "Möbel", en: "Furniture" },
+
+  { category: "technik", de: "Elektro", en: "Electrical" },
+  { category: "technik", de: "Sanitär/Wasser", en: "Plumbing/Water" },
+  { category: "technik", de: "Heizung", en: "Heating" },
+  { category: "technik", de: "Geräte/Elektronik", en: "Appliances/Electronics" },
+
+  { category: "sonstiges", de: "Termine/Verwaltung", en: "Appointments/Admin" },
+  { category: "sonstiges", de: "Kinder", en: "Kids" },
+  { category: "sonstiges", de: "Tiere", en: "Pets" },
+  { category: "sonstiges", de: "Sonstiges", en: "Other" },
+];
+
 type SeedTag = { name: string; category: TagCategory };
 
-const PREDEFINED_TAGS_DE: SeedTag[] = [
-  { name: "Küche", category: "raum" },
-  { name: "Wohnzimmer", category: "raum" },
-  { name: "Schlafzimmer", category: "raum" },
-  { name: "Bad EG", category: "raum" },
-  { name: "Bad OG", category: "raum" },
-  { name: "Kinderzimmer 1", category: "raum" },
-  { name: "Kinderzimmer 2", category: "raum" },
-  { name: "Büro", category: "raum" },
-  { name: "Keller", category: "raum" },
-  { name: "Garage", category: "raum" },
-  { name: "Reduit", category: "raum" },
-
-  { name: "Garten", category: "aussen" },
-  { name: "Terrasse", category: "aussen" },
-  { name: "Balkon OG", category: "aussen" },
-
-  { name: "Reparatur", category: "typ" },
-  { name: "Reinigung", category: "typ" },
-  { name: "Einkauf", category: "typ" },
-  { name: "Wartung", category: "typ" },
-  { name: "Entsorgung", category: "typ" },
-  { name: "Organisation", category: "typ" },
-  { name: "Pflanzenpflege", category: "typ" },
-  { name: "Wäsche", category: "typ" },
-  { name: "Möbel", category: "typ" },
-
-  { name: "Elektro", category: "technik" },
-  { name: "Sanitär/Wasser", category: "technik" },
-  { name: "Heizung", category: "technik" },
-  { name: "Geräte/Elektronik", category: "technik" },
-
-  { name: "Termine/Verwaltung", category: "sonstiges" },
-  { name: "Kinder", category: "sonstiges" },
-  { name: "Tiere", category: "sonstiges" },
-  { name: "Sonstiges", category: "sonstiges" },
-];
-
-const PREDEFINED_TAGS_EN: SeedTag[] = [
-  { name: "Kitchen", category: "raum" },
-  { name: "Living Room", category: "raum" },
-  { name: "Bedroom", category: "raum" },
-  { name: "Bathroom (Ground Floor)", category: "raum" },
-  { name: "Bathroom (Upper Floor)", category: "raum" },
-  { name: "Kids' Room 1", category: "raum" },
-  { name: "Kids' Room 2", category: "raum" },
-  { name: "Home Office", category: "raum" },
-  { name: "Basement", category: "raum" },
-  { name: "Garage", category: "raum" },
-  { name: "Utility Room", category: "raum" },
-
-  { name: "Garden", category: "aussen" },
-  { name: "Patio", category: "aussen" },
-  { name: "Balcony (Upper Floor)", category: "aussen" },
-
-  { name: "Repair", category: "typ" },
-  { name: "Cleaning", category: "typ" },
-  { name: "Shopping", category: "typ" },
-  { name: "Maintenance", category: "typ" },
-  { name: "Disposal", category: "typ" },
-  { name: "Organizing", category: "typ" },
-  { name: "Plant Care", category: "typ" },
-  { name: "Laundry", category: "typ" },
-  { name: "Furniture", category: "typ" },
-
-  { name: "Electrical", category: "technik" },
-  { name: "Plumbing/Water", category: "technik" },
-  { name: "Heating", category: "technik" },
-  { name: "Appliances/Electronics", category: "technik" },
-
-  { name: "Appointments/Admin", category: "sonstiges" },
-  { name: "Kids", category: "sonstiges" },
-  { name: "Pets", category: "sonstiges" },
-  { name: "Other", category: "sonstiges" },
-];
-
 export const PREDEFINED_TAGS: Record<Locale, SeedTag[]> = {
-  de: PREDEFINED_TAGS_DE,
-  en: PREDEFINED_TAGS_EN,
+  de: PREDEFINED_TAG_ENTRIES.map((entry) => ({ name: entry.de, category: entry.category })),
+  en: PREDEFINED_TAG_ENTRIES.map((entry) => ({ name: entry.en, category: entry.category })),
 };
+
+const TRANSLATION_LOOKUP = new Map<string, SeedTagEntry>();
+for (const entry of PREDEFINED_TAG_ENTRIES) {
+  TRANSLATION_LOOKUP.set(normalizeTagName(entry.de), entry);
+  TRANSLATION_LOOKUP.set(normalizeTagName(entry.en), entry);
+}
+
+/**
+ * Übersetzt einen Tag-Namen in die Zielsprache, sofern er (noch) exakt einem
+ * vordefinierten Tag entspricht – unabhängig davon, in welcher der beiden
+ * Sprachen er aktuell vorliegt. Gibt `null` zurück, wenn der Name nicht
+ * bekannt ist (z. B. ein selbst erstellter Tag) oder bereits in der
+ * Zielsprache vorliegt – dann bleibt der Name unverändert.
+ */
+export function translateKnownTagName(name: string, targetLocale: Locale): string | null {
+  const entry = TRANSLATION_LOOKUP.get(normalizeTagName(name));
+  if (!entry) return null;
+  const translated = entry[targetLocale];
+  return translated === name ? null : translated;
+}
+
+const LAST_LOCALE_KEY = "lastLocale";
+
+/**
+ * Übersetzt beim Sprachwechsel alle vorhandenen Tags, die (noch) exakt einem
+ * vordefinierten Tag-Namen entsprechen (z. B. „Küche“ → „Kitchen“), damit sie
+ * in Filtern/Board weiterhin korrekt einsortiert werden. Selbst erstellte Tags
+ * sowie Aufgaben-Titel/-Beschreibungen lassen sich ohne externen
+ * Übersetzungsdienst nicht automatisch übersetzen und bleiben unverändert.
+ *
+ * Die zuletzt aktive Sprache wird in `meta` gemerkt (nicht im React-State),
+ * damit die Erkennung auch über volle Seitenaufrufe/Bookmarks hinweg
+ * funktioniert – Next.js kann den Client-Zustand des Locale-Layouts beim
+ * Sprachwechsel neu mounten, ein React-`useRef` würde diesen Wechsel also
+ * nicht zuverlässig erkennen.
+ */
+export async function reconcileTagLanguage(locale: Locale): Promise<void> {
+  const lastLocale = await getOne<Locale>(STORE.meta, LAST_LOCALE_KEY);
+
+  if (lastLocale === undefined) {
+    await putValue(STORE.meta, locale, LAST_LOCALE_KEY);
+    return;
+  }
+  if (lastLocale === locale) return;
+
+  const tags = await getAll<Tag>(STORE.tags);
+  for (const tag of tags) {
+    const translated = translateKnownTagName(tag.name, locale);
+    if (!translated) continue;
+    const collision = tags.some(
+      (other) => other.id !== tag.id && normalizeTagName(other.name) === normalizeTagName(translated),
+    );
+    if (!collision) await putValue(STORE.tags, { ...tag, name: translated });
+  }
+
+  await putValue(STORE.meta, locale, LAST_LOCALE_KEY);
+}
 
 const SEED_KEY = "seedVersion";
 const SEED_VERSION = 1;

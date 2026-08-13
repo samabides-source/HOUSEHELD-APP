@@ -24,7 +24,7 @@ import {
 import { useLocale, useT } from "./i18n/context";
 import { releaseAllPhotoUrls, releasePhotoUrl } from "./photo-url";
 import { processImageFile, isAcceptedFile } from "./photos";
-import { seedIfNeeded } from "./seed";
+import { reconcileTagLanguage, seedIfNeeded } from "./seed";
 import {
   MAX_PHOTOS_PER_TASK,
   type Person,
@@ -96,6 +96,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         await seedIfNeeded(locale);
+        await reconcileTagLanguage(locale);
         await refresh();
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : t.errors.dbOpenFailed);

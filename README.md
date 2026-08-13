@@ -42,6 +42,8 @@ Mittels simplem Prompt, Verlinkung zur App und einigen technischen Angaben habe 
 Danach mehrere Iterationen hinsichtlich Details in Design und Wording.
 Im Anschluss die Site auf SEO/AEO/GEO-Kriterien geprüft und eine englische Sprachversion hinzugefügt. Claude hat sehr viele Änderungen vorgeschlagen, die aber nach meiner Einschätzung alle im Hintergrund stattfanden.
 
+**Bekannte Einschränkung der englischen Sprachversion:** Beim Umschalten zwischen Deutsch und Englisch werden nur die 31 vordefinierten Tags automatisch mitübersetzt (feste DE/EN-Zuordnung hinterlegt). Selbst erstellte Tags sowie Aufgaben-Titel und -Beschreibungen bleiben in der Sprache stehen, in der sie ursprünglich erfasst wurden. Eine echte automatische Übersetzung von Freitext wurde geprüft (u. a. die neue, rein lokale "Built-in Translator API" von Chrome/Edge sowie externe Dienste wie MyMemory und LibreTranslate), bewusst aber nicht eingebaut: Die externen Dienste würden Aufgabendaten an einen Drittanbieter senden und damit dem Kernprinzip der App widersprechen, dass sämtliche Daten ausschliesslich lokal im Browser bleiben; die browserseitige Variante wiederum funktioniert nur in Chrome/Edge auf dem Desktop.
+
 ## Reflexion
 Schon vor dem Deploy ein Problemhinweis bzgl. Datenbank erhalten: Es liegt alles clientseitig in IndexedDB.D er Datenbestand ist pro Browser/Gerät, nicht zwischen Haushaltsmitgliedern geteilt.
 Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sachen abcheckt, also mein Update im Readme. Denkt Fallback-Varianten mit (z.B. kein Internet, Datenbank lokal)

@@ -74,11 +74,22 @@ lib/
   `useT()` (liefert das Dictionary der aktuellen Sprache) bzw. `useLocale()`.
 - `personen/`, `tags/`, `einstellungen/` haben je ein schlankes Server-`layout.tsx` nur für
   `generateMetadata()` (Title/Description/hreflang) – die eigentliche Seite bleibt Client-Code.
-- **Seed-Tags und Beispieldaten sind sprachabhängig, aber nicht rückwirkend übersetzbar**: Welche
-  Sprachversion beim ersten Start angelegt wird, hängt von der zu dem Zeitpunkt aktiven Sprache ab
-  (`lib/seed.ts`, `lib/demo-data.ts`). Einmal gespeicherte Tag-/Aufgabennamen sind danach normale
-  Nutzdaten wie jeder andere Text auch und werden bei einem Sprachwechsel nicht übersetzt – die App
-  hat nur **eine** IndexedDB pro Browser, nicht eine pro Sprache.
+- **Seed-Tags und Beispieldaten sind sprachabhängig** (`lib/seed.ts`, `lib/demo-data.ts`). Welche
+  Sprachversion beim ersten Start bzw. beim Laden der Beispieldaten angelegt wird, hängt von der zu
+  dem Zeitpunkt aktiven Sprache ab – die App hat nur **eine** IndexedDB pro Browser, nicht eine pro
+  Sprache.
+- **Vordefinierte Tags werden beim Sprachwechsel automatisch mitübersetzt**
+  (`translateKnownTagName()`/`reconcileTagLanguage()` in `lib/seed.ts`, aufgerufen aus
+  `lib/store.tsx`): Jeder der 31 vordefinierten Tags ist in `PREDEFINED_TAG_ENTRIES` als
+  DE/EN-Paar hinterlegt; stimmt ein gespeicherter Tag-Name exakt mit einer der beiden Varianten
+  überein, wird er beim nächsten Start in die dann aktive Sprache umbenannt (gleiche ID, gleiche
+  Zuordnung zu Aufgaben – nur der Name ändert sich). Die zuletzt aktive Sprache steht dafür in
+  `meta.lastLocale`, **nicht** im React-State: Next.js mountet die Client-Komponenten des
+  Locale-Layouts bei einem Sprachwechsel neu, ein `useRef`/`useState` würde die vorherige Sprache
+  also verlieren.
+  **Nicht** automatisch übersetzt werden selbst angelegte Tags sowie Aufgaben-Titel/-Beschreibungen
+  – das sind Freitext-Nutzdaten, die sich ohne einen externen Übersetzungsdienst (Netzwerkaufruf,
+  Widerspruch zum lokalen/privaten Charakter der App) nicht automatisch übersetzen lassen.
 - Neue UI-Texte: Key zuerst in `de` (lib/i18n/dictionaries.ts) ergänzen, TypeScript zeigt dank
   `const en: typeof de = {…}` sofort, wo `en` nachgezogen werden muss.
 
