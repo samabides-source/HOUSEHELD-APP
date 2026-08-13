@@ -1,13 +1,12 @@
 # Dokumentation "HOUSEHELD"
 CAS AIMP - Viben und Coden / FS26
 Sandro Müntener / 08. August 2026
-https://github.com/samabides-source
 
 
 ### App-Beschrieb:
 Hausheld ist ein Haushaltsaufgaben-Tracker für Familien/WGs. Aufgaben können mit mehreren Fotos dokumentiert, Personen zugewiesen und mit Tags kategorisiert werden.
 ### Zielgruppe:
-Familien oder WGs, die anfallende Haushaltsaufgaben gemeinsam erfassen und verteilen wollen
+Familien oder WGs, die anfallende Haushaltsaufgaben gemeinsam erfassen und verteilen wollen.
 ### Problem:
 Haushaltsaufgaben werden mündlich oder in Chats verteilt und gehen dabei unter. Es fehlt ein zentraler, einfacher Ort, um zu sehen, was zu tun ist, wo genau und wer zuständig ist.
 ### Lösung:
@@ -15,9 +14,11 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 
 ## Links
 App: 			househeld-app.vercel.app
+
 Hinweis: Die App speichert alle Daten nur lokal im jeweiligen Browser. Damit du nicht mit einer leeren App startest: Oben auf „Einstellungen" klicken und „Beispieldaten laden" drücken – dann sind Aufgaben, Personen und Fotos zum Ausprobieren da.
 
 Marketing-Seite: 	househeld-page.vercel.app
+
 Video-Walkthrough:	Foglt noch. Aufzeichnung mit Teams. samuel@codecrush.ch einladen.
 
 
@@ -46,12 +47,375 @@ Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sach
 ## Beispielprompt
 folgt noch
 
-## SPEC-/PRD-FILE
-folgt noch
+# PRD: Hausheld – Haushaltsaufgaben-Tracker
 
-## Security-Checkliste:
-Checkliste verstehen und mit Claude durchgehen. Neues Chat-Fenster innerhalb derselben Session (mit Link zu Repository) und Check-Liste hochladen. Allfällige Sicherheitslücken sollen erkannt, müssen aber nicht gefixt werden.
-folgt noch
+## 1. Übersicht
+
+**Projektname:** Hausheld
+**Zweck:** Übungsprojekt (Vibe Coding), lokal hostbar, keine Veröffentlichung, keine AI-Tools
+**Zielgruppe:** Familien oder WGs, die anfallende Haushaltsaufgaben gemeinsam erfassen und verteilen wollen
+
+**Problem:** Haushaltsaufgaben werden mündlich oder in Chats verteilt und gehen dabei unter. Es fehlt ein zentraler, einfacher Ort, um zu sehen, was zu tun ist, wo genau und wer zuständig ist.
+
+**Lösung:** Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und übersichtlich dargestellt werden.
+
+## 2. Ziele
+
+- Zentrale, übersichtliche Erfassung aller Haushaltsaufgaben
+- Klare Zuständigkeiten durch Personenzuweisung
+- Schnelles Wiederfinden von Aufgaben durch Tags/Filter
+- Visuelle Klarheit durch Fotos der betroffenen Stelle
+
+## 3. Nicht-Ziele (Out of Scope)
+
+- Kein Login-/Auth-System (Personen sind vordefinierte Namen, kein Passwortschutz)
+- Keine externe Bereitstellung/Deployment im Internet
+- Keine KI-Funktionen (z. B. keine automatische Aufgabenerkennung aus Fotos)
+- Keine Push-Benachrichtigungen oder externe Dienste
+- Keine Mehrsprachigkeit (nur Deutsch)
+- Kein Vorher-/Nachher-Foto-Feature
+
+## 4. Nutzer & Rollen
+
+- **Haushaltsmitglied**: kann Aufgaben erstellen, bearbeiten, sich selbst oder andere zuweisen, Status ändern
+- Es gibt keine unterschiedlichen Berechtigungsstufen – alle Mitglieder haben dieselben Rechte
+- Personen können angelegt, umbenannt und gelöscht werden
+- **Wird eine Person gelöscht**, werden ihre Zuweisungen entfernt; die Aufgaben selbst bleiben bestehen und sind anschliessend "nicht zugewiesen"
+
+## 5. Kern-Features
+
+### 5.1 Aufgaben erfassen
+- Titel (Pflichtfeld)
+- Beschreibung (optional)
+- Erstelldatum (automatisch)
+- Fälligkeitsdatum (optional)
+- Priorität: niedrig / mittel / dringend
+- Status: offen / in Arbeit / erledigt
+- Status kann jederzeit manuell geändert werden, auch von "erledigt" zurück auf "offen" oder "in Arbeit"
+- Überfällige Aufgaben behalten ihren normalen Status; eine spezielle visuelle Kennzeichnung ist nicht Teil des ersten Wurfs
+- Eine Aufgabe kann **ohne zugewiesene Person** angelegt werden
+
+### 5.2 Foto-Anhang
+- **Mehrere Fotos pro Aufgabe** können hochgeladen werden (z. B. Fotos der betroffenen Stelle)
+- Fotos sind **jederzeit austauschbar, entfernbar oder neu hochladbar** (nicht nur beim Anlegen)
+- Foto-Upload ist beim Anlegen einer Aufgabe **optional**
+- Fotos werden lokal im Dateisystem gespeichert und als eigene Einträge mit Referenz zur Aufgabe verwaltet
+- Unterstützte Bildformate: JPG/JPEG, PNG, WebP und HEIC
+- Maximal 10 Fotos pro Aufgabe und 10 MB pro Foto
+- Fotos werden beim Upload auf eine sinnvolle maximale Auflösung reduziert und komprimiert
+- Beim Entfernen eines Fotos werden Referenz und physische Datei gelöscht
+- Beim Löschen einer Aufgabe werden sämtliche zugehörigen Fotodateien und Referenzen gelöscht
+- Fehlt eine referenzierte Fotodatei, bleibt die Aufgabe nutzbar; das fehlende Foto wird als nicht verfügbar behandelt und kann entfernt werden
+
+### 5.3 Personenzuweisung
+- Liste von Haushaltsmitgliedern kann verwaltet werden (anlegen, umbenennen, löschen)
+- Eine Aufgabe kann keiner, einer oder mehreren Personen zugewiesen werden
+- Jede Person besitzt eine eindeutige interne ID; der Name ist nur die Anzeige
+- Eine Aufgabe kann jederzeit vollständig von allen Personen entkoppelt werden
+- Ansicht "Meine Aufgaben" pro Person; eine Aufgabe mit mehreren Zuweisungen erscheint bei jeder zugewiesenen Person
+- Die Auswahl der Person für "Meine Aufgaben" wird lokal im Browser gespeichert
+
+### 5.4 Tags/Kategorien
+- Tags sind global für die lokale Installation und frei definierbar bzw. neu erstellbar
+- Tags sind eindeutig; Gross-/Kleinschreibung sowie führende/abschliessende Leerzeichen werden bei der Prüfung ignoriert
+- Neue Tags können direkt in der Aufgabenmaske erstellt werden
+- Zusätzlich existiert eine vordefinierte Tag-Datenbank (siehe unten)
+- Eine Aufgabe kann mehrere Tags haben
+- **Löschen eines Tags:** Ist der Tag noch in Gebrauch, erscheint ein Warnhinweis, dass der Tag noch verwendet wird. Bestätigt der Nutzer den Löschvorgang trotzdem, wird der Tag von allen betroffenen Aufgaben entfernt
+- Vordefinierte Tags können ebenfalls gelöscht werden und unterliegen keinen Sonderrechten
+- **Hinweis:** "dringend" ist ausschliesslich eine Priorität (siehe 5.1) und **kein Tag**
+
+**Vordefinierte Tags:**
+
+| Bereich | Tags |
+|---|---|
+| Räume | Küche, Wohnzimmer, Schlafzimmer, Bad EG, Bad OG, Kinderzimmer 1, Kinderzimmer 2, Büro, Keller, Garage, Reduit |
+| Aussenbereich | Garten, Terrasse, Balkon OG |
+| Aufgabentyp | Reparatur, Reinigung, Einkauf, Wartung, Entsorgung, Organisation, Pflanzenpflege, Wäsche, Möbel |
+| Technik & Geräte | Elektro, Sanitär/Wasser, Heizung, Geräte/Elektronik |
+| Sonstiges | Termine/Verwaltung, Kinder, Tiere, Sonstiges |
+
+*(32 vordefinierte Tags total; die Liste ist nicht abschliessend, weitere Tags können frei erstellt werden.)*
+
+### 5.5 Übersicht & Filter
+- Standardansicht ist die Listenansicht; zusätzlich kann eine Board-Ansicht verwendet werden
+- Filter nach Person, Tag, Status, Priorität
+- Filter verschiedener Kategorien werden mit UND kombiniert
+- Mehrere ausgewählte Werte innerhalb einer Kategorie werden mit ODER kombiniert
+- Standardsortierung: Fälligkeitsdatum aufsteigend; Aufgaben ohne Fälligkeitsdatum anschliessend, dort nach Erstelldatum absteigend
+- Sortierung kann nach Fälligkeitsdatum oder Erstelldatum geändert werden
+
+### 5.6 Löschen von Aufgaben
+- Das Löschen einer Aufgabe muss durch einen **zweiten Klick bestätigt werden** (keine versehentlichen Löschungen)
+- Das Löschen ist endgültig; es gibt keinen Papierkorb
+
+## 6. Design-Richtung
+
+**Stil:** "Verspielt & bunt" – familienfreundlich und klar, mit eigener Farbe pro Tag-Kategorie. Zielgruppe sind die Erwachsenen im Haushalt (siehe Abschnitt 4), das Design soll deshalb zugänglich, aber nicht kindlich wirken.
+
+- **Grundfarben:** helles Grau/Weiss als Hintergrund, dunkles Grau für Text – ruhige Basis, damit die Akzentfarben nicht überladen wirken
+- **Akzentfarben pro Tag-Bereich** (konsistent als Chip-Hintergrund verwendet):
+  - Räume → Blau
+  - Aussenbereich → Grün
+  - Aufgabentyp → Amber/Orange
+  - Technik & Geräte → Violett
+  - Sonstiges → Pink
+- **Priorität:** eigenes Farbsystem, getrennt von den Tag-Farben, um Verwechslung zu vermeiden (z. B. niedrig = neutral/grau, mittel = amber, dringend = rot)
+- **Formen:** abgerundete Ecken bei Karten, Chips und Buttons – kein scharfkantiges, technisches Erscheinungsbild
+- **Fotos:** Vorschaubilder mit abgerundeten Ecken in der Aufgabenkarte; mehrere Fotos als kleine Thumbnail-Reihe
+- **Personen:** Avatar-/Initialen-Kreis pro Person, eigene Farbe unabhängig vom Tag-Farbsystem
+- **Typografie:** eine gut lesbare Sans-Serif-Schrift mit klarer Hierarchie (Titel grösser/fett, Metadaten wie Datum/Person kleiner und gedämpft)
+- **Status-Anzeige:** Board-Spalten (offen / in Arbeit / erledigt) farblich dezent, nicht mit Tag- oder Prioritätsfarben verwechselbar
+- **Grundprinzip:** Farbe trägt Bedeutung (Kategorie, Priorität, Person), nicht nur Dekoration – bei vielen Tags nicht mehr Farben einsetzen als nötig
+
+## 7. User Stories
+
+1. Als Haushaltsmitglied möchte ich eine neue Aufgabe mit Titel und Fotos erfassen, damit andere sehen, was zu tun ist und wo.
+2. Als Haushaltsmitglied möchte ich eine Aufgabe einer Person zuweisen, damit klar ist, wer zuständig ist.
+3. Als Haushaltsmitglied möchte ich eine Aufgabe auch ohne Zuweisung anlegen können, wenn noch unklar ist, wer sie übernimmt.
+4. Als Haushaltsmitglied möchte ich Aufgaben mit Tags versehen, damit ich sie später leicht wiederfinde.
+5. Als Haushaltsmitglied möchte ich alle Aufgaben mit Priorität "dringend" filtern können, um zu sehen, was zuerst erledigt werden muss.
+6. Als Haushaltsmitglied möchte ich den Status einer Aufgabe ändern (z. B. auf "erledigt"), damit der Fortschritt sichtbar ist.
+7. Als Haushaltsmitglied möchte ich eine Person auswählen und deren zugewiesene Aufgaben in einer separaten Ansicht sehen.
+8. Als Haushaltsmitglied möchte ich Fotos einer Aufgabe jederzeit austauschen oder entfernen können, damit die Dokumentation aktuell bleibt.
+9. Als Haushaltsmitglied möchte ich beim Löschen eines noch verwendeten Tags gewarnt werden, damit ich nicht versehentlich Kategorisierungen verliere.
+10. Als Haushaltsmitglied möchte ich beim Löschen einer Aufgabe eine Bestätigung sehen, damit ich nichts versehentlich lösche.
+
+## 8. Technische Rahmenbedingungen
+
+- Muss vollständig lokal hostbar sein (kein Cloud-Deployment)
+- Keine Nutzung von KI-Tools oder externen AI-APIs
+- Backend: Node.js + Express
+- Datenbank: lowdb (JSON-Datei-basiert, kostenloses npm-Paket, kein SQL); als reguläre Projekt-Abhängigkeit via `npm install lowdb` eingebunden, kein separater Installationsschritt für Endnutzer
+- Vordefinierte Tags werden beim ersten Start als Seed-Daten angelegt und danach wie normale Tags behandelt
+- Fotos werden lokal im Dateisystem gespeichert
+- Kein Auth-System notwendig
+
+## 9. Erweiterungen für später (nicht Teil des ersten Wurfs)
+
+- Wiederkehrende Aufgaben (z. B. automatisches Neuanlegen alle 2 Wochen)
+- Kommentare/Verlauf zu einer Aufgabe
+- Einfache Punkte-/Bestenliste pro Person
+- Export der Aufgabenliste als CSV/PDF
+- Visuelle Kennzeichnung überfälliger Aufgaben
+
+## 10. Erfolgskriterien (für dieses Übungsprojekt)
+
+- App läuft lokal fehlerfrei
+- Aufgaben können vollständig angelegt, bearbeitet, gefiltert und als erledigt markiert werden
+- Foto-Upload (mehrere Fotos, jederzeit änderbar) funktioniert zuverlässig
+- Zuweisung und Tags funktionieren wie beschrieben, inkl. Warnhinweis beim Löschen genutzter Tags
+- Design folgt der festgelegten Richtung "Verspielt & bunt" (Tag-Farben, Formen, Typografie gemäss Abschnitt 6)
+- Die App wird mit Testdaten durchgespielt (z. B. 5–10 Aufgaben, 2–3 Personen, mehrere Tags), um den Ablauf end-to-end zu prüfen
+
+
+# Security-Checkliste für Vibe-coded Apps — ausgefüllt für **Hausheld**
+
+Geprüft am: 2026-08-08
+Repo: `samabides-source/HOUSEHELD-APP` (main, Stand Commit `b0c51b1`)
+Stack laut `CLAUDE.md`: Next.js 15 App Router, **keine API-Routen, kein Server-Code**, keine
+Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supabase im Einsatz.
+
+> Ursprünglich hatte ich keinen Zugriff auf GitHub-Repo-Einstellungen und das Vercel-Dashboard
+> (kein `gh`-CLI, kein Vercel-Login in dieser Umgebung). Diese Punkte wurden danach gemeinsam mit
+> dem Nutzer manuell durchgegangen, der direkt im GitHub-Repo (`Settings → Advanced Security`,
+> `Settings → Branches`) und im Vercel-Dashboard nachgeschaut und dabei auch gleich Secret
+> Scanning, Push Protection, Dependabot und Branch Protection auf `main` aktiviert hat
+> (Stand 2026-08-08, alles unten entsprechend nachgetragen).
+>
+> Auftrag war ursprünglich, Probleme nur zu **identifizieren**, nicht zu beheben — die
+> GitHub-Einstellungen wurden auf Wunsch des Nutzers im Gespräch trotzdem direkt behoben. Die
+> restlichen, rein code-/dokumentationsseitigen Punkte (siehe Zusammenfassung unten) sind
+> weiterhin nur identifiziert, nicht behoben.
+
+---
+
+## Kritische Punkte
+
+### 1. Keine Secrets im Code oder Repo
+
+- [x] Repo nach `key`, `secret`, `token`, `password`, `api` durchsucht — 19 Treffer, alles
+      unkritisch (Funktions-/Variablennamen wie `isAcceptedFile`, die Openverse-API-URL). **Kein
+      einziger `process.env`-Zugriff im gesamten Code** — die App braucht strukturell keine Secrets.
+- [x] Keine `.env`-Datei im Repo. Volltextsuche über die komplette Commit-History
+      (`git log --all -p`) nach Secret-Mustern (`sk-…`, `service_role`, `AKIA…`, `api_key=…`) —
+      keine Treffer.
+- [x] `.gitignore` enthält `.env*` (mit Ausnahme `.env.example`) — korrekt gesetzt.
+- [x] API-Keys in Vercel Env Vars statt Code — entfällt, die App verwendet gar keine API-Keys (die
+      Openverse-Bildersuche in `lib/demo-data.ts` ist laut CLAUDE.md bewusst keyless).
+- [x] **GitHub Secret Scanning / Push Protection aktiviert** — vom Nutzer im Repo unter
+      Settings → Advanced Security geprüft und eingeschaltet: Secret scanning **Enabled**,
+      Push protection **eingeschaltet** (2026-08-08).
+
+### 2. Keine Secrets im Client-Bundle
+
+- [x] Keine `NEXT_PUBLIC_`/`VITE_`/`REACT_APP_`-Variable mit Geheimnis — es gibt keine einzige
+      Umgebungsvariable im Code (bestätigt per Grep auf `process.env`, 0 Treffer).
+- [x] Supabase anon/service_role-Trennung — entfällt, kein Supabase im Stack.
+- [x] Build durchgeführt (`npm run build`) und `.next/static` nach `sk-`, `service_role`, `secret`
+      durchsucht — keine Treffer (erwartbar, da keine Secrets existieren).
+- [ ] Zusatzprüfung im Browser (Seitenquelltext auf publizierter URL) — **nicht durchgeführt**,
+      da mir keine öffentliche Deployment-URL vorlag. Nach jedem Deploy einmal manuell empfohlen.
+
+### 3. Login und Accounts nur über etablierte Mechanismen
+
+- [x] **N/A** — laut CLAUDE.md explizit nicht im Umfang ("Nicht im Umfang: Auth"). Im Code kein
+      Login-, Passwort- oder Session-Handling gefunden.
+
+### 4. Datenbank-Zugriffsregeln aktiv
+
+- [x] **N/A** — keine serverseitige Datenbank. Persistenz läuft ausschliesslich über IndexedDB im
+      Browser des jeweiligen Geräts (`lib/db.ts`), pro Gerät isoliert. Row Level Security ist auf
+      dieses Modell nicht anwendbar, da keine zentrale, mandantenfähige Datenbank existiert.
+
+### 5. Jede API-Route prüft selbst
+
+- [x] **N/A für Session/Autorisierung/CORS** — es gibt keine `app/api`-Routen und keine Server
+      Actions; alle Seiten sind `"use client"` (bestätigt durch Durchsicht von `app/`).
+- [x] File-Uploads sind begrenzt: `lib/photos.ts` erzwingt max. 10 MB/Datei
+      (`MAX_PHOTO_BYTES`) und `lib/types.ts` max. 10 Fotos/Aufgabe (`MAX_PHOTOS_PER_TASK`),
+      Typprüfung über `isAcceptedFile()`. Dateien landen nicht in einem öffentlichen Ordner,
+      sondern als Blob in IndexedDB — nicht ausführbar, nicht über eine URL erreichbar.
+
+### 6. Deployment-Schutz auf Vercel
+
+- [x] Deployment Protection aktiviert — vom Nutzer im Vercel-Dashboard geprüft: Steht auf
+      **"Standard Protection"**, das ist die von Vercel empfohlene Standardeinstellung (2026-08-08).
+- [x] Env-Variablen pro Umgebung getrennt — vom Nutzer geprüft: Unter Project Settings →
+      Environments ist die Liste **leer**, es sind keine Variablen gesetzt. Das ist der erwartete
+      Zustand, da die App laut CLAUDE.md keine Umgebungsvariablen benötigt (2026-08-08).
+- [ ] Publizierte URL im Inkognito-Fenster geprüft — nicht durchgeführt, keine URL bekannt.
+- [x] Admin-/Testseiten ohne Login erreichbar — es gibt keine Admin-Bereiche in der App; alle
+      Seiten (`/`, `/personen`, `/tags`, `/einstellungen`) sind bewusst öffentlich nutzbar
+      (kein Auth im Scope), das ist also kein Leck, sondern Design.
+
+---
+
+## Empfohlene Punkte
+
+### 7. Claude Code selbst absichern
+
+- [x] `.claude/settings.local.json` geprüft: enthält ausschliesslich Allow-Regeln für
+      `npm install/view/run` und `npx tsc` — keine Shell-Befehle mit Netzwerk-Schreibzugriff,
+      **keine Hooks** konfiguriert.
+- [x] Kein `.mcp.json` im Repo — keine MCP-Server-Anbindung im Projekt selbst hinterlegt.
+- [ ] Nutzung von `--dangerously-skip-permissions` — von hier aus nicht rückwirkend prüfbar
+      (liegt ausserhalb des Repo-Inhalts).
+
+### 8. Abhängigkeiten
+
+- [x] `package.json` geprüft: Produktions-Deps sind nur `next`, `react`, `react-dom`; Dev-Deps
+      `eslint`, `eslint-config-next`, `tailwindcss`, `@tailwindcss/postcss`, `typescript`,
+      `@types/*` — alles bekannte, plausible, weit verbreitete Pakete. Kein Slopsquatting-Verdacht.
+- [x] `package-lock.json` ist committed.
+- [ ] **`npm audit` liefert 3 High-Findings**: `sharp <0.35.0` (transitive Abhängigkeit von
+      `next`, für serverseitige Bildoptimierung) — CVE-2026-33327, CVE-2026-33328, CVE-2026-35590,
+      CVE-2026-35591 in libvips (GHSA-f88m-g3jw-g9cj). **Nur identifiziert, nicht behoben.**
+      Risiko dürfte in der Praxis gering sein, da die App laut CLAUDE.md bewusst `<img>` statt
+      `next/image` verwendet und den Next-Image-Optimizer damit nicht aktiv nutzt — `sharp` bleibt
+      aber als Dependency im Baum.
+- [x] Dependabot Alerts / Security Updates aktiviert — vom Nutzer im Repo unter Settings →
+      Advanced Security eingeschaltet (2026-08-08). Die 3 High-Findings zu `sharp` (siehe oben)
+      bleiben davon unberührt bestehen, da Dependabot keinen Fix für eine transitive
+      `next`-Abhängigkeit automatisch bereitstellen kann, solange `next` selbst keine neue
+      Version mit gepatchtem `sharp` zieht.
+
+### 9. GitHub und Repo-Hygiene
+
+- [x] Force-Push auf `main` blockiert — ursprünglich **nicht konfiguriert** ("Classic branch
+      protections have not been configured"), vom Nutzer danach eingerichtet (2026-08-08).
+- [x] Keine GitHub Actions im Repo (`.github/` existiert nicht) — Punkt zu gepinnten
+      Third-Party-Actions entfällt damit vollständig.
+- [ ] Vercel-Integration / Repo-Zugriffsumfang — vom Nutzer geprüft: Auf GitHub unter
+      Settings → Applications → Installed GitHub Apps → Vercel steht **"All repositories"**.
+      Die Vercel-App hat damit Zugriff auf **alle** Repos, nicht nur auf HOUSEHELD-APP. Kein
+      akutes Risiko, aber weiter gefasst als nötig (Prinzip der minimalen Rechte). Optional auf
+      "Only select repositories" einschränkbar. **Identifiziert, nicht behoben.**
+
+### 10. Umgang mit fremden Eingaben
+
+- [x] Kein `dangerouslySetInnerHTML`, kein `eval(`, kein `innerHTML =` im gesamten Code gefunden
+      (Volltext-Grep über `app/`, `components/`, `lib/`).
+- [x] Keine SQL-Strings — App nutzt die IndexedDB-Objekt-Store-API (`lib/db.ts`), kein SQL im
+      Einsatz, damit auch keine Injection-Fläche dieser Art.
+- [ ] Verhalten bei leerer/sehr langer/HTML-haltiger Eingabe im UI **noch nicht aktiv
+      durchgetestet**. Aus dem Code ersichtlich: Titel-Feld verlangt einen nicht-leeren,
+      getrimmten Wert (`TaskDialog.tsx:85`), React escaped alle Ausgaben automatisch (kein
+      `dangerouslySetInnerHTML` vorhanden), HTML-Injection ist damit strukturell ausgeschlossen.
+      Es gibt aber **keine Maximallänge** für Titel/Beschreibung — sehr lange Eingaben werden nicht
+      begrenzt. Auswirkung ist gering, da rein lokal (kein Server, der dadurch belastet würde),
+      aber als offener Punkt festgehalten.
+
+### 11. Kosten- und Missbrauchsschutz
+
+- [x] **Grösstenteils N/A** — kein Server, kein LLM-Aufruf, kein Mailversand. Die einzige externe
+      Anfrage ist die Openverse-Bildersuche in `lib/demo-data.ts`, keyless und laut CLAUDE.md
+      kostenlos, wird nur durch einen manuellen "Demo-Daten"-Klick ausgelöst und läuft mit
+      5-Sekunden-Timeout (`FETCH_TIMEOUT_MS`). Kein Rate-Limiting vorhanden, aber auch kein
+      Kostenrisiko, da der Aufruf clientseitig, unauthentifiziert und pro Nutzeraktion einmalig ist.
+- [x] Vercel Spend Management / Usage Alerts — vom Nutzer geprüft: nicht konfiguriert, aber
+      unkritisch, da das Projekt auf dem kostenlosen **Hobby-Plan** läuft. Spend Management ist
+      ohnehin nur ein Pro/Enterprise-Feature; auf Hobby besteht kein nutzungsbasiertes
+      Abrechnungsrisiko wie im PDF beschrieben (2026-08-08).
+- [x] Hartes Ausgabenlimit bei externen API-Anbietern — entfällt, es gibt keinen kostenpflichtigen
+      externen API-Anbieter im Stack.
+
+### 12. Security Headers
+
+- [ ] **Nicht gesetzt.** `next.config.ts` enthält nur `reactStrictMode: true`, keine
+      Headers-Konfiguration. Es existiert kein `vercel.json`. Damit fehlen aktuell CSP,
+      `X-Frame-Options`/`frame-ancestors`, `X-Content-Type-Options`, HSTS und `Referrer-Policy`.
+      **Identifiziert, nicht behoben.**
+- [ ] Gegenprüfung auf securityheaders.com — nicht durchgeführt (keine öffentliche URL Teil dieser
+      Prüfung).
+
+### 13. Betrieb
+
+- [x] Logs mit Tokens/Passwörtern — strukturell ausgeschlossen, da es keinen Server-Code gibt, der
+      überhaupt Logs mit solchen Inhalten erzeugen könnte (rein statisches Deployment).
+- [ ] Datenbank-Backup existiert und wurde zurückgespielt — **entfällt strukturell und ist bewusst
+      so gewählt**: Daten liegen nur lokal im Browser (IndexedDB), es gibt laut CLAUDE.md
+      ("Abweichung vom PRD") explizit kein zentrales Backup. Das ist kein technischer Fehler,
+      sollte den Nutzenden aber bewusst sein: Browser-Daten löschen = Datenverlust ist endgültig.
+- [ ] Notfallablauf (Key rotieren, Rollback, Datenidentifikation) dokumentiert — **nicht
+      dokumentiert**. Da keine Keys/Secrets existieren, reduziert sich ein Notfall im
+      Wesentlichen auf "Deployment auf Vercel zurückrollen".
+- [x] Personendaten: Es werden nur lokal im Browser gespeicherte Namen/Fotos verwaltet, es gibt
+      keine Übertragung an einen eigenen Server. Die einzige externe Anfrage (Openverse) sendet
+      generische Suchbegriffe, keine Personendaten. Serverstandort/Auftragsverarbeitung damit für
+      diese App nicht relevant.
+
+---
+
+## Wenn die Zeit knapp ist — die 3 wichtigsten Punkte
+
+1. **Deployment Protection auf Vercel** — ✅ bestätigt: "Standard Protection" aktiv.
+2. **Kein Secret hinter `NEXT_PUBLIC_`** — ✅ bestätigt: Es gibt im gesamten Code keine einzige
+   Umgebungsvariable, und auf Vercel sind auch keine Environment Variables gesetzt.
+3. **Autorisierung pro API-Route** — entfällt: Es existieren keine API-Routen oder Server Actions.
+
+---
+
+## Zusammenfassung: identifizierte offene Punkte (noch nicht behoben)
+
+| # | Punkt | Kategorie | Schweregrad (grob) | Status |
+|---|---|---|---|---|
+| 1 | `npm audit`: 3× High in `sharp` (transitiv über `next`, Bildoptimierung) | 8 | gering–mittel (Feature ungenutzt) | offen |
+| 2 | Keine Security-Headers (CSP, X-Frame-Options, HSTS, …) in `next.config.ts`/`vercel.json` | 12 | mittel | offen |
+| 3 | Vercel-GitHub-App hat Zugriff auf "All repositories" statt nur HOUSEHELD-APP | 9 | gering | offen |
+| 4 | Keine Maximallänge für Titel/Beschreibung von Aufgaben | 10 | gering | offen |
+| 5 | Kein dokumentierter Notfallablauf | 13 | gering | offen |
+| 6 | Kein Backup-Mechanismus für lokale Daten (bewusste Design-Entscheidung, aber Nutzer:innen sollten es wissen) | 13 | gering (bewusst) | offen (Design) |
+| ~~7~~ | ~~GitHub Secret Scanning/Push Protection~~ | 1 | — | ✅ erledigt 2026-08-08 |
+| ~~8~~ | ~~GitHub Dependabot Alerts/Security Updates~~ | 8 | — | ✅ erledigt 2026-08-08 |
+| ~~9~~ | ~~GitHub Branch Protection auf `main`~~ | 9 | — | ✅ erledigt 2026-08-08 |
+| ~~10~~ | ~~Vercel Deployment Protection~~ | 6 | — | ✅ bestätigt (Standard Protection) |
+| ~~11~~ | ~~Vercel Environment Variables~~ | 6 | — | ✅ bestätigt (leer, wie erwartet) |
+| ~~12~~ | ~~Vercel Spend Management~~ | 11 | — | ✅ unkritisch (Hobby-Plan) |
+
+Alle anderen Punkte der Checkliste sind entweder erfüllt oder für diesen Stack (rein statische
+App ohne Server, ohne Datenbank, ohne Auth, ohne Secrets) strukturell nicht anwendbar.
+
 
 ## Notes Sandro
 KOMMENTARE / WICHITGE AUSSAGEN CLAUDE
