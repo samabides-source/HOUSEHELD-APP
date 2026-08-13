@@ -322,10 +322,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     await refresh();
   }, [refresh, locale]);
 
+  /**
+   * `clearAll()` leert auch `meta` und damit den `lastLocale`-Marker. Ohne den
+   * erneuten Aufruf von `reconcileTagLanguage()` würde der nächste
+   * Sprachwechsel `lastLocale` fälschlich als "allererster Start" behandeln
+   * und die frisch geseedeten Tags stillschweigend NICHT übersetzen.
+   */
   const resetEverything = useCallback(async () => {
     await clearAll();
     releaseAllPhotoUrls();
     await seedIfNeeded(locale);
+    await reconcileTagLanguage(locale);
     await refresh();
   }, [refresh, locale]);
 
