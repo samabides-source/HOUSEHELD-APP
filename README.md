@@ -13,13 +13,13 @@ Haushaltsaufgaben werden mündlich oder in Chats verteilt und gehen dabei unter.
 Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und übersichtlich dargestellt werden.
 
 ## Links
-App: 			househeld-app.vercel.app
+App: 			https://househeld-app.vercel.app/
 
-Hinweis: Die App speichert alle Daten nur lokal im jeweiligen Browser. Damit du nicht mit einer leeren App startest: Oben auf „Einstellungen" klicken und „Beispieldaten laden" drücken – dann sind Aufgaben, Personen und Fotos zum Ausprobieren da.
+Hinweis: Die App speichert alle Daten nur lokal im jeweiligen Browser. Damit du nicht mit einer leeren App startest: Rechts oben auf „Einstellungen" klicken und „Beispieldaten laden" drücken – dann sind Aufgaben, Personen und Fotos zum Ausprobieren da.
 
-Marketing-Seite: 	househeld-page.vercel.app
+Marketing-Seite: 	https://househeld-page.vercel.app/ 
 
-Video-Walkthrough:	Foglt noch. Aufzeichnung mit Teams. samuel@codecrush.ch einladen.
+Video-Walkthrough:	Folgt noch. Aufzeichnung mit Teams. samuel@codecrush.ch einladen.
 
 
 ## Entwicklungsprozess APP
@@ -39,6 +39,8 @@ Viele Iterationen inkl. Screenshots nötig, damit die Liste bestmöglich ausgef�
 
 ## Entwicklungsprozess SITE
 Mittels simplem Prompt, Verlinkung zur App und einigen technischen Angaben habe ich mir eine erste Fassung der Marketing-Seite erstellen lassen. Design und beschriebene Funktionen stimmen mit der App überein.
+Danach mehrere Iterationen hinsichtlich Details in Design und Wording.
+Im Anschluss die Site auf SEO/AEO/GEO-Kriterien geprüft und eine englische Sprachversion hinzugefügt. Claude hat sehr viele Änderungen vorgeschlagen, die aber nach meiner Einschätzung alle im Hintergrund stattfanden.
 
 ## Reflexion
 Schon vor dem Deploy ein Problemhinweis bzgl. Datenbank erhalten: Es liegt alles clientseitig in IndexedDB.D er Datenbestand ist pro Browser/Gerät, nicht zwischen Haushaltsmitgliedern geteilt.

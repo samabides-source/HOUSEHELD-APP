@@ -1,13 +1,19 @@
 import { STORE, getOne, putMany, putValue } from "./db";
+import type { Locale } from "./i18n/config";
 import type { Tag, TagCategory } from "./types";
 import { newId, nowIso } from "./utils";
 
 /**
- * Vordefinierte Tags gemäss PRD 5.4 (32 Stück). Nach dem Seeding sind sie ganz
- * normale Tags – sie können umbenannt und gelöscht werden und haben keine
- * Sonderrechte.
+ * Vordefinierte Tags gemäss PRD 5.4 (32 Stück), je Sprache. Nach dem Seeding
+ * sind sie ganz normale Tags – sie können umbenannt und gelöscht werden und
+ * haben keine Sonderrechte. Welche Sprachversion angelegt wird, hängt davon
+ * ab, in welcher Sprache die App beim ersten Start geöffnet wurde; einmal
+ * gespeicherte Tag-Namen werden bei einem späteren Sprachwechsel nicht
+ * nachträglich übersetzt (sie sind ab dann normale Nutzdaten).
  */
-export const PREDEFINED_TAGS: Array<{ name: string; category: TagCategory }> = [
+type SeedTag = { name: string; category: TagCategory };
+
+const PREDEFINED_TAGS_DE: SeedTag[] = [
   { name: "Küche", category: "raum" },
   { name: "Wohnzimmer", category: "raum" },
   { name: "Schlafzimmer", category: "raum" },
@@ -45,6 +51,49 @@ export const PREDEFINED_TAGS: Array<{ name: string; category: TagCategory }> = [
   { name: "Sonstiges", category: "sonstiges" },
 ];
 
+const PREDEFINED_TAGS_EN: SeedTag[] = [
+  { name: "Kitchen", category: "raum" },
+  { name: "Living Room", category: "raum" },
+  { name: "Bedroom", category: "raum" },
+  { name: "Bathroom (Ground Floor)", category: "raum" },
+  { name: "Bathroom (Upper Floor)", category: "raum" },
+  { name: "Kids' Room 1", category: "raum" },
+  { name: "Kids' Room 2", category: "raum" },
+  { name: "Home Office", category: "raum" },
+  { name: "Basement", category: "raum" },
+  { name: "Garage", category: "raum" },
+  { name: "Utility Room", category: "raum" },
+
+  { name: "Garden", category: "aussen" },
+  { name: "Patio", category: "aussen" },
+  { name: "Balcony (Upper Floor)", category: "aussen" },
+
+  { name: "Repair", category: "typ" },
+  { name: "Cleaning", category: "typ" },
+  { name: "Shopping", category: "typ" },
+  { name: "Maintenance", category: "typ" },
+  { name: "Disposal", category: "typ" },
+  { name: "Organizing", category: "typ" },
+  { name: "Plant Care", category: "typ" },
+  { name: "Laundry", category: "typ" },
+  { name: "Furniture", category: "typ" },
+
+  { name: "Electrical", category: "technik" },
+  { name: "Plumbing/Water", category: "technik" },
+  { name: "Heating", category: "technik" },
+  { name: "Appliances/Electronics", category: "technik" },
+
+  { name: "Appointments/Admin", category: "sonstiges" },
+  { name: "Kids", category: "sonstiges" },
+  { name: "Pets", category: "sonstiges" },
+  { name: "Other", category: "sonstiges" },
+];
+
+export const PREDEFINED_TAGS: Record<Locale, SeedTag[]> = {
+  de: PREDEFINED_TAGS_DE,
+  en: PREDEFINED_TAGS_EN,
+};
+
 const SEED_KEY = "seedVersion";
 const SEED_VERSION = 1;
 
@@ -53,12 +102,12 @@ const SEED_VERSION = 1;
  * gesetzt, laufen spätere Starts ohne Seeding – gelöschte Tags kommen also
  * nicht zurück.
  */
-export async function seedIfNeeded(): Promise<Tag[]> {
+export async function seedIfNeeded(locale: Locale): Promise<Tag[]> {
   const seeded = await getOne<number>(STORE.meta, SEED_KEY);
   if (seeded === SEED_VERSION) return [];
 
   const createdAt = nowIso();
-  const tags: Tag[] = PREDEFINED_TAGS.map((entry) => ({
+  const tags: Tag[] = PREDEFINED_TAGS[locale].map((entry) => ({
     id: newId(),
     name: entry.name,
     category: entry.category,

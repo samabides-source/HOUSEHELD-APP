@@ -8,25 +8,8 @@ export const PRIORITIES: Priority[] = ["niedrig", "mittel", "dringend"];
 export const STATUSES: Status[] = ["offen", "in_arbeit", "erledigt"];
 export const TAG_CATEGORIES: TagCategory[] = ["raum", "aussen", "typ", "technik", "sonstiges"];
 
-export const PRIORITY_LABEL: Record<Priority, string> = {
-  niedrig: "Niedrig",
-  mittel: "Mittel",
-  dringend: "Dringend",
-};
-
-export const STATUS_LABEL: Record<Status, string> = {
-  offen: "Offen",
-  in_arbeit: "In Arbeit",
-  erledigt: "Erledigt",
-};
-
-export const TAG_CATEGORY_LABEL: Record<TagCategory, string> = {
-  raum: "Räume",
-  aussen: "Aussenbereich",
-  typ: "Aufgabentyp",
-  technik: "Technik & Geräte",
-  sonstiges: "Sonstiges",
-};
+// Anzeige-Labels für Priorität/Status/Tag-Kategorie liegen sprachabhängig in
+// den i18n-Dictionaries (lib/i18n/dictionaries.ts: `labels.*`), nicht hier.
 
 export interface Person {
   id: string;

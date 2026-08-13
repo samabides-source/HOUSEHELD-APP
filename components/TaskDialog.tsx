@@ -2,15 +2,13 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 
+import { useT } from "@/lib/i18n/context";
 import { useStore } from "@/lib/store";
 import { TAG_CATEGORY_STYLE } from "@/lib/theme";
 import {
   PRIORITIES,
-  PRIORITY_LABEL,
   STATUSES,
-  STATUS_LABEL,
   TAG_CATEGORIES,
-  TAG_CATEGORY_LABEL,
   type Priority,
   type Status,
   type TagCategory,
@@ -33,6 +31,7 @@ const FIELD =
  */
 export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () => void }) {
   const store = useStore();
+  const t = useT();
   const isNew = task === null;
 
   const [draftId] = useState(() => task?.id ?? newId());
@@ -83,7 +82,7 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (title.trim().length === 0) {
-      setError("Bitte einen Titel eingeben.");
+      setError(t.taskDialog.titleRequiredError);
       return;
     }
 
@@ -113,14 +112,14 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
   return (
     <Modal
       open
-      title={isNew ? "Neue Aufgabe" : "Aufgabe bearbeiten"}
+      title={isNew ? t.taskDialog.titleNew : t.taskDialog.titleEdit}
       onClose={handleCancel}
       footer={
         <>
           {!isNew && (
             <ConfirmButton
-              label="Aufgabe löschen"
-              confirmLabel="Endgültig löschen?"
+              label={t.taskDialog.deleteTask}
+              confirmLabel={t.common.deleteConfirmFinal}
               size="md"
               className="mr-auto"
               onConfirm={async () => {
@@ -130,10 +129,10 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
             />
           )}
           <Button type="button" variant="secondary" onClick={handleCancel}>
-            Abbrechen
+            {t.common.cancel}
           </Button>
           <Button type="submit" form="task-form" variant="primary" disabled={saving}>
-            {saving ? "Speichern …" : "Speichern"}
+            {saving ? t.common.saving : t.common.save}
           </Button>
         </>
       }
@@ -141,7 +140,7 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
       <form id="task-form" onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="task-title" className="mb-1 block text-sm font-semibold">
-            Titel <span className="text-red-500">*</span>
+            {t.taskDialog.titleFieldLabel} <span className="text-red-500">*</span>
           </label>
           <input
             id="task-title"
@@ -151,7 +150,7 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
               setTitle(event.target.value);
               setError(null);
             }}
-            placeholder="z. B. Tropfender Wasserhahn im Bad EG"
+            placeholder={t.taskDialog.titlePlaceholder}
             autoFocus
           />
           {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
@@ -159,21 +158,21 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
 
         <div>
           <label htmlFor="task-description" className="mb-1 block text-sm font-semibold">
-            Beschreibung
+            {t.taskDialog.descriptionLabel}
           </label>
           <textarea
             id="task-description"
             className={cn(FIELD, "min-h-24 resize-y")}
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="Optional: Details, Ort, benötigtes Material …"
+            placeholder={t.taskDialog.descriptionPlaceholder}
           />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="task-due" className="mb-1 block text-sm font-semibold">
-              Fälligkeitsdatum
+              {t.taskDialog.dueDateLabel}
             </label>
             <input
               id="task-due"
@@ -185,7 +184,7 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
           </div>
 
           <div>
-            <span className="mb-1 block text-sm font-semibold">Priorität</span>
+            <span className="mb-1 block text-sm font-semibold">{t.taskDialog.priorityLabel}</span>
             <div className="flex gap-2">
               {PRIORITIES.map((value) => (
                 <button
@@ -199,7 +198,7 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
                       : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50",
                   )}
                 >
-                  {PRIORITY_LABEL[value]}
+                  {t.labels.priority[value]}
                 </button>
               ))}
             </div>
@@ -207,7 +206,7 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
         </div>
 
         <div>
-          <span className="mb-1 block text-sm font-semibold">Status</span>
+          <span className="mb-1 block text-sm font-semibold">{t.taskDialog.statusLabel}</span>
           <div className="flex gap-2">
             {STATUSES.map((value) => (
               <button
@@ -221,7 +220,7 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
                     : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50",
                 )}
               >
-                {STATUS_LABEL[value]}
+                {t.labels.status[value]}
               </button>
             ))}
           </div>
@@ -229,22 +228,19 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
 
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-semibold">Zuständig</span>
+            <span className="text-sm font-semibold">{t.taskDialog.assigneeLabel}</span>
             {assigneeIds.length > 0 && (
               <button
                 type="button"
                 onClick={() => setAssigneeIds([])}
                 className="text-xs text-slate-500 underline underline-offset-2 hover:text-slate-800"
               >
-                Alle Zuweisungen entfernen
+                {t.taskDialog.removeAllAssignees}
               </button>
             )}
           </div>
           {store.persons.length === 0 ? (
-            <p className="text-xs text-slate-500">
-              Noch keine Personen erfasst – unter „Personen“ anlegen. Aufgaben können auch ohne
-              Zuweisung gespeichert werden.
-            </p>
+            <p className="text-xs text-slate-500">{t.taskDialog.noPersonsHint}</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {store.persons.map((person) => {
@@ -271,14 +267,14 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
         </div>
 
         <div>
-          <span className="mb-2 block text-sm font-semibold">Tags</span>
+          <span className="mb-2 block text-sm font-semibold">{t.taskDialog.tagsLabel}</span>
 
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <input
               className={cn(FIELD, "sm:max-w-64")}
               value={tagQuery}
               onChange={(event) => setTagQuery(event.target.value)}
-              placeholder="Tag suchen oder neu erstellen …"
+              placeholder={t.taskDialog.tagSearchPlaceholder}
             />
             {canCreateTag && (
               <>
@@ -286,16 +282,16 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
                   className={cn(FIELD, "sm:max-w-44")}
                   value={newTagCategory}
                   onChange={(event) => setNewTagCategory(event.target.value as TagCategory)}
-                  aria-label="Farbbereich für neuen Tag"
+                  aria-label={t.taskDialog.tagCategoryAriaLabel}
                 >
                   {TAG_CATEGORIES.map((category) => (
                     <option key={category} value={category}>
-                      {TAG_CATEGORY_LABEL[category]}
+                      {t.labels.tagCategory[category]}
                     </option>
                   ))}
                 </select>
                 <Button type="button" size="sm" variant="primary" onClick={handleCreateTag}>
-                  „{tagQuery.trim()}“ erstellen
+                  {t.taskDialog.createTagButton(tagQuery.trim())}
                 </Button>
               </>
             )}
@@ -303,7 +299,7 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
 
           <div className="flex max-h-48 flex-wrap gap-2 overflow-y-auto rounded-2xl bg-slate-50 p-3">
             {filteredTags.length === 0 && (
-              <p className="text-xs text-slate-500">Keine passenden Tags gefunden.</p>
+              <p className="text-xs text-slate-500">{t.taskDialog.noMatchingTags}</p>
             )}
             {filteredTags.map((tag) => {
               const active = tagIds.includes(tag.id);
@@ -326,8 +322,8 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
         </div>
 
         <div>
-          <span className="mb-2 block text-sm font-semibold">Fotos</span>
-          <PhotoManager taskId={draftId} photos={photos} />
+          <span className="mb-2 block text-sm font-semibold">{t.taskDialog.photosLabel}</span>
+          <PhotoManager taskId={draftId} photos={photos} taskTitle={title} />
         </div>
       </form>
     </Modal>

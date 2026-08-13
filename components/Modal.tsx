@@ -2,6 +2,8 @@
 
 import { useEffect, type ReactNode } from "react";
 
+import { useT } from "@/lib/i18n/context";
+
 /** Einfacher Dialog: Overlay, Escape zum Schliessen, Scroll-Sperre. */
 export function Modal({
   open,
@@ -16,6 +18,8 @@ export function Modal({
   children: ReactNode;
   footer?: ReactNode;
 }) {
+  const t = useT();
+
   useEffect(() => {
     if (!open) return;
 
@@ -40,7 +44,7 @@ export function Modal({
       <button
         type="button"
         className="absolute inset-0 cursor-default"
-        aria-label="Dialog schliessen"
+        aria-label={t.modal.closeOverlayAriaLabel}
         onClick={onClose}
       />
       <div
@@ -55,7 +59,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             className="rounded-full px-2 py-1 text-xl leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-            aria-label="Schliessen"
+            aria-label={t.modal.closeAriaLabel}
           >
             ×
           </button>

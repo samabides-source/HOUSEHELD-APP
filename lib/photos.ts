@@ -25,9 +25,13 @@ export function isAcceptedFile(file: File): boolean {
  * nicht dekodieren (typisch für HEIC ausserhalb von Safari), wird die
  * Originaldatei unverändert übernommen – die Aufgabe bleibt so nutzbar.
  */
-export async function processImageFile(file: File): Promise<ProcessedImage> {
+export async function processImageFile(
+  file: File,
+  fileTooLargeMessage: (fileName: string, size: string) => string = (name, size) =>
+    `"${name}" ist ${size} gross – maximal 10 MB erlaubt.`,
+): Promise<ProcessedImage> {
   if (file.size > MAX_PHOTO_BYTES) {
-    throw new Error(`"${file.name}" ist ${formatBytes(file.size)} gross – maximal 10 MB erlaubt.`);
+    throw new Error(fileTooLargeMessage(file.name, formatBytes(file.size)));
   }
 
   try {

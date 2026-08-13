@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 
 import { EMPTY_FILTERS, applyFilters, sortTasks, type Filters, type SortKey } from "@/lib/filters";
+import { useT } from "@/lib/i18n/context";
 import { STATUS_STYLE } from "@/lib/theme";
-import { STATUSES, STATUS_LABEL, type Task } from "@/lib/types";
+import { STATUSES, type Task } from "@/lib/types";
 import { useLocalState } from "@/lib/use-local-state";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
@@ -22,13 +23,8 @@ const PERSON_FILTER_STORAGE_KEY = "hausheld.taskFilters.personIds";
  * gemerkt, damit man beim erneuten Öffnen nicht jedes Mal neu auf sich selbst
  * filtern muss; die übrigen Filter setzen sich pro Sitzung zurück.
  */
-export function TaskWorkspace({
-  tasks,
-  emptyHint = "Noch keine Aufgaben erfasst.",
-}: {
-  tasks: Task[];
-  emptyHint?: string;
-}) {
+export function TaskWorkspace({ tasks, emptyHint }: { tasks: Task[]; emptyHint: string }) {
+  const t = useT();
   const [personIds, setPersonIds] = useLocalState<string[]>(PERSON_FILTER_STORAGE_KEY, []);
   const [otherFilters, setOtherFilters] = useState<Omit<Filters, "personIds">>({
     tagIds: EMPTY_FILTERS.tagIds,
@@ -75,17 +71,15 @@ export function TaskWorkspace({
                 view === value ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100",
               )}
             >
-              {value === "liste" ? "Liste" : "Board"}
+              {value === "liste" ? t.taskWorkspace.viewList : t.taskWorkspace.viewBoard}
             </button>
           ))}
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">
-            {visible.length} von {tasks.length} Aufgaben
-          </span>
+          <span className="text-xs text-slate-500">{t.taskWorkspace.countLabel(visible.length, tasks.length)}</span>
           <Button variant="primary" onClick={openNew}>
-            + Neue Aufgabe
+            {t.taskWorkspace.newTask}
           </Button>
         </div>
       </div>
@@ -94,7 +88,7 @@ export function TaskWorkspace({
 
       {visible.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-500">
-          {tasks.length === 0 ? emptyHint : "Keine Aufgabe passt zu den gewählten Filtern."}
+          {tasks.length === 0 ? emptyHint : t.taskWorkspace.emptyFiltered}
         </p>
       ) : view === "liste" ? (
         <div className="grid gap-3 lg:grid-cols-2">
@@ -114,7 +108,7 @@ export function TaskWorkspace({
                 <header className="flex items-center justify-between px-1">
                   <h3 className="flex items-center gap-2 text-sm font-bold">
                     <span className={cn("size-2 rounded-full", STATUS_STYLE[status].dot)} />
-                    {STATUS_LABEL[status]}
+                    {t.labels.status[status]}
                   </h3>
                   <span className="text-xs text-slate-500">{column.length}</span>
                 </header>
@@ -123,7 +117,7 @@ export function TaskWorkspace({
                     <TaskCard key={task.id} task={task} onEdit={openEdit} compact />
                   ))}
                   {column.length === 0 && (
-                    <p className="px-1 pb-2 text-xs text-slate-400">Keine Aufgaben</p>
+                    <p className="px-1 pb-2 text-xs text-slate-400">{t.taskWorkspace.emptyColumn}</p>
                   )}
                 </div>
               </section>

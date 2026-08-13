@@ -5,10 +5,12 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/Button";
 import { PersonAvatar } from "@/components/Chips";
 import { ConfirmButton } from "@/components/ConfirmButton";
+import { useT } from "@/lib/i18n/context";
 import { useStore } from "@/lib/store";
 
 export default function PersonsPage() {
   const { persons, tasks, createPerson, renamePerson, deletePerson } = useStore();
+  const t = useT();
   const [name, setName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
@@ -37,11 +39,8 @@ export default function PersonsPage() {
   return (
     <div className="space-y-5">
       <section>
-        <h1 className="text-2xl font-extrabold tracking-tight">Personen</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Haushaltsmitglieder verwalten. Wird eine Person gelöscht, bleiben ihre Aufgaben bestehen
-          und gelten danach als „nicht zugewiesen“.
-        </p>
+        <h1 className="text-2xl font-extrabold tracking-tight">{t.persons.heading}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t.persons.description}</p>
       </section>
 
       <form
@@ -51,18 +50,18 @@ export default function PersonsPage() {
         <input
           value={name}
           onChange={(event) => setName(event.target.value)}
-          placeholder="Name, z. B. Mira"
+          placeholder={t.persons.namePlaceholder}
           className="min-w-48 flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-indigo-500"
-          aria-label="Name der neuen Person"
+          aria-label={t.persons.nameAriaLabel}
         />
         <Button type="submit" variant="primary" disabled={name.trim().length === 0}>
-          Person hinzufügen
+          {t.persons.addPerson}
         </Button>
       </form>
 
       {persons.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-500">
-          Noch keine Personen erfasst.
+          {t.persons.empty}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -85,19 +84,14 @@ export default function PersonsPage() {
                         if (event.key === "Escape") setEditingId(null);
                       }}
                       className="min-w-40 flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500"
-                      aria-label={`Name von ${person.name} ändern`}
+                      aria-label={t.persons.renameAriaLabel(person.name)}
                       autoFocus
                     />
                     <Button type="button" variant="primary" size="sm" onClick={saveEdit}>
-                      Speichern
+                      {t.common.save}
                     </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setEditingId(null)}
-                    >
-                      Abbrechen
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)}>
+                      {t.common.cancel}
                     </Button>
                   </>
                 ) : (
@@ -105,9 +99,7 @@ export default function PersonsPage() {
                     <PersonAvatar person={person} size="md" decorative />
                     <div className="flex-1">
                       <p className="font-semibold">{person.name}</p>
-                      <p className="text-xs text-slate-500">
-                        {assigned.length} zugewiesene Aufgaben · {openCount} noch nicht erledigt
-                      </p>
+                      <p className="text-xs text-slate-500">{t.persons.assignedCount(assigned.length, openCount)}</p>
                     </div>
                     <Button
                       type="button"
@@ -115,11 +107,11 @@ export default function PersonsPage() {
                       size="sm"
                       onClick={() => startEdit(person.id, person.name)}
                     >
-                      Umbenennen
+                      {t.common.rename}
                     </Button>
                     <ConfirmButton
-                      label="Löschen"
-                      confirmLabel="Person wirklich löschen?"
+                      label={t.common.delete}
+                      confirmLabel={t.persons.deleteConfirm}
                       onConfirm={() => deletePerson(person.id)}
                     />
                   </>

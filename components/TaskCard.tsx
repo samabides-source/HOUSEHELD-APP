@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 
+import { useLocale, useT } from "@/lib/i18n/context";
 import { useStore } from "@/lib/store";
 import { PRIORITY_STYLE } from "@/lib/theme";
-import { STATUSES, STATUS_LABEL, type Photo, type Status, type Task } from "@/lib/types";
+import { STATUSES, type Photo, type Status, type Task } from "@/lib/types";
 import { cn, formatDate } from "@/lib/utils";
 import { EmptyAvatar, PersonAvatar, PriorityPill, TagChip } from "./Chips";
 import { ConfirmButton } from "./ConfirmButton";
@@ -21,11 +22,14 @@ export function TaskCard({
   compact?: boolean;
 }) {
   const { personById, tagById, photosForTask, updateTask, deleteTask } = useStore();
+  const t = useT();
+  const locale = useLocale();
   const [previewPhoto, setPreviewPhoto] = useState<Photo | null>(null);
 
   const persons = task.assigneeIds.map(personById).filter((person) => person !== undefined);
   const tags = task.tagIds.map(tagById).filter((tag) => tag !== undefined);
   const photos = photosForTask(task.id);
+  const photoAlt = t.photos.altText(task.title);
 
   return (
     <article
@@ -62,7 +66,7 @@ export function TaskCard({
         )}
 
         {photos.length > 0 && (
-          <PhotoStrip photos={photos} max={compact ? 3 : 4} onSelect={setPreviewPhoto} />
+          <PhotoStrip photos={photos} max={compact ? 3 : 4} onSelect={setPreviewPhoto} alt={photoAlt} />
         )}
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
@@ -76,30 +80,30 @@ export function TaskCard({
             ) : (
               <>
                 <EmptyAvatar />
-                <span>Nicht zugewiesen</span>
+                <span>{t.common.unassigned}</span>
               </>
             )}
           </span>
 
           {task.dueDate ? (
-            <span>Fällig: {formatDate(task.dueDate)}</span>
+            <span>{t.taskCard.due(formatDate(task.dueDate, locale))}</span>
           ) : (
-            <span>Erstellt: {formatDate(task.createdAt)}</span>
+            <span>{t.taskCard.created(formatDate(task.createdAt, locale))}</span>
           )}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
           <label className="flex items-center gap-2 text-xs text-slate-500">
-            <span className="sr-only sm:not-sr-only">Status</span>
+            <span className="sr-only sm:not-sr-only">{t.common.status}</span>
             <select
               value={task.status}
               onChange={(event) => updateTask(task.id, { status: event.target.value as Status })}
               className="rounded-full border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 outline-none transition hover:bg-slate-50 focus:border-indigo-500"
-              aria-label={`Status von ${task.title} ändern`}
+              aria-label={t.taskCard.statusAriaLabel(task.title)}
             >
               {STATUSES.map((status) => (
                 <option key={status} value={status}>
-                  {STATUS_LABEL[status]}
+                  {t.labels.status[status]}
                 </option>
               ))}
             </select>
@@ -111,11 +115,11 @@ export function TaskCard({
               onClick={() => onEdit(task)}
               className="rounded-full px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
             >
-              Bearbeiten
+              {t.common.edit}
             </button>
             <ConfirmButton
-              label="Löschen"
-              confirmLabel="Endgültig löschen?"
+              label={t.common.delete}
+              confirmLabel={t.common.deleteConfirmFinal}
               onConfirm={() => deleteTask(task.id)}
             />
           </div>
@@ -124,7 +128,7 @@ export function TaskCard({
 
       <Modal
         open={previewPhoto !== null}
-        title={previewPhoto?.fileName ?? "Foto"}
+        title={previewPhoto?.fileName ?? t.common.photoFallbackTitle}
         onClose={() => setPreviewPhoto(null)}
       >
         {previewPhoto && (
@@ -132,6 +136,7 @@ export function TaskCard({
             photo={previewPhoto}
             className="max-h-[70vh] w-full rounded-2xl"
             imageClassName="object-contain"
+            alt={photoAlt}
           />
         )}
       </Modal>

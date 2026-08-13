@@ -1,4 +1,5 @@
 import { STORE, getAll, putMany, putPhoto } from "./db";
+import type { Locale } from "./i18n/config";
 import { processImageFile } from "./photos";
 import type { Person, Photo, Priority, Status, Tag, Task } from "./types";
 import { isoDateInDays, newId, normalizeTagName, nowIso } from "./utils";
@@ -10,6 +11,10 @@ import { isoDateInDays, newId, normalizeTagName, nowIso } from "./utils";
  * fehl (kein Netz, keine Treffer, Rate-Limit), fällt die jeweilige Aufgabe auf
  * ein generiertes Farb-Platzhalterbild zurück. Die Daten werden ergänzt, nichts
  * wird überschrieben.
+ *
+ * Es gibt eine Aufgaben-/Tag-Liste je Sprache; die Tag-Namen in `tags` müssen
+ * exakt mit `PREDEFINED_TAGS` (lib/seed.ts) derselben Sprache übereinstimmen,
+ * damit sie mit bereits vorhandenen Tags zusammengeführt werden.
  */
 
 interface PhotoSpec {
@@ -33,7 +38,7 @@ interface DemoTask {
 
 const DEMO_PERSONS = ["Sandro", "Mira", "Jonas", "Lea", "Noah", "Fabienne"];
 
-const DEMO_TASKS: DemoTask[] = [
+const DEMO_TASKS_DE: DemoTask[] = [
   {
     title: "Tropfender Wasserhahn im Bad EG",
     description: "Tropft seit Montag durchgehend. Dichtung besorgen und ersetzen.",
@@ -178,6 +183,153 @@ const DEMO_TASKS: DemoTask[] = [
   },
 ];
 
+const DEMO_TASKS_EN: DemoTask[] = [
+  {
+    title: "Dripping faucet in the ground floor bathroom",
+    description: "Has been dripping continuously since Monday. Get a replacement washer and fit it.",
+    dueInDays: 2,
+    priority: "dringend",
+    status: "offen",
+    assignees: ["Sandro"],
+    tags: ["Bathroom (Ground Floor)", "Repair", "Plumbing/Water"],
+    photos: [
+      { query: "leaking faucet dripping tap", label: "Faucet", hue: 205 },
+      { query: "rubber washer plumbing seal", label: "Washer", hue: 262 },
+    ],
+  },
+  {
+    title: "Bring the laundry up from the basement",
+    description: "It's been drying in the utility room since last night.",
+    dueInDays: 0,
+    priority: "mittel",
+    status: "in_arbeit",
+    assignees: ["Mira"],
+    tags: ["Basement", "Laundry"],
+    photos: [{ query: "laundry basket folded clothes", label: "Laundry", hue: 280 }],
+  },
+  {
+    title: "Big grocery shop for the weekend",
+    description: "List is on the fridge door. Don't forget drinks.",
+    dueInDays: 3,
+    priority: "mittel",
+    status: "offen",
+    assignees: ["Mira", "Jonas"],
+    tags: ["Shopping", "Kitchen"],
+    photos: [{ query: "grocery shopping paper bags", label: "Groceries", hue: 35 }],
+  },
+  {
+    title: "Bleed the radiators",
+    description: "The living room radiator isn't heating up at the top.",
+    dueInDays: 7,
+    priority: "niedrig",
+    status: "offen",
+    assignees: [],
+    tags: ["Living Room", "Heating", "Maintenance"],
+    photos: [{ query: "radiator heater bleed valve", label: "Radiator", hue: 15 }],
+  },
+  {
+    title: "Water the houseplants",
+    description: "Balcony and living room, roughly every 4 days.",
+    dueInDays: 1,
+    priority: "niedrig",
+    status: "offen",
+    assignees: ["Jonas"],
+    tags: ["Balcony (Upper Floor)", "Plant Care"],
+    photos: [{ query: "watering can houseplant", label: "Plants", hue: 110 }],
+  },
+  {
+    title: "Take glass and cardboard to recycling",
+    description: "Collection point is open until 4pm on Saturdays.",
+    dueInDays: 5,
+    priority: "mittel",
+    status: "offen",
+    assignees: ["Sandro"],
+    tags: ["Garage", "Disposal"],
+    photos: [{ query: "glass bottle recycling bin", label: "Glass recycling", hue: 145 }],
+  },
+  {
+    title: "Assemble the shelf in the home office",
+    description: "Parts are still packed behind the door.",
+    dueInDays: null,
+    priority: "niedrig",
+    status: "offen",
+    assignees: [],
+    tags: ["Home Office", "Furniture"],
+    photos: [{ query: "flat pack shelf assembly furniture", label: "Shelf", hue: 200 }],
+  },
+  {
+    title: "Confirm chimney sweep appointment",
+    description: "Call back by end of week, letter is on the sideboard.",
+    dueInDays: null,
+    priority: "mittel",
+    status: "erledigt",
+    assignees: ["Mira"],
+    tags: ["Appointments/Admin"],
+  },
+  {
+    title: "Fix the bike in the garden",
+    description: "Rear tire is flat, repair kit is in the garage.",
+    dueInDays: 4,
+    priority: "mittel",
+    status: "offen",
+    assignees: ["Noah"],
+    tags: ["Garden", "Repair"],
+    photos: [{ query: "bicycle tire repair", label: "Bike", hue: 20 }],
+  },
+  {
+    title: "Clean the litter box",
+    description: "Best done every other day, litter is in the utility room.",
+    dueInDays: 0,
+    priority: "mittel",
+    status: "offen",
+    assignees: ["Lea"],
+    tags: ["Pets", "Cleaning"],
+    photos: [{ query: "cat litter box", label: "Litter box", hue: 30 }],
+  },
+  {
+    title: "Mow the lawn",
+    description: "Get it done before the forecast rain this weekend.",
+    dueInDays: 2,
+    priority: "niedrig",
+    status: "offen",
+    assignees: ["Fabienne"],
+    tags: ["Garden", "Plant Care"],
+    photos: [{ query: "lawn mower mowing grass", label: "Lawn", hue: 100 }],
+  },
+  {
+    title: "Clean the washing machine",
+    description: "Whites smell slightly musty – run an empty cycle with vinegar.",
+    dueInDays: 6,
+    priority: "mittel",
+    status: "offen",
+    assignees: ["Fabienne"],
+    tags: ["Basement", "Cleaning", "Appliances/Electronics"],
+    photos: [{ query: "washing machine laundry room", label: "Washing machine", hue: 210 }],
+  },
+  {
+    title: "Replace the lamp in Kids' Room 1",
+    description: "Bulb has blown, spare is in the basement.",
+    dueInDays: 1,
+    priority: "dringend",
+    status: "offen",
+    assignees: ["Noah"],
+    tags: ["Kids' Room 1", "Electrical", "Repair"],
+    photos: [{ query: "light bulb ceiling lamp", label: "Lamp", hue: 50 }],
+  },
+  {
+    title: "Clean the living room windows",
+    description: "Outside is pretty dirty after the storm.",
+    dueInDays: 8,
+    priority: "niedrig",
+    status: "in_arbeit",
+    assignees: ["Lea"],
+    tags: ["Living Room", "Cleaning"],
+    photos: [{ query: "window cleaning squeegee", label: "Window", hue: 195 }],
+  },
+];
+
+const DEMO_TASKS: Record<Locale, DemoTask[]> = { de: DEMO_TASKS_DE, en: DEMO_TASKS_EN };
+
 const OPENVERSE_SEARCH_URL = "https://api.openverse.org/v1/images/";
 const FETCH_TIMEOUT_MS = 5000;
 
@@ -302,7 +454,9 @@ async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T)
   return results;
 }
 
-export async function seedDemoData(): Promise<void> {
+export async function seedDemoData(locale: Locale): Promise<void> {
+  const demoTasks = DEMO_TASKS[locale];
+
   const [existingPersons, existingTags] = await Promise.all([
     getAll<Person>(STORE.persons),
     getAll<Tag>(STORE.tags),
@@ -321,7 +475,7 @@ export async function seedDemoData(): Promise<void> {
 
   const tagByName = new Map(existingTags.map((t) => [normalizeTagName(t.name), t]));
   const newTags: Tag[] = [];
-  for (const demo of DEMO_TASKS) {
+  for (const demo of demoTasks) {
     for (const name of demo.tags) {
       const key = normalizeTagName(name);
       if (tagByName.has(key)) continue;
@@ -331,7 +485,7 @@ export async function seedDemoData(): Promise<void> {
     }
   }
 
-  const tasks: Task[] = DEMO_TASKS.map((demo) => ({
+  const tasks: Task[] = demoTasks.map((demo) => ({
     id: newId(),
     title: demo.title,
     description: demo.description,
@@ -349,7 +503,7 @@ export async function seedDemoData(): Promise<void> {
 
   // Bildanfragen mit begrenzter Parallelität auflösen: schnell genug, aber
   // ohne die Foto-API mit 14+ gleichzeitigen Anfragen zu überlasten.
-  const photoRequests = DEMO_TASKS.flatMap((demo, taskIndex) =>
+  const photoRequests = demoTasks.flatMap((demo, taskIndex) =>
     (demo.photos ?? []).map((spec, sortIndex) => ({ taskId: tasks[taskIndex].id, spec, sortIndex })),
   );
 

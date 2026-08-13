@@ -9,14 +9,14 @@ import { Button } from "./Button";
  * zurück.
  */
 export function ConfirmButton({
-  label = "Löschen",
-  confirmLabel = "Wirklich löschen?",
+  label,
+  confirmLabel,
   onConfirm,
   size = "sm",
   className,
 }: {
-  label?: string;
-  confirmLabel?: string;
+  label: string;
+  confirmLabel: string;
   onConfirm: () => void;
   size?: "sm" | "md";
   className?: string;

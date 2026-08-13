@@ -3,16 +3,10 @@
 import { useMemo, useState } from "react";
 
 import { EMPTY_FILTERS, UNASSIGNED, toggleValue, type Filters, type SortKey } from "@/lib/filters";
+import { useT } from "@/lib/i18n/context";
 import { useStore } from "@/lib/store";
 import { TAG_CATEGORY_STYLE } from "@/lib/theme";
-import {
-  PRIORITIES,
-  PRIORITY_LABEL,
-  STATUSES,
-  STATUS_LABEL,
-  TAG_CATEGORIES,
-  TAG_CATEGORY_LABEL,
-} from "@/lib/types";
+import { PRIORITIES, STATUSES, TAG_CATEGORIES } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 function FilterChip({
@@ -70,6 +64,7 @@ export function FilterBar({
   onSortChange: (sort: SortKey) => void;
 }) {
   const { persons, tags } = useStore();
+  const t = useT();
   const [showAllTags, setShowAllTags] = useState(false);
 
   const tagsByCategory = useMemo(() => {
@@ -94,20 +89,20 @@ export function FilterBar({
         <input
           value={filters.search}
           onChange={(event) => onChange({ ...filters, search: event.target.value })}
-          placeholder="Aufgaben durchsuchen …"
+          placeholder={t.filterBar.searchPlaceholder}
           className="min-w-48 flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-indigo-500"
-          aria-label="Aufgaben durchsuchen"
+          aria-label={t.filterBar.searchAriaLabel}
         />
 
         <label className="flex items-center gap-2 text-xs text-slate-500">
-          Sortierung
+          {t.filterBar.sortLabel}
           <select
             value={sort}
             onChange={(event) => onSortChange(event.target.value as SortKey)}
             className="rounded-xl border border-slate-300 bg-white px-2.5 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-indigo-500"
           >
-            <option value="dueDate">Fälligkeitsdatum</option>
-            <option value="createdAt">Erstelldatum (neuste zuerst)</option>
+            <option value="dueDate">{t.filterBar.sortDueDate}</option>
+            <option value="createdAt">{t.filterBar.sortCreatedAt}</option>
           </select>
         </label>
 
@@ -117,24 +112,24 @@ export function FilterBar({
             onClick={() => onChange({ ...EMPTY_FILTERS })}
             className="rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-100"
           >
-            Filter zurücksetzen ({active})
+            {t.filterBar.resetFilters(active)}
           </button>
         )}
       </div>
 
-      <Section label="Status">
+      <Section label={t.filterBar.sectionStatus}>
         {STATUSES.map((status) => (
           <FilterChip
             key={status}
             active={filters.statuses.includes(status)}
             onClick={() => onChange({ ...filters, statuses: toggleValue(filters.statuses, status) })}
           >
-            {STATUS_LABEL[status]}
+            {t.labels.status[status]}
           </FilterChip>
         ))}
       </Section>
 
-      <Section label="Priorität">
+      <Section label={t.filterBar.sectionPriority}>
         {PRIORITIES.map((priority) => (
           <FilterChip
             key={priority}
@@ -150,12 +145,12 @@ export function FilterBar({
                   : "bg-slate-500 text-white"
             }
           >
-            {PRIORITY_LABEL[priority]}
+            {t.labels.priority[priority]}
           </FilterChip>
         ))}
       </Section>
 
-      <Section label="Person">
+      <Section label={t.filterBar.sectionPerson}>
         {persons.map((person) => (
           <FilterChip
             key={person.id}
@@ -173,14 +168,14 @@ export function FilterBar({
             onChange({ ...filters, personIds: toggleValue(filters.personIds, UNASSIGNED) })
           }
         >
-          Nicht zugewiesen
+          {t.common.unassigned}
         </FilterChip>
       </Section>
 
       <div className="space-y-2">
         <div className={cn("space-y-2 overflow-hidden", !showAllTags && "max-h-24")}>
           {tagsByCategory.map((group) => (
-            <Section key={group.category} label={TAG_CATEGORY_LABEL[group.category]}>
+            <Section key={group.category} label={t.labels.tagCategory[group.category]}>
               {group.entries.map((tag) => (
                 <FilterChip
                   key={tag.id}
@@ -201,7 +196,7 @@ export function FilterBar({
             onClick={() => setShowAllTags((value) => !value)}
             className="text-xs font-semibold text-indigo-600 underline underline-offset-2 hover:text-indigo-800"
           >
-            {showAllTags ? "Tags einklappen" : "Alle Tags anzeigen"}
+            {showAllTags ? t.filterBar.collapseTags : t.filterBar.showAllTags}
           </button>
         )}
       </div>

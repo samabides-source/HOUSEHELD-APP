@@ -2,6 +2,7 @@
 
 import { useRef, useState, type ChangeEvent } from "react";
 
+import { useT } from "@/lib/i18n/context";
 import { usePhotoUrl } from "@/lib/photo-url";
 import { useStore } from "@/lib/store";
 import { MAX_PHOTOS_PER_TASK, type Photo } from "@/lib/types";
@@ -16,11 +17,15 @@ export function PhotoImage({
   photo,
   className,
   imageClassName,
+  alt,
 }: {
   photo: Photo;
   className?: string;
   imageClassName?: string;
+  /** Beschreibender Alt-Text (z. B. Aufgabentitel); fällt sonst auf einen generischen Text zurück. */
+  alt?: string;
 }) {
+  const t = useT();
   const { url, state } = usePhotoUrl(photo.id);
 
   if (state === "loading") {
@@ -34,17 +39,23 @@ export function PhotoImage({
           "flex items-center justify-center bg-slate-100 p-1 text-center text-[10px] leading-tight text-slate-400",
           className,
         )}
-        title="Bilddatei nicht verfügbar"
+        title={t.photos.notAvailableTitle}
       >
-        nicht verfügbar
+        {t.photos.notAvailable}
       </div>
     );
   }
 
   // Bewusst <img>: die Blobs liegen lokal im Browser, next/image bringt hier
   // keinen Vorteil und kann Object-URLs nicht optimieren.
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={url} alt={photo.fileName} className={cn("object-cover", className, imageClassName)} />;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={url}
+      alt={alt ?? t.photos.altFallback}
+      className={cn("object-cover", className, imageClassName)}
+    />
+  );
 }
 
 /**
@@ -55,11 +66,15 @@ export function PhotoStrip({
   photos,
   max = 4,
   onSelect,
+  alt,
 }: {
   photos: Photo[];
   max?: number;
   onSelect?: (photo: Photo) => void;
+  /** Beschreibender Alt-Text für alle Thumbnails dieser Aufgabe. */
+  alt?: string;
 }) {
+  const t = useT();
   if (photos.length === 0) return null;
   const visible = photos.slice(0, max);
   const rest = photos.length - visible.length;
@@ -73,12 +88,17 @@ export function PhotoStrip({
             type="button"
             onClick={() => onSelect(photo)}
             className="overflow-hidden rounded-xl border border-slate-200 transition hover:opacity-80"
-            aria-label={`Foto ${photo.fileName} vergrössern`}
+            aria-label={t.photos.magnifyAriaLabel(photo.fileName)}
           >
-            <PhotoImage photo={photo} className="size-14" />
+            <PhotoImage photo={photo} className="size-14" alt={alt} />
           </button>
         ) : (
-          <PhotoImage key={photo.id} photo={photo} className="size-14 rounded-xl border border-slate-200" />
+          <PhotoImage
+            key={photo.id}
+            photo={photo}
+            className="size-14 rounded-xl border border-slate-200"
+            alt={alt}
+          />
         ),
       )}
       {rest > 0 && (
@@ -94,7 +114,17 @@ export function PhotoStrip({
  * Foto-Verwaltung einer Aufgabe: hinzufügen, ansehen, entfernen – jederzeit,
  * nicht nur beim Anlegen (PRD 5.2).
  */
-export function PhotoManager({ taskId, photos }: { taskId: string; photos: Photo[] }) {
+export function PhotoManager({
+  taskId,
+  photos,
+  taskTitle,
+}: {
+  taskId: string;
+  photos: Photo[];
+  /** Aktueller Aufgabentitel, für einen sinnvollen Alt-Text der Fotos. */
+  taskTitle: string;
+}) {
+  const t = useT();
   const { addPhotos, removePhoto } = useStore();
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
@@ -102,6 +132,7 @@ export function PhotoManager({ taskId, photos }: { taskId: string; photos: Photo
   const inputRef = useRef<HTMLInputElement>(null);
 
   const remaining = MAX_PHOTOS_PER_TASK - photos.length;
+  const alt = taskTitle.trim() ? t.photos.altText(taskTitle.trim()) : t.photos.altFallback;
 
   const handleFiles = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
@@ -128,11 +159,9 @@ export function PhotoManager({ taskId, photos }: { taskId: string; photos: Photo
           disabled={busy || remaining <= 0}
           onClick={() => inputRef.current?.click()}
         >
-          {busy ? "Wird verarbeitet …" : "Fotos hinzufügen"}
+          {busy ? t.photos.processing : t.photos.addPhotos}
         </Button>
-        <span className="text-xs text-slate-500">
-          {photos.length}/{MAX_PHOTOS_PER_TASK} Fotos · JPG, PNG, WebP, HEIC · max. 10 MB
-        </span>
+        <span className="text-xs text-slate-500">{t.photos.countLabel(photos.length, MAX_PHOTOS_PER_TASK)}</span>
         <input
           ref={inputRef}
           type="file"
@@ -161,13 +190,13 @@ export function PhotoManager({ taskId, photos }: { taskId: string; photos: Photo
                 className="block w-full overflow-hidden rounded-2xl border border-slate-200"
                 title={photo.fileName}
               >
-                <PhotoImage photo={photo} className="aspect-square w-full" />
+                <PhotoImage photo={photo} className="aspect-square w-full" alt={alt} />
               </button>
               <button
                 type="button"
                 onClick={() => removePhoto(photo.id)}
                 className="absolute -right-1.5 -top-1.5 flex size-6 items-center justify-center rounded-full bg-white text-sm leading-none text-slate-500 shadow ring-1 ring-slate-200 transition hover:bg-red-600 hover:text-white"
-                aria-label={`Foto ${photo.fileName} entfernen`}
+                aria-label={t.photos.removeAriaLabel(photo.fileName)}
               >
                 ×
               </button>
@@ -176,13 +205,18 @@ export function PhotoManager({ taskId, photos }: { taskId: string; photos: Photo
         </ul>
       ) : (
         <p className="rounded-2xl border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-400">
-          Noch keine Fotos – optional, jederzeit ergänzbar.
+          {t.photos.emptyHint}
         </p>
       )}
 
-      <Modal open={preview !== null} title={preview?.fileName ?? "Foto"} onClose={() => setPreview(null)}>
+      <Modal open={preview !== null} title={preview?.fileName ?? t.common.photoFallbackTitle} onClose={() => setPreview(null)}>
         {preview && (
-          <PhotoImage photo={preview} className="max-h-[70vh] w-full rounded-2xl" imageClassName="object-contain" />
+          <PhotoImage
+            photo={preview}
+            className="max-h-[70vh] w-full rounded-2xl"
+            imageClassName="object-contain"
+            alt={alt}
+          />
         )}
       </Modal>
     </div>

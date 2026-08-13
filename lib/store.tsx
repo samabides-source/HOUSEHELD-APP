@@ -21,6 +21,7 @@ import {
   putPhoto,
   putValue,
 } from "./db";
+import { useLocale, useT } from "./i18n/context";
 import { releaseAllPhotoUrls, releasePhotoUrl } from "./photo-url";
 import { processImageFile, isAcceptedFile } from "./photos";
 import { seedIfNeeded } from "./seed";
@@ -70,6 +71,8 @@ interface StoreValue {
 const StoreContext = createContext<StoreValue | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
+  const t = useT();
+  const locale = useLocale();
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [persons, setPersons] = useState<Person[]>([]);
@@ -92,18 +95,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        await seedIfNeeded();
+        await seedIfNeeded(locale);
         await refresh();
       } catch (cause) {
-        setError(
-          cause instanceof Error
-            ? cause.message
-            : "Die lokale Datenbank konnte nicht geöffnet werden.",
-        );
+        setError(cause instanceof Error ? cause.message : t.errors.dbOpenFailed);
       } finally {
         setReady(true);
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
 
   const photosForTask = useCallback(
@@ -260,16 +260,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       for (const file of files) {
         if (slots <= 0) {
-          errors.push(`Maximal ${MAX_PHOTOS_PER_TASK} Fotos pro Aufgabe – "${file.name}" wurde ignoriert.`);
+          errors.push(t.errors.tooManyPhotos(MAX_PHOTOS_PER_TASK, file.name));
           continue;
         }
         if (!isAcceptedFile(file)) {
-          errors.push(`"${file.name}" hat ein nicht unterstütztes Format (JPG, PNG, WebP, HEIC).`);
+          errors.push(t.errors.unsupportedFormat(file.name));
           continue;
         }
 
         try {
-          const processed = await processImageFile(file);
+          const processed = await processImageFile(file, t.errors.fileTooLarge);
           const photo: Photo = {
             id: newId(),
             taskId,
@@ -285,14 +285,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           created.push(photo);
           slots -= 1;
         } catch (cause) {
-          errors.push(cause instanceof Error ? cause.message : `"${file.name}" konnte nicht gespeichert werden.`);
+          errors.push(cause instanceof Error ? cause.message : t.errors.saveFailed(file.name));
         }
       }
 
       if (created.length > 0) setPhotos((current) => [...current, ...created]);
       return errors;
     },
-    [photos],
+    [photos, t],
   );
 
   const removePhoto = useCallback(async (photoId: string) => {
@@ -317,16 +317,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const loadDemoData = useCallback(async () => {
     const { seedDemoData } = await import("./demo-data");
-    await seedDemoData();
+    await seedDemoData(locale);
     await refresh();
-  }, [refresh]);
+  }, [refresh, locale]);
 
   const resetEverything = useCallback(async () => {
     await clearAll();
     releaseAllPhotoUrls();
-    await seedIfNeeded();
+    await seedIfNeeded(locale);
     await refresh();
-  }, [refresh]);
+  }, [refresh, locale]);
 
   const value = useMemo<StoreValue>(
     () => ({

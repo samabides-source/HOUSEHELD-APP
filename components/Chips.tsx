@@ -1,14 +1,8 @@
 "use client";
 
+import { useT } from "@/lib/i18n/context";
 import { PRIORITY_STYLE, STATUS_STYLE, TAG_CATEGORY_STYLE } from "@/lib/theme";
-import {
-  PRIORITY_LABEL,
-  STATUS_LABEL,
-  type Person,
-  type Priority,
-  type Status,
-  type Tag,
-} from "@/lib/types";
+import type { Person, Priority, Status, Tag } from "@/lib/types";
 import { cn, initials, personColor } from "@/lib/utils";
 
 export function TagChip({
@@ -20,6 +14,7 @@ export function TagChip({
   onRemove?: () => void;
   className?: string;
 }) {
+  const t = useT();
   return (
     <span
       className={cn(
@@ -34,7 +29,7 @@ export function TagChip({
           type="button"
           onClick={onRemove}
           className="-mr-1 rounded-full px-1 leading-none opacity-60 transition hover:opacity-100"
-          aria-label={`Tag ${tag.name} entfernen`}
+          aria-label={t.chips.removeTagAriaLabel(tag.name)}
         >
           ×
         </button>
@@ -44,6 +39,7 @@ export function TagChip({
 }
 
 export function PriorityPill({ priority }: { priority: Priority }) {
+  const t = useT();
   const style = PRIORITY_STYLE[priority];
   return (
     <span
@@ -53,12 +49,13 @@ export function PriorityPill({ priority }: { priority: Priority }) {
       )}
     >
       <span className={cn("size-1.5 rounded-full", style.dot)} />
-      {PRIORITY_LABEL[priority]}
+      {t.labels.priority[priority]}
     </span>
   );
 }
 
 export function StatusBadge({ status }: { status: Status }) {
+  const t = useT();
   const style = STATUS_STYLE[status];
   return (
     <span
@@ -68,7 +65,7 @@ export function StatusBadge({ status }: { status: Status }) {
       )}
     >
       <span className={cn("size-1.5 rounded-full", style.dot)} />
-      {STATUS_LABEL[status]}
+      {t.labels.status[status]}
     </span>
   );
 }
@@ -110,11 +107,13 @@ export function PersonAvatar({
   );
 }
 
-export function EmptyAvatar({ label = "Nicht zugewiesen" }: { label?: string }) {
+export function EmptyAvatar({ label }: { label?: string }) {
+  const t = useT();
+  const resolvedLabel = label ?? t.common.unassigned;
   return (
     <span
       className="inline-flex size-7 items-center justify-center rounded-full border border-dashed border-slate-300 text-[11px] text-slate-400"
-      title={label}
+      title={resolvedLabel}
     >
       –
     </span>

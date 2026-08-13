@@ -5,14 +5,10 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/Button";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { Modal } from "@/components/Modal";
+import { useT } from "@/lib/i18n/context";
 import { useStore } from "@/lib/store";
 import { TAG_CATEGORY_STYLE } from "@/lib/theme";
-import {
-  TAG_CATEGORIES,
-  TAG_CATEGORY_LABEL,
-  type Tag,
-  type TagCategory,
-} from "@/lib/types";
+import { TAG_CATEGORIES, type Tag, type TagCategory } from "@/lib/types";
 import { cn, normalizeTagName } from "@/lib/utils";
 
 const FIELD =
@@ -20,6 +16,7 @@ const FIELD =
 
 export default function TagsPage() {
   const { tags, createTag, updateTag, deleteTag, tasksUsingTag } = useStore();
+  const t = useT();
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState<TagCategory>("sonstiges");
@@ -46,7 +43,7 @@ export default function TagsPage() {
 
     const duplicate = tags.find((tag) => normalizeTagName(tag.name) === normalizeTagName(trimmed));
     if (duplicate) {
-      setHint(`„${duplicate.name}“ existiert bereits – Tags sind eindeutig.`);
+      setHint(t.tags.duplicateHint(duplicate.name));
       return;
     }
 
@@ -66,7 +63,7 @@ export default function TagsPage() {
       (tag) => tag.id !== editingId && normalizeTagName(tag.name) === normalizeTagName(trimmed),
     );
     if (duplicate) {
-      setHint(`„${duplicate.name}“ existiert bereits – Tags sind eindeutig.`);
+      setHint(t.tags.duplicateHint(duplicate.name));
       return;
     }
     await updateTag(editingId, { name: trimmed });
@@ -79,11 +76,8 @@ export default function TagsPage() {
   return (
     <div className="space-y-5">
       <section>
-        <h1 className="text-2xl font-extrabold tracking-tight">Tags</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Tags gelten für die ganze Installation und sind eindeutig (Gross-/Kleinschreibung und
-          Leerzeichen am Rand werden ignoriert). Der Farbbereich bestimmt die Chip-Farbe.
-        </p>
+        <h1 className="text-2xl font-extrabold tracking-tight">{t.tags.heading}</h1>
+        <p className="mt-1 text-sm text-slate-500">{t.tags.description}</p>
       </section>
 
       <form
@@ -96,41 +90,39 @@ export default function TagsPage() {
             setName(event.target.value);
             setHint(null);
           }}
-          placeholder="Neuer Tag, z. B. Estrich"
+          placeholder={t.tags.namePlaceholder}
           className={cn(FIELD, "min-w-48 flex-1")}
-          aria-label="Name des neuen Tags"
+          aria-label={t.tags.nameAriaLabel}
         />
         <select
           value={category}
           onChange={(event) => setCategory(event.target.value as TagCategory)}
           className={FIELD}
-          aria-label="Farbbereich"
+          aria-label={t.tags.categoryAriaLabel}
         >
           {TAG_CATEGORIES.map((entry) => (
             <option key={entry} value={entry}>
-              {TAG_CATEGORY_LABEL[entry]}
+              {t.labels.tagCategory[entry]}
             </option>
           ))}
         </select>
         <Button type="submit" variant="primary" disabled={name.trim().length === 0}>
-          Tag erstellen
+          {t.tags.createButton}
         </Button>
         {hint && <p className="w-full text-xs text-amber-700">{hint}</p>}
       </form>
 
       {grouped.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-500">
-          Keine Tags vorhanden.
+          {t.tags.empty}
         </p>
       ) : (
         grouped.map((group) => (
           <section key={group.category} className="space-y-2">
             <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-500">
               <span className={cn("size-2 rounded-full", TAG_CATEGORY_STYLE[group.category].dot)} />
-              {TAG_CATEGORY_LABEL[group.category]}
-              <span className="font-normal normal-case text-slate-400">
-                ({group.entries.length})
-              </span>
+              {t.labels.tagCategory[group.category]}
+              <span className="font-normal normal-case text-slate-400">({group.entries.length})</span>
             </h2>
 
             <ul className="grid gap-2 sm:grid-cols-2">
@@ -152,19 +144,14 @@ export default function TagsPage() {
                             if (event.key === "Escape") setEditingId(null);
                           }}
                           className={cn(FIELD, "min-w-32 flex-1")}
-                          aria-label={`Tag ${tag.name} umbenennen`}
+                          aria-label={t.tags.renameAriaLabel(tag.name)}
                           autoFocus
                         />
                         <Button type="button" size="sm" variant="primary" onClick={saveEdit}>
-                          Speichern
+                          {t.common.save}
                         </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setEditingId(null)}
-                        >
-                          Abbrechen
+                        <Button type="button" size="sm" variant="ghost" onClick={() => setEditingId(null)}>
+                          {t.common.cancel}
                         </Button>
                       </>
                     ) : (
@@ -177,11 +164,7 @@ export default function TagsPage() {
                         >
                           {tag.name}
                         </span>
-                        <span className="text-xs text-slate-400">
-                          {usage === 0
-                            ? "nicht verwendet"
-                            : `${usage} ${usage === 1 ? "Aufgabe" : "Aufgaben"}`}
-                        </span>
+                        <span className="text-xs text-slate-400">{t.tags.usageCount(usage)}</span>
 
                         <div className="ml-auto flex items-center gap-1">
                           <select
@@ -190,11 +173,11 @@ export default function TagsPage() {
                               updateTag(tag.id, { category: event.target.value as TagCategory })
                             }
                             className="rounded-full border border-slate-300 bg-white px-2 py-1 text-xs text-slate-600 outline-none focus:border-indigo-500"
-                            aria-label={`Farbbereich von ${tag.name}`}
+                            aria-label={t.tags.categoryChangeAriaLabel(tag.name)}
                           >
                             {TAG_CATEGORIES.map((entry) => (
                               <option key={entry} value={entry}>
-                                {TAG_CATEGORY_LABEL[entry]}
+                                {t.labels.tagCategory[entry]}
                               </option>
                             ))}
                           </select>
@@ -209,22 +192,17 @@ export default function TagsPage() {
                               setHint(null);
                             }}
                           >
-                            Umbenennen
+                            {t.common.rename}
                           </Button>
 
                           {usage > 0 ? (
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setPendingDelete(tag)}
-                            >
-                              Löschen
+                            <Button type="button" size="sm" variant="ghost" onClick={() => setPendingDelete(tag)}>
+                              {t.common.delete}
                             </Button>
                           ) : (
                             <ConfirmButton
-                              label="Löschen"
-                              confirmLabel="Wirklich löschen?"
+                              label={t.common.delete}
+                              confirmLabel={t.common.deleteConfirm}
                               onConfirm={() => deleteTag(tag.id)}
                             />
                           )}
@@ -242,12 +220,12 @@ export default function TagsPage() {
       {/* Warnhinweis beim Löschen eines noch verwendeten Tags (PRD 5.4) */}
       <Modal
         open={pendingDelete !== null}
-        title="Tag wird noch verwendet"
+        title={t.tags.usedWarningTitle}
         onClose={() => setPendingDelete(null)}
         footer={
           <>
             <Button type="button" variant="secondary" onClick={() => setPendingDelete(null)}>
-              Abbrechen
+              {t.common.cancel}
             </Button>
             <Button
               type="button"
@@ -257,18 +235,14 @@ export default function TagsPage() {
                 setPendingDelete(null);
               }}
             >
-              Trotzdem löschen
+              {t.tags.deleteAnyway}
             </Button>
           </>
         }
       >
         <p className="text-sm text-slate-600">
-          Der Tag <strong>{pendingDelete?.name}</strong> wird aktuell von{" "}
-          <strong>
-            {usageOfPending} {usageOfPending === 1 ? "Aufgabe" : "Aufgaben"}
-          </strong>{" "}
-          verwendet. Beim Löschen wird er von allen betroffenen Aufgaben entfernt. Die Aufgaben
-          selbst bleiben bestehen.
+          {t.tags.usedWarningIntro} <strong>{pendingDelete?.name}</strong>
+          {t.tags.usedWarningBody(usageOfPending)} {t.tags.usedWarningNote}
         </p>
       </Modal>
     </div>

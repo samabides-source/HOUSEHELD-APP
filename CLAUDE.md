@@ -22,31 +22,65 @@ npm run lint
 ```
 
 Sprache im UI, in Kommentaren und in Commit-Messages: **Deutsch** (Schweizer Schreibweise, „ss“
-statt „ß“).
+statt „ß“). Deutsch ist die **Quellsprache**: neue UI-Texte zuerst in `lib/i18n/dictionaries.ts`
+unter `de` ergänzen, dann `en` nachziehen (TypeScript meldet fehlende Keys, weil `en` gegen den
+Typ von `de` geprüft wird).
 
 ## Architektur
 
-Next.js 15 (App Router) + React 19 + Tailwind CSS v4 + TypeScript. **Es gibt keinen Server-Code
-und keine API-Routen** – alle Seiten sind statisch, die gesamte Logik läuft im Browser.
+Next.js 15 (App Router) + React 19 + Tailwind CSS v4 + TypeScript. **Es gibt keinen eigenen
+Backend-/API-Code** – die gesamte fachliche Logik läuft im Browser, IndexedDB ist der einzige
+Datenspeicher. Für Mehrsprachigkeit und SEO-Metadaten kommen Next-eigene Edge-Mechanismen zum
+Einsatz (`middleware.ts`, dynamische `opengraph-image`/`apple-icon`) – das sind Next.js-Bordmittel
+ohne eigene Server-/Datenbank-Anbindung, kein Widerspruch zur „kein Backend“-Regel.
 
 ```
-app/                    Seiten (alle "use client")
-  page.tsx              Alle Aufgaben (Liste + Board), Personen-Filter lokal gemerkt
-  personen/             Personenverwaltung
-  tags/                 Tagverwaltung inkl. Löschwarnung
-  einstellungen/        Statistik, Beispieldaten, Reset
-components/             UI-Bausteine (Chips, Modal, TaskCard, TaskDialog, …)
+middleware.ts           Locale-Rewrite: "/" (ohne Präfix) → intern "/de", "/en/…" bleibt explizit
+app/
+  [locale]/              Seiten je Sprache (de = kein Präfix, en = "/en/…"), alle "use client"
+    layout.tsx           Root-Layout: <html lang>, Metadata/JSON-LD, I18nProvider, StoreProvider
+    page.tsx              Alle Aufgaben (Liste + Board), Personen-Filter lokal gemerkt
+    personen/              Personenverwaltung (+ layout.tsx für Metadata, da page.tsx Client ist)
+    tags/                  Tagverwaltung inkl. Löschwarnung (+ layout.tsx für Metadata)
+    einstellungen/         Statistik, Beispieldaten, Reset (+ layout.tsx für Metadata)
+  robots.ts              /robots.txt
+  sitemap.ts             /sitemap.xml (mit hreflang-Alternates de/en)
+  manifest.ts            Web App Manifest
+  opengraph-image.tsx    OG-Bild (next/og, generisch für beide Sprachen)
+  apple-icon.tsx         apple-touch-icon (180×180, aus app/icon.svg generiert)
+components/             UI-Bausteine (Chips, Modal, TaskCard, TaskDialog, …) – lesen Texte über `useT()`
 lib/
+  i18n/
+    config.ts            Locale-Typ, DEFAULT_LOCALE, `localeHref()`
+    dictionaries.ts       Alle UI-Texte (de = Quelle, en typgeprüft dagegen)
+    context.tsx           `I18nProvider`, `useLocale()`, `useT()`
   db.ts                 IndexedDB-Zugriff (einzige Stelle mit IDB-API)
-  store.tsx             React-Context: Zustand + alle Schreibaktionen
-  types.ts              Domänentypen, Labels, Grenzwerte
+  store.tsx             React-Context: Zustand + alle Schreibaktionen (locale-abhängiges Seeding)
+  types.ts              Domänentypen, Grenzwerte (Anzeige-Labels liegen in den i18n-Dictionaries)
   theme.ts              Farbzuordnung (Tag-Kategorie, Priorität, Status)
   filters.ts            Filter- und Sortierlogik (rein, ohne React)
   photos.ts             Bildverkleinerung/-komprimierung
   photo-url.ts          Object-URL-Cache + usePhotoUrl
-  seed.ts               Vordefinierte Tags (einmaliges Seeding)
-  demo-data.ts          Beispieldaten (lazy geladen)
+  seed.ts               Vordefinierte Tags je Sprache (einmaliges Seeding)
+  demo-data.ts          Beispieldaten je Sprache (lazy geladen)
 ```
+
+### Mehrsprachigkeit (DE/EN)
+
+- Deutsch bleibt ohne URL-Präfix erreichbar (`/`, `/personen`, …), Englisch liegt explizit unter
+  `/en/…`. `middleware.ts` schreibt präfixlose Pfade intern auf `/de/…` um (Rewrite, keine
+  sichtbare Weiterleitung) – bestehende Links/Bookmarks bleiben gültig.
+- Jede Route liegt unter `app/[locale]/…`; Seiten sind Client-Komponenten und lesen Texte über
+  `useT()` (liefert das Dictionary der aktuellen Sprache) bzw. `useLocale()`.
+- `personen/`, `tags/`, `einstellungen/` haben je ein schlankes Server-`layout.tsx` nur für
+  `generateMetadata()` (Title/Description/hreflang) – die eigentliche Seite bleibt Client-Code.
+- **Seed-Tags und Beispieldaten sind sprachabhängig, aber nicht rückwirkend übersetzbar**: Welche
+  Sprachversion beim ersten Start angelegt wird, hängt von der zu dem Zeitpunkt aktiven Sprache ab
+  (`lib/seed.ts`, `lib/demo-data.ts`). Einmal gespeicherte Tag-/Aufgabennamen sind danach normale
+  Nutzdaten wie jeder andere Text auch und werden bei einem Sprachwechsel nicht übersetzt – die App
+  hat nur **eine** IndexedDB pro Browser, nicht eine pro Sprache.
+- Neue UI-Texte: Key zuerst in `de` (lib/i18n/dictionaries.ts) ergänzen, TypeScript zeigt dank
+  `const en: typeof de = {…}` sofort, wo `en` nachgezogen werden muss.
 
 **Demo-Daten und Netzwerk:** `demo-data.ts` versucht für jedes Beispielfoto ein passendes,
 offen lizenziertes Bild über die Openverse-API (kostenlos, kein Key) zu laden. Schlägt das fehl
@@ -89,8 +123,9 @@ Store-Schnittstelle kann dabei unverändert bleiben.
 - **Standardsortierung**: Fälligkeitsdatum aufsteigend, Aufgaben ohne Datum danach (Erstelldatum
   absteigend). Umschaltbar auf Erstelldatum.
 - **„dringend“ ist eine Priorität, kein Tag.** Nicht als Tag anlegen.
-- Nicht im Umfang: Auth, KI-Funktionen, Push, Mehrsprachigkeit, Vorher-/Nachher-Fotos, Papierkorb,
-  visuelle Kennzeichnung überfälliger Aufgaben.
+- Nicht im Umfang: Auth, KI-Funktionen, Push, Vorher-/Nachher-Fotos, Papierkorb, visuelle
+  Kennzeichnung überfälliger Aufgaben. Mehrsprachigkeit (DE/EN) ist über das PRD hinaus ergänzt
+  worden, siehe „Mehrsprachigkeit (DE/EN)“ oben.
 
 ## Design-Regeln
 
@@ -125,5 +160,20 @@ gedämpft. Bewusst keine Google-Font, damit der Build ohne Netzwerkzugriff funkt
 
 ## Deployment
 
-Vercel, Framework-Preset „Next.js“, keine Umgebungsvariablen, kein Build-Override nötig. Da alles
-statisch prerendered wird, gibt es keine Serverless-Functions und keine Datenbank-Anbindung.
+Vercel, Framework-Preset „Next.js“, keine Umgebungsvariablen, kein Build-Override nötig, Domain
+`https://househeld-app.vercel.app/`. Fachliche Seiten werden statisch prerendert (pro Locale, via
+`generateStaticParams`); `middleware.ts` läuft als Edge-Function nur für das Locale-Rewriting,
+`opengraph-image.tsx`/`apple-icon.tsx` generieren Bilder on-demand. Es gibt weiterhin **keine
+Datenbank-Anbindung und keine eigene API** – diese Next-Mechanismen ersetzen keine
+Server-Fachlogik, die bleibt vollständig im Client.
+
+## SEO/AEO/GEO
+
+- `app/robots.ts`, `app/sitemap.ts` (mit hreflang-Alternates de/en), `app/manifest.ts`,
+  `app/opengraph-image.tsx`, `app/apple-icon.tsx`.
+- `app/[locale]/layout.tsx` setzt `metadataBase`, Title-Template, Open-Graph/Twitter-Metadata und
+  ein `SoftwareApplication`-JSON-LD (für Answer-/Generative-Engines) pro Sprache.
+- `personen/`, `tags/`, `einstellungen/` haben eigene, sprachspezifische Title/Description über
+  ihr jeweiliges `layout.tsx` (`generateMetadata`), statt den Root-Title zu erben.
+- `public/llms.txt` beschreibt die App kurz für LLM-Crawler (GEO).
+- Foto-Alt-Texte referenzieren den Aufgabentitel (`t.photos.altText`) statt des rohen Dateinamens.

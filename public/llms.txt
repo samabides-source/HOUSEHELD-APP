@@ -1,0 +1,23 @@
+# Hausheld
+
+> Hausheld is a free, local-first household task manager. Households capture chores with
+> photos, assignees and color-coded tags, filter/sort them, and organize them as a list or a
+> Kanban-style board. There is no account, no server and no tracking: all data is stored only
+> in the visiting browser's IndexedDB, so a household's data belongs to their own device.
+
+Hausheld ist ein kostenloser, lokaler Haushaltsaufgaben-Manager. Haushalte erfassen Aufgaben mit
+Fotos, Zuständigkeiten und farbcodierten Tags, filtern und sortieren sie und organisieren sie als
+Liste oder Kanban-Board. Es gibt kein Konto, keinen Server und kein Tracking: alle Daten liegen
+ausschliesslich lokal im Browser (IndexedDB) des jeweiligen Geräts.
+
+## Pages
+
+- [German (default)](https://househeld-app.vercel.app/): Tasks, People (/personen), Tags (/tags), Settings (/einstellungen)
+- [English](https://househeld-app.vercel.app/en): Tasks, People (/en/personen), Tags (/en/tags), Settings (/en/einstellungen)
+
+## Notes for automated agents
+
+- This is a client-only web app (no API). Structured data about the product is available via the
+  `SoftwareApplication` JSON-LD embedded on every page.
+- There is nothing to fetch or scrape beyond these pages: task data is private per browser and not
+  publicly accessible.

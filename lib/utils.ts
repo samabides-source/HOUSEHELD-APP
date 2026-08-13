@@ -1,3 +1,5 @@
+import type { Locale } from "./i18n/config";
+
 export function newId(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
@@ -21,18 +23,17 @@ export function normalizeTagName(name: string): string {
   return name.trim().replace(/\s+/g, " ").toLocaleLowerCase("de-CH");
 }
 
-const dateFormatter = new Intl.DateTimeFormat("de-CH", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-});
+const DATE_FORMATTERS: Record<Locale, Intl.DateTimeFormat> = {
+  de: new Intl.DateTimeFormat("de-CH", { day: "2-digit", month: "2-digit", year: "numeric" }),
+  en: new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }),
+};
 
-/** Formatiert ein ISO-Datum (YYYY-MM-DD oder voller Zeitstempel) als TT.MM.JJJJ. */
-export function formatDate(value: string | null | undefined): string {
+/** Formatiert ein ISO-Datum (YYYY-MM-DD oder voller Zeitstempel) sprachabhängig. */
+export function formatDate(value: string | null | undefined, locale: Locale = "de"): string {
   if (!value) return "";
   const date = value.length === 10 ? new Date(`${value}T00:00:00`) : new Date(value);
   if (Number.isNaN(date.getTime())) return "";
-  return dateFormatter.format(date);
+  return DATE_FORMATTERS[locale].format(date);
 }
 
 export function initials(name: string): string {
