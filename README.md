@@ -57,14 +57,44 @@ Zum Abschluss wurde in einer separaten Session eine vorgegebene Security-Checkli
 - Geprüft, aber bewusst nicht umgesetzt: eine echte automatische Übersetzung von frei eingegebenen Aufgaben-Titeln/-Beschreibungen. Recherchiert wurden die neue, rein lokale „Built-in Translator API" von Chrome/Edge (nur Desktop-Chrome/Edge) sowie externe Dienste wie MyMemory und LibreTranslate. Verworfen, weil externe Dienste Aufgabendaten an Dritte senden würden – ein Widerspruch zum Kernprinzip „alle Daten bleiben lokal im Browser". Als bekannte Einschränkung im README dokumentiert.
 
 ## Entwicklungsprozess SITE
-Mittels simplem Prompt, Verlinkung zur App und einigen technischen Angaben habe ich mir eine erste Fassung der Marketing-Seite erstellen lassen. Design und beschriebene Funktionen stimmen mit der App überein.
-Danach mehrere Iterationen hinsichtlich Details in Design und Wording.
-Im Anschluss die Site auf SEO/AEO/GEO-Kriterien geprüft und eine englische Sprachversion hinzugefügt. Claude hat sehr viele Änderungen vorgeschlagen, die aber nach meiner Einschätzung alle im Hintergrund stattfanden.
 
-**Bekannte Einschränkung der englischen Sprachversion:** Beim Umschalten zwischen Deutsch und Englisch werden nur die 31 vordefinierten Tags automatisch mitübersetzt (feste DE/EN-Zuordnung hinterlegt). Selbst erstellte Tags sowie Aufgaben-Titel und -Beschreibungen bleiben in der Sprache stehen, in der sie ursprünglich erfasst wurden. Eine echte automatische Übersetzung von Freitext wurde geprüft (u. a. die neue, rein lokale "Built-in Translator API" von Chrome/Edge sowie externe Dienste wie MyMemory und LibreTranslate), bewusst aber nicht eingebaut: Die externen Dienste würden Aufgabendaten an einen Drittanbieter senden und damit dem Kernprinzip der App widersprechen, dass sämtliche Daten ausschliesslich lokal im Browser bleiben; die browserseitige Variante wiederum funktioniert nur in Chrome/Edge auf dem Desktop.
+**Meilensteine**
+
+Die Marketingseite entstand als Grundgerüst mit fünf Seiten (Home, Features, FAQ, About, App
+testen), im gleichen Design wie die App. Danach kamen eine Kontaktadresse auf der About-Seite
+sowie Fotos auf Home und Features dazu, und die About-Seite wurde neu strukturiert: Projekt,
+Technik und Hintergrundentscheide sind seither in einer aufklappbaren Kachel zusammengefasst.
+
+Der grösste Schritt war eine vollständige SEO-, AEO- und GEO-Überarbeitung kombiniert mit dem
+Aufbau einer kompletten englischen Sprachversion. Die Inhalte wurden dafür in getrennte deutsche
+und englische Dateien mit gemeinsamer Struktur aufgeteilt, Deutsch ohne Präfix, Englisch unter
+eigenem Pfad. Ergänzt wurden strukturierte Daten für Suchmaschinen und Sprachassistenten,
+dynamisch generierte Vorschaubilder, eine maschinenlesbare Zusammenfassung für KI-Crawler sowie
+Sprachverweise auf jeder Seite.
+
+Zum Schluss wurde die Verlinkung zur App sprachabhängig gemacht, nachdem auch die App selbst eine
+englische Version erhielt: Alle Links sowie das App-Mockup zeigen seither je nach gewählter
+Sprache auf die passende Version.
+
+**Wichtige Anpassungen**
+
+- Das Home-Foto wurde mehrfach ausgetauscht, bis ein passendes Motiv gefunden war – die Lizenz
+  wurde dabei sauber pro Bild dokumentiert.
+- Die Inhalte wurden von einer einzelnen Content-Datei auf getrennte, sprachspezifische Dateien
+  mit gemeinsamer Struktur umgestellt, als Grundlage für die Zweisprachigkeit.
+- Die App-Verlinkung wurde von einer festen URL auf eine sprachabhängige Zuordnung umgebaut,
+  ebenso das App-Mockup, das seither je nach Sprache passende Texte zeigt.
+
+**Bugfixes**
+
+- Ein bei jedem Build neu gesetztes, bedeutungsloses Datum in der Sitemap wurde fest gesetzt.
+- Die Sprachangabe des Dokuments wurde korrigiert.
+- Überflüssige Screenreader-Ausgaben bei den Logo-Symbolen wurden unterdrückt.
+- Verwaiste Verweise auf die alte Content-Datei wurden bereinigt.
+- Eine überholte Aussage zur App-Oberfläche wurde im Leitfaden korrigiert.
 
 ## Reflexion
-Schon vor dem Deploy ein Problemhinweis bzgl. Datenbank erhalten: Es liegt alles clientseitig in IndexedDB.D er Datenbestand ist pro Browser/Gerät, nicht zwischen Haushaltsmitgliedern geteilt.
+Folgt noch... 
 Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sachen abcheckt, also mein Update im Readme. Denkt Fallback-Varianten mit (z.B. kein Internet, Datenbank lokal)
 
 ## Beispielprompt
