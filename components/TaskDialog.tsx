@@ -233,14 +233,14 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
               <button
                 type="button"
                 onClick={() => setAssigneeIds([])}
-                className="text-xs text-slate-500 underline underline-offset-2 hover:text-slate-800"
+                className="-mx-1.5 -my-1.5 rounded-md px-1.5 py-1.5 text-xs text-slate-600 underline underline-offset-2 hover:text-slate-800"
               >
                 {t.taskDialog.removeAllAssignees}
               </button>
             )}
           </div>
           {store.persons.length === 0 ? (
-            <p className="text-xs text-slate-500">{t.taskDialog.noPersonsHint}</p>
+            <p className="text-xs text-slate-600">{t.taskDialog.noPersonsHint}</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {store.persons.map((person) => {
@@ -299,7 +299,7 @@ export function TaskDialog({ task, onClose }: { task: Task | null; onClose: () =
 
           <div className="flex max-h-48 flex-wrap gap-2 overflow-y-auto rounded-2xl bg-slate-50 p-3">
             {filteredTags.length === 0 && (
-              <p className="text-xs text-slate-500">{t.taskDialog.noMatchingTags}</p>
+              <p className="text-xs text-slate-600">{t.taskDialog.noMatchingTags}</p>
             )}
             {filteredTags.map((tag) => {
               const active = tagIds.includes(tag.id);

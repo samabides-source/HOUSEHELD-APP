@@ -36,7 +36,7 @@ export function PhotoImage({
     return (
       <div
         className={cn(
-          "flex items-center justify-center bg-slate-100 p-1 text-center text-[10px] leading-tight text-slate-400",
+          "flex items-center justify-center bg-slate-100 p-1 text-center text-[10px] leading-tight text-slate-600",
           className,
         )}
         title={t.photos.notAvailableTitle}
@@ -102,7 +102,7 @@ export function PhotoStrip({
         ),
       )}
       {rest > 0 && (
-        <span className="flex size-14 items-center justify-center rounded-xl bg-slate-100 text-xs font-semibold text-slate-500">
+        <span className="flex size-14 items-center justify-center rounded-xl bg-slate-100 text-xs font-semibold text-slate-600">
           +{rest}
         </span>
       )}
@@ -161,7 +161,7 @@ export function PhotoManager({
         >
           {busy ? t.photos.processing : t.photos.addPhotos}
         </Button>
-        <span className="text-xs text-slate-500">{t.photos.countLabel(photos.length, MAX_PHOTOS_PER_TASK)}</span>
+        <span className="text-xs text-slate-600">{t.photos.countLabel(photos.length, MAX_PHOTOS_PER_TASK)}</span>
         <input
           ref={inputRef}
           type="file"
@@ -195,7 +195,7 @@ export function PhotoManager({
               <button
                 type="button"
                 onClick={() => removePhoto(photo.id)}
-                className="absolute -right-1.5 -top-1.5 flex size-6 items-center justify-center rounded-full bg-white text-sm leading-none text-slate-500 shadow ring-1 ring-slate-200 transition hover:bg-red-600 hover:text-white"
+                className="absolute -right-1.5 -top-1.5 flex size-6 items-center justify-center rounded-full bg-white text-sm leading-none text-slate-600 shadow ring-1 ring-slate-200 transition hover:bg-red-600 hover:text-white"
                 aria-label={t.photos.removeAriaLabel(photo.fileName)}
               >
                 ×
@@ -204,7 +204,7 @@ export function PhotoManager({
           ))}
         </ul>
       ) : (
-        <p className="rounded-2xl border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-400">
+        <p className="rounded-2xl border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-600">
           {t.photos.emptyHint}
         </p>
       )}

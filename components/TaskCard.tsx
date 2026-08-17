@@ -69,7 +69,7 @@ export function TaskCard({
           <PhotoStrip photos={photos} max={compact ? 3 : 4} onSelect={setPreviewPhoto} alt={photoAlt} />
         )}
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
           <span className="flex items-center gap-1.5">
             {persons.length > 0 ? (
               <span className="flex -space-x-1.5">
@@ -93,7 +93,7 @@ export function TaskCard({
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
-          <label className="flex items-center gap-2 text-xs text-slate-500">
+          <label className="flex items-center gap-2 text-xs text-slate-600">
             <span className="sr-only sm:not-sr-only">{t.common.status}</span>
             <select
               value={task.status}

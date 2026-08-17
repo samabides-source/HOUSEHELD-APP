@@ -25,7 +25,7 @@ export default function SettingsPage() {
     <div className="space-y-5">
       <section>
         <h1 className="text-2xl font-extrabold tracking-tight">{t.settings.heading}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t.settings.description}</p>
+        <p className="mt-1 text-sm text-slate-600">{t.settings.description}</p>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-4">
@@ -40,7 +40,7 @@ export default function SettingsPage() {
             className="rounded-2xl bg-white p-4 text-center shadow-sm ring-1 ring-slate-200/70"
           >
             <p className="text-2xl font-extrabold">{stat.value}</p>
-            <p className="text-xs uppercase tracking-wide text-slate-400">{stat.label}</p>
+            <p className="text-xs uppercase tracking-wide text-slate-600">{stat.label}</p>
           </div>
         ))}
       </section>

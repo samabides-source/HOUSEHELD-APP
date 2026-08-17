@@ -40,7 +40,7 @@ export default function PersonsPage() {
     <div className="space-y-5">
       <section>
         <h1 className="text-2xl font-extrabold tracking-tight">{t.persons.heading}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t.persons.description}</p>
+        <p className="mt-1 text-sm text-slate-600">{t.persons.description}</p>
       </section>
 
       <form
@@ -60,7 +60,7 @@ export default function PersonsPage() {
       </form>
 
       {persons.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-500">
+        <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-600">
           {t.persons.empty}
         </p>
       ) : (
@@ -99,7 +99,7 @@ export default function PersonsPage() {
                     <PersonAvatar person={person} size="md" decorative />
                     <div className="flex-1">
                       <p className="font-semibold">{person.name}</p>
-                      <p className="text-xs text-slate-500">{t.persons.assignedCount(assigned.length, openCount)}</p>
+                      <p className="text-xs text-slate-600">{t.persons.assignedCount(assigned.length, openCount)}</p>
                     </div>
                     <Button
                       type="button"

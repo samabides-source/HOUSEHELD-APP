@@ -26,7 +26,7 @@ function FilterChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "rounded-full px-2.5 py-1 text-xs font-medium transition",
+        "rounded-full px-2.5 py-1.5 text-xs font-medium transition",
         active
           ? (className ?? "bg-indigo-600 text-white")
           : "bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-100",
@@ -40,7 +40,7 @@ function FilterChip({
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <span className="block text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <span className="block text-xs font-semibold uppercase tracking-wide text-slate-600">
         {label}
       </span>
       <div className="flex flex-wrap gap-1.5">{children}</div>
@@ -94,7 +94,7 @@ export function FilterBar({
           aria-label={t.filterBar.searchAriaLabel}
         />
 
-        <label className="flex items-center gap-2 text-xs text-slate-500">
+        <label className="flex items-center gap-2 text-xs text-slate-600">
           {t.filterBar.sortLabel}
           <select
             value={sort}
@@ -110,7 +110,7 @@ export function FilterBar({
           <button
             type="button"
             onClick={() => onChange({ ...EMPTY_FILTERS })}
-            className="rounded-full px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-100"
+            className="rounded-full px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
           >
             {t.filterBar.resetFilters(active)}
           </button>
@@ -194,7 +194,7 @@ export function FilterBar({
           <button
             type="button"
             onClick={() => setShowAllTags((value) => !value)}
-            className="text-xs font-semibold text-indigo-600 underline underline-offset-2 hover:text-indigo-800"
+            className="-mx-1.5 -my-1.5 rounded-md px-1.5 py-1.5 text-xs font-semibold text-indigo-600 underline underline-offset-2 hover:text-indigo-800"
           >
             {showAllTags ? t.filterBar.collapseTags : t.filterBar.showAllTags}
           </button>

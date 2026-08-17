@@ -77,7 +77,7 @@ export default function TagsPage() {
     <div className="space-y-5">
       <section>
         <h1 className="text-2xl font-extrabold tracking-tight">{t.tags.heading}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t.tags.description}</p>
+        <p className="mt-1 text-sm text-slate-600">{t.tags.description}</p>
       </section>
 
       <form
@@ -113,16 +113,16 @@ export default function TagsPage() {
       </form>
 
       {grouped.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-500">
+        <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-600">
           {t.tags.empty}
         </p>
       ) : (
         grouped.map((group) => (
           <section key={group.category} className="space-y-2">
-            <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-500">
+            <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-600">
               <span className={cn("size-2 rounded-full", TAG_CATEGORY_STYLE[group.category].dot)} />
               {t.labels.tagCategory[group.category]}
-              <span className="font-normal normal-case text-slate-400">({group.entries.length})</span>
+              <span className="font-normal normal-case text-slate-600">({group.entries.length})</span>
             </h2>
 
             <ul className="grid gap-2 sm:grid-cols-2">
@@ -164,7 +164,7 @@ export default function TagsPage() {
                         >
                           {tag.name}
                         </span>
-                        <span className="text-xs text-slate-400">{t.tags.usageCount(usage)}</span>
+                        <span className="text-xs text-slate-600">{t.tags.usageCount(usage)}</span>
 
                         <div className="ml-auto flex items-center gap-1">
                           <select

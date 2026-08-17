@@ -28,7 +28,7 @@ export function TagChip({
         <button
           type="button"
           onClick={onRemove}
-          className="-mr-1 rounded-full px-1 leading-none opacity-60 transition hover:opacity-100"
+          className="-my-1.5 -mr-1.5 rounded-full px-1.5 py-1.5 leading-none opacity-60 transition hover:opacity-100"
           aria-label={t.chips.removeTagAriaLabel(tag.name)}
         >
           ×
@@ -112,7 +112,7 @@ export function EmptyAvatar({ label }: { label?: string }) {
   const resolvedLabel = label ?? t.common.unassigned;
   return (
     <span
-      className="inline-flex size-7 items-center justify-center rounded-full border border-dashed border-slate-300 text-[11px] text-slate-400"
+      className="inline-flex size-7 items-center justify-center rounded-full border border-dashed border-slate-300 text-[11px] text-slate-600"
       title={resolvedLabel}
     >
       –

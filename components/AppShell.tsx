@@ -11,8 +11,13 @@ import { cn } from "@/lib/utils";
 
 const LOCALE_LABEL: Record<Locale, string> = { de: "DE", en: "EN" };
 
+/**
+ * Entfernt das Locale-Präfix von `usePathname()`. Wichtig: `usePathname()`
+ * spiegelt den von `middleware.ts` intern umgeschriebenen Pfad wider (also
+ * z. B. "/de/personen"), nicht die sichtbare, präfixlose URL-Leiste – daher
+ * muss auch für Deutsch aktiv gestrippt werden, nicht nur für andere Sprachen.
+ */
 function stripLocalePrefix(pathname: string, locale: Locale): string {
-  if (locale === "de") return pathname;
   const prefix = `/${locale}`;
   if (pathname === prefix) return "/";
   if (pathname.startsWith(`${prefix}/`)) return pathname.slice(prefix.length);
@@ -37,7 +42,7 @@ function LanguageSwitcher() {
           href={localeHref(value, currentPath)}
           className={cn(
             "rounded-full px-2.5 py-1 text-xs font-bold transition",
-            value === locale ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-800",
+            value === locale ? "bg-white text-indigo-700 shadow-sm" : "text-slate-600 hover:text-slate-800",
           )}
           aria-current={value === locale ? "true" : undefined}
         >
@@ -53,11 +58,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const locale = useLocale();
   const t = useT();
   const { ready, error } = useStore();
+  const currentPath = stripLocalePrefix(pathname, locale);
 
   const NAV = [
-    { href: localeHref(locale, "/personen"), label: t.nav.persons },
-    { href: localeHref(locale, "/tags"), label: t.nav.tags },
-    { href: localeHref(locale, "/einstellungen"), label: t.nav.settings },
+    { path: "/personen", href: localeHref(locale, "/personen"), label: t.nav.persons },
+    { path: "/tags", href: localeHref(locale, "/tags"), label: t.nav.tags },
+    { path: "/einstellungen", href: localeHref(locale, "/einstellungen"), label: t.nav.settings },
   ];
   const homeHref = localeHref(locale, "/");
 
@@ -77,7 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               href={homeHref}
               className={cn(
                 "whitespace-nowrap rounded-full px-4 py-2 text-base font-extrabold transition",
-                pathname === homeHref
+                currentPath === "/"
                   ? "bg-indigo-600 text-white shadow-sm"
                   : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
               )}
@@ -86,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
 
             {NAV.map((item) => {
-              const active = pathname === item.href;
+              const active = currentPath === item.path;
               return (
                 <Link
                   key={item.href}
@@ -123,7 +129,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
       </main>
 
-      <footer className="mx-auto max-w-6xl px-4 pb-10 pt-4 text-xs text-slate-400">{t.appShell.footer}</footer>
+      <footer className="mx-auto max-w-6xl px-4 pb-10 pt-4 text-xs text-slate-600">{t.appShell.footer}</footer>
     </div>
   );
 }

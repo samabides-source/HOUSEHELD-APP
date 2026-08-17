@@ -21,8 +21,8 @@ export default function TasksPage() {
       <section className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">{t.home.heading}</h1>
-          <p className="mt-1 max-w-xl text-sm text-slate-500">{t.home.tagline}</p>
-          <p className="mt-1 text-sm text-slate-500">{t.home.summary(open, inProgress, done)}</p>
+          <p className="mt-1 max-w-xl text-sm text-slate-600">{t.home.tagline}</p>
+          <p className="mt-1 text-sm text-slate-600">{t.home.summary(open, inProgress, done)}</p>
         </div>
         {persons.length === 0 && (
           <p className="rounded-2xl bg-amber-50 px-4 py-2 text-xs text-amber-800 ring-1 ring-amber-200">

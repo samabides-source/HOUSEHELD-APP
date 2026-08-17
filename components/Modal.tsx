@@ -58,7 +58,7 @@ export function Modal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full px-2 py-1 text-xl leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className="rounded-full px-2 py-1 text-xl leading-none text-slate-600 transition hover:bg-slate-100 hover:text-slate-700"
             aria-label={t.modal.closeAriaLabel}
           >
             ×

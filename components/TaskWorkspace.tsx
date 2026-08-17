@@ -77,7 +77,7 @@ export function TaskWorkspace({ tasks, emptyHint }: { tasks: Task[]; emptyHint: 
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">{t.taskWorkspace.countLabel(visible.length, tasks.length)}</span>
+          <span className="text-xs text-slate-600">{t.taskWorkspace.countLabel(visible.length, tasks.length)}</span>
           <Button variant="primary" onClick={openNew}>
             {t.taskWorkspace.newTask}
           </Button>
@@ -87,7 +87,7 @@ export function TaskWorkspace({ tasks, emptyHint }: { tasks: Task[]; emptyHint: 
       <FilterBar filters={filters} onChange={handleFiltersChange} sort={sort} onSortChange={setSort} />
 
       {visible.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-500">
+        <p className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center text-sm text-slate-600">
           {tasks.length === 0 ? emptyHint : t.taskWorkspace.emptyFiltered}
         </p>
       ) : view === "liste" ? (
@@ -110,14 +110,14 @@ export function TaskWorkspace({ tasks, emptyHint }: { tasks: Task[]; emptyHint: 
                     <span className={cn("size-2 rounded-full", STATUS_STYLE[status].dot)} />
                     {t.labels.status[status]}
                   </h3>
-                  <span className="text-xs text-slate-500">{column.length}</span>
+                  <span className="text-xs text-slate-600">{column.length}</span>
                 </header>
                 <div className="space-y-3">
                   {column.map((task) => (
                     <TaskCard key={task.id} task={task} onEdit={openEdit} compact />
                   ))}
                   {column.length === 0 && (
-                    <p className="px-1 pb-2 text-xs text-slate-400">{t.taskWorkspace.emptyColumn}</p>
+                    <p className="px-1 pb-2 text-xs text-slate-600">{t.taskWorkspace.emptyColumn}</p>
                   )}
                 </div>
               </section>
