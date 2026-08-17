@@ -24,35 +24,8 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Entwicklungsprozess SITE](#entwicklungsprozess-site)
 - [Reflexion](#reflexion)
 - [Beispielprompt](#beispielprompt)
-- [PRD: Hausheld – Haushaltsaufgaben-Tracker](#prd-hausheld--haushaltsaufgaben-tracker)
-  - [1. Übersicht](#1-übersicht)
-  - [2. Ziele](#2-ziele)
-  - [3. Nicht-Ziele (Out of Scope)](#3-nicht-ziele-out-of-scope)
-  - [4. Nutzer & Rollen](#4-nutzer--rollen)
-  - [5. Kern-Features](#5-kern-features)
-  - [6. Design-Richtung](#6-design-richtung)
-  - [7. User Stories](#7-user-stories)
-  - [8. Technische Rahmenbedingungen](#8-technische-rahmenbedingungen)
-  - [9. Erweiterungen für später](#9-erweiterungen-für-später-nicht-teil-des-ersten-wurfs)
-  - [10. Erfolgskriterien](#10-erfolgskriterien-für-dieses-übungsprojekt)
-- [Security-Checkliste für Vibe-coded Apps](#security-checkliste-für-vibe-coded-apps--ausgefüllt-für-hausheld)
-  - [Kritische Punkte](#kritische-punkte)
-    - [1. Keine Secrets im Code oder Repo](#1-keine-secrets-im-code-oder-repo)
-    - [2. Keine Secrets im Client-Bundle](#2-keine-secrets-im-client-bundle)
-    - [3. Login und Accounts nur über etablierte Mechanismen](#3-login-und-accounts-nur-über-etablierte-mechanismen)
-    - [4. Datenbank-Zugriffsregeln aktiv](#4-datenbank-zugriffsregeln-aktiv)
-    - [5. Jede API-Route prüft selbst](#5-jede-api-route-prüft-selbst)
-    - [6. Deployment-Schutz auf Vercel](#6-deployment-schutz-auf-vercel)
-  - [Empfohlene Punkte](#empfohlene-punkte)
-    - [7. Claude Code selbst absichern](#7-claude-code-selbst-absichern)
-    - [8. Abhängigkeiten](#8-abhängigkeiten)
-    - [9. GitHub und Repo-Hygiene](#9-github-und-repo-hygiene)
-    - [10. Umgang mit fremden Eingaben](#10-umgang-mit-fremden-eingaben)
-    - [11. Kosten- und Missbrauchsschutz](#11-kosten--und-missbrauchsschutz)
-    - [12. Security Headers](#12-security-headers)
-    - [13. Betrieb](#13-betrieb)
-  - [Wenn die Zeit knapp ist – die 3 wichtigsten Punkte](#wenn-die-zeit-knapp-ist--die-3-wichtigsten-punkte)
-  - [Zusammenfassung: offene Punkte](#zusammenfassung-identifizierte-offene-punkte-noch-nicht-behoben)
+- [PRD-/SPEC-File(#prd-hausheld--haushaltsaufgaben-tracker)
+- [Security-Checkliste](#security-checkliste-für-vibe-coded-apps--ausgefüllt-für-hausheld)
 - [Notes Sandro](#notes-sandro)
 
 ## Links
@@ -63,6 +36,7 @@ Hinweis: Die App speichert alle Daten nur lokal im jeweiligen Browser. Damit du 
 
 **Marketing-Seite**
 https://househeld-page.vercel.app/
+
 **Marketing-Seite: Github Repository**
 https://github.com/samabides-source/HOUSEHELD-PAGE
 
