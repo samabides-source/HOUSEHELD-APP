@@ -24,7 +24,7 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Entwicklungsprozess SITE](#entwicklungsprozess-site)
 - [Reflexion](#reflexion)
 - [Beispielprompt](#beispielprompt)
-- [PRD-/SPEC-File(#prd-hausheld--haushaltsaufgaben-tracker)
+- [PRD-/SPEC-File](#prd-hausheld--haushaltsaufgaben-tracker)
 - [Security-Checkliste](#security-checkliste-für-vibe-coded-apps--ausgefüllt-für-hausheld)
 - [Notes Sandro](#notes-sandro)
 
