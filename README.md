@@ -78,6 +78,8 @@ In einer späteren, grösseren Session wurde die App auf SEO/AEO/GEO geprüft un
 
 Zum Abschluss wurde in einer separaten Session eine vorgegebene Security-Checkliste für vibe-gecodete Apps durchgearbeitet (siehe eigener Abschnitt weiter unten im Dokument). Ergebnis: keine Secrets im Code, kein Server-/API-Code, der klassische Angriffsflächen böte; im Gespräch wurden zusätzlich GitHub-Repo-Einstellungen (Secret Scanning, Push Protection, Dependabot, Branch Protection) und die Vercel-Konfiguration (Deployment Protection, Environment Variables) gemeinsam geprüft und gehärtet.
 
+In einer weiteren Session wurde ein manueller PageSpeed-Insights-Test (Mobile) auf der produktiven App ausgewertet: Performance 98, Accessibility 92, Best Practices 100, SEO 100, Agentisches Browsing 3/3. Die Auswertung der aufgelisteten „fehlerhaften Elemente" deckte dabei einen produktiv ausgelieferten Navigationsbug auf und führte ausserdem zu gezielten Barrierefreiheits-Korrekturen (siehe Bugfixes).
+
 **Wichtige Anpassungen**
 
 Über mehrere Feedbackrunden hinweg wurden u. a. folgende Änderungen umgesetzt:
@@ -95,6 +97,8 @@ Zum Abschluss wurde in einer separaten Session eine vorgegebene Security-Checkli
 - Tags wurden beim Sprachwechsel nicht übersetzt: Ursache war, dass Next.js beim Sprachwechsel die Client-Komponenten neu mountet, wodurch ein zur Erkennung genutzter useRef jedes Mal zurückgesetzt wurde. Fix: Die zuletzt aktive Sprache wird seither in IndexedDB gespeichert (meta.lastLocale) statt im React-State, wodurch die Übersetzung der 31 vordefinierten Tags zuverlässig bei jedem Sprachwechsel greift.
 - Folgebug, entdeckt nach dem ersten Fix: Nach „Alle Daten löschen" wurde auch der lastLocale-Marker gelöscht, wodurch der nächste Sprachwechsel die Tags nicht mehr übersetzte (erst der übernächste Wechsel „reparierte" es wieder) – reproduziert sowohl im Dev- als auch im Produktions-Build. Fix: resetEverything() setzt den Marker nach dem Neu-Seeding jetzt explizit wieder.
 - Geprüft, aber bewusst nicht umgesetzt: eine echte automatische Übersetzung von frei eingegebenen Aufgaben-Titeln/-Beschreibungen. Recherchiert wurden die neue, rein lokale „Built-in Translator API" von Chrome/Edge (nur Desktop-Chrome/Edge) sowie externe Dienste wie MyMemory und LibreTranslate. Verworfen, weil externe Dienste Aufgabendaten an Dritte senden würden – ein Widerspruch zum Kernprinzip „alle Daten bleiben lokal im Browser". Als bekannte Einschränkung im README dokumentiert.
+- PageSpeed-Insights-Audit deckte einen produktiv ausgelieferten Bug im Sprachumschalter auf: Ein Klick auf „EN" von einer deutschen Seite führte auf eine nicht existierende Route (z. B. `/en/de/personen` statt `/en/personen`) – 404. Ursache: `usePathname()` liefert nach dem Locale-Rewrite in `middleware.ts` den intern aufgelösten Pfad (z. B. `/de/personen`), nicht die sichtbare, präfixlose URL; die Pfad-Bereinigungsfunktion ging fälschlich davon aus, Deutsch habe nie ein Präfix, und hat es deshalb nur für Englisch entfernt. Als Nebeneffekt war dadurch auch die aktive Hervorhebung in der Navigation auf allen deutschen Seiten dauerhaft kaputt (nie markiert). Beide Symptome mit derselben Korrektur behoben und per DE↔EN-Roundtrip nachgetestet.
+- Barrierefreiheit (PageSpeed-Score 92) korrigiert: Das Kontrastverhältnis von gedämpftem Sekundärtext (Fusszeile, Filterlabels, Zeitangaben u. a., 34 Stellen app-weit) lag mit `text-slate-400`/`text-slate-500` unter dem WCAG-AA-Mindestwert von 4,5:1; app-weit auf `text-slate-600` (~7:1) vereinheitlicht. Ausserdem waren einzelne Berührungszielbereiche (Filter-Chips, „Alle Tags anzeigen", Tag entfernen, „Alle Zuweisungen entfernen") mit rund 24 px zu knapp bemessen; Tap-Fläche per zusätzlichem Padding samt kompensierendem Negativ-Margin vergrössert, ohne das sichtbare Layout zu verschieben.
 
 ## Entwicklungsprozess SITE
 
@@ -116,6 +120,19 @@ Zum Schluss wurde die Verlinkung zur App sprachabhängig gemacht, nachdem auch d
 englische Version erhielt: Alle Links sowie das App-Mockup zeigen seither je nach gewählter
 Sprache auf die passende Version.
 
+Danach folgte ein eigenständiger GEO-Audit anhand einer vorgegebenen Checkliste (siehe Abschnitt
+oben). Jeder Punkt wurde einzeln geprüft – Code-Durchsicht, Live-Tests im Browser und, wo
+sinnvoll, echte externe Werkzeuge statt blosser Einschätzung: die Schema-Markups wurden bei
+validator.schema.org gegen die produktive URL validiert, nicht nur gegen lokal eingefügten Code.
+Dabei kam ans Licht, dass die in den Metadaten hinterlegte Domain die ganze Zeit falsch war
+(`hausheld-page` statt `househeld-page`) – ein reiner Tippfehler, der aber Canonical-URLs,
+Open-Graph-Tags, Sitemap und sämtliche strukturierten Daten betraf und ohne den Audit
+wahrscheinlich unentdeckt geblieben wäre. Nach der Korrektur und einem manuellen Deployment durch
+den Nutzer liess sich die Seite erstmals vollständig live testen, inklusive eines
+PageSpeed-Insights-Berichts, der zusätzlich noch unter dem Radar gebliebene
+Kontrastprobleme sowie ein nicht spezifikationskonformes `llms.txt` aufdeckte – beides wurde im
+Anschluss behoben und erneut verifiziert.
+
 **Wichtige Anpassungen**
 
 - Das Home-Foto wurde mehrfach ausgetauscht, bis ein passendes Motiv gefunden war – die Lizenz
@@ -124,6 +141,13 @@ Sprache auf die passende Version.
   mit gemeinsamer Struktur umgestellt, als Grundlage für die Zweisprachigkeit.
 - Die App-Verlinkung wurde von einer festen URL auf eine sprachabhängige Zuordnung umgebaut,
   ebenso das App-Mockup, das seither je nach Sprache passende Texte zeigt.
+- Die Produktdefinition stand bisher nur in Meta-Daten und strukturierten Daten, nie im
+  sichtbaren Seitentext – auf Home und About wurde je ein Satz ergänzt, der das direkt und
+  eigenständig lesbar macht.
+- Auf der Features-Seite wurde eine Zwischenüberschrift vor dem Funktions-Raster ergänzt, damit
+  die Überschriftenhierarchie keinen Sprung mehr macht.
+- `llms.txt` wurde vom reinen Fliesstext-Format auf das offiziell erwartete Markdown-Format mit
+  echten Links umgestellt.
 
 **Bugfixes**
 
@@ -132,6 +156,15 @@ Sprache auf die passende Version.
 - Überflüssige Screenreader-Ausgaben bei den Logo-Symbolen wurden unterdrückt.
 - Verwaiste Verweise auf die alte Content-Datei wurden bereinigt.
 - Eine überholte Aussage zur App-Oberfläche wurde im Leitfaden korrigiert.
+- Eine falsche Platzhalter-Domain in den Metadaten wurde korrigiert – betraf Canonical-URLs,
+  Open-Graph-Tags, Sitemap und alle strukturierten Daten der ganzen Seite.
+- Mehrere Text/Hintergrund-Kombinationen mit zu geringem Kontrast (teils nur 2.5:1) wurden auf
+  das WCAG-AA-Minimum von 4.5:1 angehoben.
+- Der Produktname war – vermutlich aus der DE/EN-Aufteilung der Inhalte hervorgegangen – auf der
+  gesamten Seite als „Hausheld" statt „Househeld" gelandet (Titel, Meta-Description, OG-Bilder,
+  JSON-LD, sämtliche Fliesstexte in beiden Sprachen, `llms.txt`). Auf GitHub-Repo-Namen, Live-
+  Domain und die verlinkte App als Referenz durchgehend auf „Househeld" korrigiert; die App selbst
+  wurde dabei nicht angefasst.
 
 ## Reflexion
 Folgt noch... 
