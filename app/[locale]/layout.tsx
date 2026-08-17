@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     metadataBase: new URL(SITE_URL),
     title: { default: dict.pages.tasks.title, template: dict.meta.titleTemplate },
-    description: dict.pages.tasks.description,
+    description: dict.meta.description,
     alternates: {
       canonical: localePath || "/",
       languages: {
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     openGraph: {
       title: dict.pages.tasks.title,
-      description: dict.pages.tasks.description,
+      description: dict.meta.description,
       url: localePath || "/",
       siteName: dict.meta.siteName,
       locale: locale === "de" ? "de_CH" : "en_US",
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     twitter: {
       card: "summary_large_image",
       title: dict.pages.tasks.title,
-      description: dict.pages.tasks.description,
+      description: dict.meta.description,
     },
   };
 }
@@ -65,7 +65,7 @@ export default async function LocaleLayout({
     "@type": "SoftwareApplication",
     name: dict.meta.siteName,
     description: dict.meta.description,
-    applicationCategory: "ProductivityApplication",
+    applicationCategory: "LifestyleApplication",
     operatingSystem: "Any (Web)",
     url: `${SITE_URL}${locale === DEFAULT_LOCALE ? "" : `/${locale}`}`,
     inLanguage: locale === "de" ? "de-CH" : "en",

@@ -16,8 +16,6 @@ const de = {
   pages: {
     tasks: {
       title: "Househeld – Haushaltsaufgaben im Griff",
-      description:
-        "Alle Haushaltsaufgaben auf einen Blick: Liste oder Board, mit Fotos, Zuständigkeiten, Tags und Prioritäten.",
     },
     persons: {
       title: "Personen",
@@ -82,6 +80,8 @@ const de = {
   },
   home: {
     heading: "Alle Aufgaben",
+    tagline:
+      "Househeld sammelt alle Haushaltsaufgaben an einem Ort – kostenlos, ohne Konto. Alle Daten bleiben lokal im Browser.",
     summary: (open: number, inProgress: number, done: number) =>
       `${open} offen · ${inProgress} in Arbeit · ${done} erledigt`,
     onboardingPrefix: "Noch keine Haushaltsmitglieder erfasst – ",
@@ -228,8 +228,6 @@ const en: typeof de = {
   pages: {
     tasks: {
       title: "Househeld – Household Tasks Under Control",
-      description:
-        "All household tasks at a glance: list or board view, with photos, assignees, tags and priorities.",
     },
     persons: {
       title: "People",
@@ -294,6 +292,8 @@ const en: typeof de = {
   },
   home: {
     heading: "All Tasks",
+    tagline:
+      "Househeld collects every household task in one place – free, no account. All data stays local in your browser.",
     summary: (open: number, inProgress: number, done: number) =>
       `${open} open · ${inProgress} in progress · ${done} done`,
     onboardingPrefix: "No household members yet – ",
