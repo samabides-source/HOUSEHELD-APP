@@ -1,6 +1,6 @@
 import type { Person, Photo, Tag, Task } from "./types";
 
-export const DB_NAME = "hausheld";
+export const DB_NAME = "househeld";
 export const DB_VERSION = 1;
 
 export const STORE = {

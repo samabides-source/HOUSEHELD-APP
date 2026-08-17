@@ -5,7 +5,7 @@ Sandro Müntener / 17. August 2026
 
 
 ### App-Beschrieb: ###
-Hausheld ist ein Haushaltsaufgaben-Tracker für Familien/WGs. Aufgaben können mit mehreren Fotos dokumentiert, Personen zugewiesen und mit Tags kategorisiert werden.
+Househeld ist ein Haushaltsaufgaben-Tracker für Familien/WGs. Aufgaben können mit mehreren Fotos dokumentiert, Personen zugewiesen und mit Tags kategorisiert werden.
 
 ### Zielgruppe: ###
 Familien oder WGs, die anfallende Haushaltsaufgaben gemeinsam erfassen und verteilen wollen.
@@ -24,8 +24,8 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Entwicklungsprozess SITE](#entwicklungsprozess-site)
 - [Reflexion](#reflexion)
 - [Beispielprompt](#beispielprompt)
-- [PRD-/SPEC-File](#prd-hausheld--haushaltsaufgaben-tracker)
-- [Security-Checkliste](#security-checkliste-für-vibe-coded-apps--ausgefüllt-für-hausheld)
+- [PRD-/SPEC-File](#prd-househeld--haushaltsaufgaben-tracker)
+- [Security-Checkliste](#security-checkliste-für-vibe-coded-apps--ausgefüllt-für-househeld)
 - [Notes Sandro](#notes-sandro)
 
 ## Links
@@ -140,11 +140,11 @@ Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sach
 ## Beispielprompt
 "Ich muss die auf Vercel deployte App meinem Dozenten schicken. Dieser wird sie via URL aufrufen und anschauen. Nun erhält er aktuell eine "leere" App, ohne Aufgaben und ohne Personen. Ist es nicht doch irgendwie möglich, dass von mir erfasste Aufgaben und Personen an neue User weitergegeben werden? Mach mir Vorschläge, die für mich mit keinen Kosten verbunden sind."
 
-# PRD: Hausheld – Haushaltsaufgaben-Tracker
+# PRD: Househeld – Haushaltsaufgaben-Tracker
 
 ## 1. Übersicht
 
-**Projektname:** Hausheld
+**Projektname:** Househeld
 **Zweck:** Übungsprojekt (Vibe Coding), lokal hostbar, keine Veröffentlichung, keine AI-Tools
 **Zielgruppe:** Familien oder WGs, die anfallende Haushaltsaufgaben gemeinsam erfassen und verteilen wollen
 
@@ -302,7 +302,7 @@ Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sach
 - Die App wird mit Testdaten durchgespielt (z. B. 5–10 Aufgaben, 2–3 Personen, mehrere Tags), um den Ablauf end-to-end zu prüfen
 
 
-# Security-Checkliste für Vibe-coded Apps — ausgefüllt für **Hausheld**
+# Security-Checkliste für Vibe-coded Apps — ausgefüllt für **Househeld**
 
 Geprüft am: 2026-08-08
 Repo: `samabides-source/HOUSEHELD-APP` (main, Stand Commit `b0c51b1`)

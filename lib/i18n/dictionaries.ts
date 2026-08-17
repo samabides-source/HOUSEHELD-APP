@@ -6,16 +6,16 @@ import type { Locale } from "./config";
  */
 const de = {
   meta: {
-    siteName: "Hausheld",
-    titleDefault: "Hausheld – Haushaltsaufgaben im Griff",
-    titleTemplate: "%s · Hausheld",
+    siteName: "Househeld",
+    titleDefault: "Househeld – Haushaltsaufgaben im Griff",
+    titleTemplate: "%s · Househeld",
     description:
-      "Hausheld sammelt alle Haushaltsaufgaben an einem Ort: mit Fotos, Zuständigkeiten und Tags. Kostenlos, ohne Konto – alle Daten bleiben lokal im Browser.",
-    ogAlt: "Hausheld – Haushaltsaufgaben im Griff",
+      "Househeld sammelt alle Haushaltsaufgaben an einem Ort: mit Fotos, Zuständigkeiten und Tags. Kostenlos, ohne Konto – alle Daten bleiben lokal im Browser.",
+    ogAlt: "Househeld – Haushaltsaufgaben im Griff",
   },
   pages: {
     tasks: {
-      title: "Hausheld – Haushaltsaufgaben im Griff",
+      title: "Househeld – Haushaltsaufgaben im Griff",
       description:
         "Alle Haushaltsaufgaben auf einen Blick: Liste oder Board, mit Fotos, Zuständigkeiten, Tags und Prioritäten.",
     },
@@ -33,7 +33,7 @@ const de = {
     },
   },
   nav: {
-    brand: "Hausheld",
+    brand: "Househeld",
     tasks: "Aufgaben",
     persons: "Personen",
     tags: "Tags",
@@ -45,8 +45,8 @@ const de = {
   appShell: {
     storageErrorTitle: "Lokaler Speicher nicht verfügbar",
     storageErrorHint:
-      "Hausheld speichert alle Daten im Browser (IndexedDB). Im privaten Modus oder bei blockiertem Speicher funktioniert die App nicht.",
-    footer: "Hausheld · Übungsprojekt · Daten werden ausschliesslich lokal im Browser gespeichert.",
+      "Househeld speichert alle Daten im Browser (IndexedDB). Im privaten Modus oder bei blockiertem Speicher funktioniert die App nicht.",
+    footer: "Househeld · Übungsprojekt · Daten werden ausschliesslich lokal im Browser gespeichert.",
   },
   common: {
     save: "Speichern",
@@ -218,16 +218,16 @@ const de = {
 
 const en: typeof de = {
   meta: {
-    siteName: "Hausheld",
-    titleDefault: "Hausheld – Household Tasks Under Control",
-    titleTemplate: "%s · Hausheld",
+    siteName: "Househeld",
+    titleDefault: "Househeld – Household Tasks Under Control",
+    titleTemplate: "%s · Househeld",
     description:
-      "Hausheld collects every household task in one place: with photos, ownership and tags. Free, no account needed – all data stays local in your browser.",
-    ogAlt: "Hausheld – Household Tasks Under Control",
+      "Househeld collects every household task in one place: with photos, ownership and tags. Free, no account needed – all data stays local in your browser.",
+    ogAlt: "Househeld – Household Tasks Under Control",
   },
   pages: {
     tasks: {
-      title: "Hausheld – Household Tasks Under Control",
+      title: "Househeld – Household Tasks Under Control",
       description:
         "All household tasks at a glance: list or board view, with photos, assignees, tags and priorities.",
     },
@@ -245,7 +245,7 @@ const en: typeof de = {
     },
   },
   nav: {
-    brand: "Hausheld",
+    brand: "Househeld",
     tasks: "Tasks",
     persons: "People",
     tags: "Tags",
@@ -257,8 +257,8 @@ const en: typeof de = {
   appShell: {
     storageErrorTitle: "Local storage unavailable",
     storageErrorHint:
-      "Hausheld stores all data in the browser (IndexedDB). It won't work in private browsing mode or if storage is blocked.",
-    footer: "Hausheld · Practice project · Data is stored exclusively in your local browser.",
+      "Househeld stores all data in the browser (IndexedDB). It won't work in private browsing mode or if storage is blocked.",
+    footer: "Househeld · Practice project · Data is stored exclusively in your local browser.",
   },
   common: {
     save: "Save",

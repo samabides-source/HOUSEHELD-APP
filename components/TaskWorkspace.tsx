@@ -15,7 +15,7 @@ import { TaskDialog } from "./TaskDialog";
 
 type View = "liste" | "board";
 
-const PERSON_FILTER_STORAGE_KEY = "hausheld.taskFilters.personIds";
+const PERSON_FILTER_STORAGE_KEY = "househeld.taskFilters.personIds";
 
 /**
  * Arbeitsfläche für die Aufgaben-Übersicht: Filterleiste, Ansichtswechsel

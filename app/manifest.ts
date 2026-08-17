@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Hausheld – Haushaltsaufgaben im Griff",
-    short_name: "Hausheld",
+    name: "Househeld – Haushaltsaufgaben im Griff",
+    short_name: "Househeld",
     description:
       "Haushaltsaufgaben erfassen und verteilen: mit Fotos, Zuständigkeiten und Tags. Läuft vollständig offline im Browser.",
     start_url: "/",

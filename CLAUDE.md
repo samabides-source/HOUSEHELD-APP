@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Leitfaden für die Arbeit an **Hausheld** – einer App zum Erfassen und Verteilen von
+Leitfaden für die Arbeit an **Househeld** – einer App zum Erfassen und Verteilen von
 Haushaltsaufgaben (Übungsprojekt, Modul „Viben und Coden“).
 
 ## Befehle
@@ -102,7 +102,7 @@ Nutzung (eigene Aufgaben, eigene Fotos) bleibt vollständig lokal/offline-fähig
 
 ### Persistenz
 
-Alle Daten liegen in **IndexedDB** (Datenbank `hausheld`), Fotos als `Blob` im Store
+Alle Daten liegen in **IndexedDB** (Datenbank `househeld`), Fotos als `Blob` im Store
 `photoBlobs`, die Metadaten getrennt in `photos`. Zugriff **nur** über `lib/db.ts`; Komponenten
 sprechen ausschliesslich mit `useStore()`.
 

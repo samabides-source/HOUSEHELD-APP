@@ -33,7 +33,7 @@ export default function OpengraphImage() {
         >
           🏠
         </div>
-        <div style={{ display: "flex", fontSize: 72, fontWeight: 800, color: "#ffffff" }}>Hausheld</div>
+        <div style={{ display: "flex", fontSize: 72, fontWeight: 800, color: "#ffffff" }}>Househeld</div>
         <div style={{ display: "flex", fontSize: 32, color: "rgba(255,255,255,0.85)" }}>
           Haushaltsaufgaben im Griff · Household Tasks Under Control
         </div>
