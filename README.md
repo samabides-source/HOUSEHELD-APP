@@ -1,6 +1,7 @@
 # Dokumentation "HOUSEHELD"
 CAS AIMP - Viben und Coden / FS26
-Sandro Müntener / 08. August 2026
+
+Sandro Müntener / 17. August 2026
 
 
 ### App-Beschrieb: ###
@@ -15,6 +16,45 @@ Haushaltsaufgaben werden mündlich oder in Chats verteilt und gehen dabei unter.
 ### Lösung: ###
 Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und übersichtlich dargestellt werden.
 
+## Inhaltsverzeichnis
+
+- [Links](#links)
+- [Ideenfindung & Entwicklung PRD](#ideenfindung--entwicklung-prd)
+- [Entwicklungsprozess APP](#entwicklungsprozess-app)
+- [Entwicklungsprozess SITE](#entwicklungsprozess-site)
+- [Reflexion](#reflexion)
+- [Beispielprompt](#beispielprompt)
+- [PRD: Hausheld – Haushaltsaufgaben-Tracker](#prd-hausheld--haushaltsaufgaben-tracker)
+  - [1. Übersicht](#1-übersicht)
+  - [2. Ziele](#2-ziele)
+  - [3. Nicht-Ziele (Out of Scope)](#3-nicht-ziele-out-of-scope)
+  - [4. Nutzer & Rollen](#4-nutzer--rollen)
+  - [5. Kern-Features](#5-kern-features)
+  - [6. Design-Richtung](#6-design-richtung)
+  - [7. User Stories](#7-user-stories)
+  - [8. Technische Rahmenbedingungen](#8-technische-rahmenbedingungen)
+  - [9. Erweiterungen für später](#9-erweiterungen-für-später-nicht-teil-des-ersten-wurfs)
+  - [10. Erfolgskriterien](#10-erfolgskriterien-für-dieses-übungsprojekt)
+- [Security-Checkliste für Vibe-coded Apps](#security-checkliste-für-vibe-coded-apps--ausgefüllt-für-hausheld)
+  - [Kritische Punkte](#kritische-punkte)
+    - [1. Keine Secrets im Code oder Repo](#1-keine-secrets-im-code-oder-repo)
+    - [2. Keine Secrets im Client-Bundle](#2-keine-secrets-im-client-bundle)
+    - [3. Login und Accounts nur über etablierte Mechanismen](#3-login-und-accounts-nur-über-etablierte-mechanismen)
+    - [4. Datenbank-Zugriffsregeln aktiv](#4-datenbank-zugriffsregeln-aktiv)
+    - [5. Jede API-Route prüft selbst](#5-jede-api-route-prüft-selbst)
+    - [6. Deployment-Schutz auf Vercel](#6-deployment-schutz-auf-vercel)
+  - [Empfohlene Punkte](#empfohlene-punkte)
+    - [7. Claude Code selbst absichern](#7-claude-code-selbst-absichern)
+    - [8. Abhängigkeiten](#8-abhängigkeiten)
+    - [9. GitHub und Repo-Hygiene](#9-github-und-repo-hygiene)
+    - [10. Umgang mit fremden Eingaben](#10-umgang-mit-fremden-eingaben)
+    - [11. Kosten- und Missbrauchsschutz](#11-kosten--und-missbrauchsschutz)
+    - [12. Security Headers](#12-security-headers)
+    - [13. Betrieb](#13-betrieb)
+  - [Wenn die Zeit knapp ist – die 3 wichtigsten Punkte](#wenn-die-zeit-knapp-ist--die-3-wichtigsten-punkte)
+  - [Zusammenfassung: offene Punkte](#zusammenfassung-identifizierte-offene-punkte-noch-nicht-behoben)
+- [Notes Sandro](#notes-sandro)
+
 ## Links
 **App**
 https://househeld-app.vercel.app/
@@ -22,11 +62,37 @@ https://househeld-app.vercel.app/
 Hinweis: Die App speichert alle Daten nur lokal im jeweiligen Browser. Damit du nicht mit einer leeren App startest: Rechts oben auf „Einstellungen" klicken und „Beispieldaten laden" drücken – dann sind Aufgaben, Personen und Fotos zum Ausprobieren da.
 
 **Marketing-Seite**
-https://househeld-page.vercel.app/ 
+https://househeld-page.vercel.app/
+**Marketing-Seite: Github Repository**
+https://github.com/samabides-source/HOUSEHELD-PAGE
 
 **Video-Walkthrough**
 Folgt noch. Aufzeichnung mit Teams. samuel@codecrush.ch einladen.
 
+## Ideenfindung & Entwicklung PRD
+
+**Ausgangslage & Ideenfindung**
+
+Im Rahmen einer Vibe-Coding-Einführung sollte eine einfache, lokal hostbare App ohne KI-Funktionen entstehen – rein zu Ausbildungszwecken, ohne Veröffentlichung. Aus einer ersten Liste von fünf App-Vorschlägen (u. a. Habit-Tracker, Rezeptbuch, Pomodoro-Timer, Haushaltsbuch, Kanban-Board) entstand die konkrete Idee für einen Haushaltsaufgaben-Tracker: Aufgaben erfassen, mit Fotos dokumentieren, Personen zuweisen und mit Tags kategorisieren.
+
+**Meilensteine**
+- Konzeption: Aus der Grundidee wurde ein ausführlicher App-Beschrieb mit Kern-Features (Aufgaben, Fotos, Zuweisung, Tags, Filter) sowie möglichen späteren Erweiterungen entwickelt.
+- Erstes PRD: Daraus entstand ein erstes, strukturiertes PRD-Dokument.
+- Tag-System: Eine vordefinierte Tag-Liste wurde erarbeitet und iterativ verfeinert (Räume, Aussenbereich, Aufgabentyp, Technik & Geräte, Sonstiges) – am Ende 32 vordefinierte Tags, ergänzbar durch frei erstellbare.
+- Zweite Iteration: Eine parallel mit ChatGPT erstellte, feinere PRD-Version brachte weitere Präzisierungen, die ins PRD übernommen wurden.
+- Technische Ausrichtung: Als Tech-Stack wurde Node.js + Express mit lowdb (kostenlose, JSON-Datei-basierte Datenbank ohne SQL) festgelegt.
+- Design: Aus fünf vorgeschlagenen Design-Richtungen wurde "Verspielt & bunt" gewählt: farbcodierte Tag-Kategorien, ein davon getrenntes Prioritäts-Farbsystem, abgerundete Formen, Avatar-Kreise für Personen.
+- Ergebnis: Ein finales, in sich konsistentes PRD sowie zwei Agenten-Kontextdateien (CLAUDE.md für Claude Code, AGENTS.md für Cursor), die alle Business-Regeln, den Tech-Stack und die Design-Vorgaben zusammenfassen – bereit für die praktische Umsetzung mit Claude Code.
+
+**Wichtige Anpassungen**
+
+- Mehrere Fotos statt nur eines pro Aufgabe, jederzeit austauschbar oder entfernbar
+- Verhalten beim Löschen von Personen: Aufgaben bleiben bestehen und werden automatisch "nicht zugewiesen"
+- Warnhinweis beim Löschen noch verwendeter Tags, statt sie kommentarlos zu entfernen
+- Klare Trennung zwischen Priorität "dringend" und Tags (kein Doppel-Konzept)
+- Bestätigung per zweitem Klick beim Löschen von Aufgaben (kein versehentliches Löschen, kein Papierkorb)
+- Präzisierungen aus der ChatGPT-Iteration: Foto-Formate/-Limits, Verhalten bei fehlenden Dateien, UND/ODER-Logik bei Filtern, Standardsortierung, Seed-Daten-Verhalten der Tags
+- Wechsel von SQLite auf lowdb als einfachere, lizenzkostenfreie Datenbank-Lösung für das Lernprojekt
 
 ## Entwicklungsprozess APP
 
@@ -98,7 +164,7 @@ Folgt noch...
 Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sachen abcheckt, also mein Update im Readme. Denkt Fallback-Varianten mit (z.B. kein Internet, Datenbank lokal)
 
 ## Beispielprompt
-folgt noch
+"Ich muss die auf Vercel deployte App meinem Dozenten schicken. Dieser wird sie via URL aufrufen und anschauen. Nun erhält er aktuell eine "leere" App, ohne Aufgaben und ohne Personen. Ist es nicht doch irgendwie möglich, dass von mir erfasste Aufgaben und Personen an neue User weitergegeben werden? Mach mir Vorschläge, die für mich mit keinen Kosten verbunden sind."
 
 # PRD: Hausheld – Haushaltsaufgaben-Tracker
 
