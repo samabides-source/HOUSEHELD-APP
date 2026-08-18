@@ -80,6 +80,8 @@ Zum Abschluss wurde in einer separaten Session eine vorgegebene Security-Checkli
 
 In einer weiteren Session wurde ein manueller PageSpeed-Insights-Test (Mobile) auf der produktiven App ausgewertet: Performance 98, Accessibility 92, Best Practices 100, SEO 100, Agentisches Browsing 3/3. Die Auswertung der aufgelisteten „fehlerhaften Elemente" deckte dabei einen produktiv ausgelieferten Navigationsbug auf und führte ausserdem zu gezielten Barrierefreiheits-Korrekturen (siehe Bugfixes).
 
+Nach den DE/EN- und SEO-Änderungen wurde die Security-Checkliste in einer weiteren Session ein zweites Mal komplett durchgearbeitet — diesmal zusätzlich live gegen die deployte App und über die öffentliche GitHub-API, nicht nur gegen den lokalen Code. Dabei kam ans Licht, dass das beim ersten Security-Durchgang eingerichtete Branch-Protection-Ruleset auf `main` zwar noch existierte, aber auf „disabled" stand und damit faktisch wirkungslos war. Als konkreter Fix wurden ausserdem die fehlenden Security-Headers ergänzt: `next.config.ts` setzt jetzt Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy und Permissions-Policy für alle Routen, mit einer CSP, die gezielt auf die tatsächlich verwendeten Ressourcen zugeschnitten ist (u. a. `blob:` für Foto-Vorschauen, `api.openverse.org` für die Demo-Bildersuche). Der Fix wurde vor dem Deploy gegen einen lokalen Produktions-Build verifiziert (Header per `curl` geprüft, Aufgabe anlegen und Demo-Daten laden inkl. Openverse-Aufruf im Browser getestet, keine CSP-Verletzung), nach dem Deploy bestätigte securityheaders.com die Note A. Bewusst nicht verschärft wurde die verbleibende `'unsafe-inline'`-Direktive im CSP-`script-src`: Eine strengere, nonce-basierte CSP hätte erfordert, die aktuell statisch prerenderten Seiten auf dynamisches Rendering pro Request umzustellen — ein Zielkonflikt mit der bestehenden Architektur-Entscheidung für statisches, gecachtes Prerendering, den der Nutzer bewusst zugunsten der Performance aufgelöst hat.
+
 **Wichtige Anpassungen**
 
 Über mehrere Feedbackrunden hinweg wurden u. a. folgende Änderungen umgesetzt:
@@ -352,8 +354,13 @@ Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sach
 
 # Security-Checkliste für Vibe-coded Apps — ausgefüllt für **Househeld**
 
-Geprüft am: 2026-08-08
-Repo: `samabides-source/HOUSEHELD-APP` (main, Stand Commit `b0c51b1`)
+Erste Prüfung: 2026-08-08 (Commit `b0c51b1`).
+Zweite Prüfung: 2026-08-18 (Commit `7adb95d`), nach Einführung von Mehrsprachigkeit (DE/EN),
+`middleware.ts`, SEO-Routen (`robots.ts`, `sitemap.ts`, `manifest.ts`, `opengraph-image.tsx`,
+`apple-icon.tsx`) und `public/llms.txt` — diesmal zusätzlich gegen die live deployte App
+(https://househeld-app.vercel.app/) und über die öffentliche, unauthentifizierte GitHub-API
+geprüft, nicht nur gegen den lokalen Code.
+Repo: `samabides-source/HOUSEHELD-APP`
 Stack laut `CLAUDE.md`: Next.js 15 App Router, **keine API-Routen, kein Server-Code**, keine
 Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supabase im Einsatz.
 
@@ -368,6 +375,12 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
 > GitHub-Einstellungen wurden auf Wunsch des Nutzers im Gespräch trotzdem direkt behoben. Die
 > restlichen, rein code-/dokumentationsseitigen Punkte (siehe Zusammenfassung unten) sind
 > weiterhin nur identifiziert, nicht behoben.
+>
+> **Zweite Prüfung (2026-08-18):** Wichtigster Fund war, dass die beim ersten Mal eingerichtete
+> Branch-Protection auf `main` zwar noch existierte (Ruleset `main`), aber nicht mehr aktiv war
+> (`enforcement: disabled`) — siehe Punkt 9. Ausserdem wurden auf Wunsch des Nutzers diesmal auch
+> die fehlenden Security-Headers direkt behoben (siehe Punkt 12), inkl. Verifikation gegen einen
+> lokalen Produktions-Build und anschliessender Note **A** auf securityheaders.com nach dem Deploy.
 
 ---
 
@@ -386,7 +399,7 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
       Openverse-Bildersuche in `lib/demo-data.ts` ist laut CLAUDE.md bewusst keyless).
 - [x] **GitHub Secret Scanning / Push Protection aktiviert** — vom Nutzer im Repo unter
       Settings → Advanced Security geprüft und eingeschaltet: Secret scanning **Enabled**,
-      Push protection **eingeschaltet** (2026-08-08).
+      Push protection **eingeschaltet** (2026-08-08, in der zweiten Prüfung nicht erneut verifiziert).
 
 ### 2. Keine Secrets im Client-Bundle
 
@@ -394,9 +407,11 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
       Umgebungsvariable im Code (bestätigt per Grep auf `process.env`, 0 Treffer).
 - [x] Supabase anon/service_role-Trennung — entfällt, kein Supabase im Stack.
 - [x] Build durchgeführt (`npm run build`) und `.next/static` nach `sk-`, `service_role`, `secret`
-      durchsucht — keine Treffer (erwartbar, da keine Secrets existieren).
-- [ ] Zusatzprüfung im Browser (Seitenquelltext auf publizierter URL) — **nicht durchgeführt**,
-      da mir keine öffentliche Deployment-URL vorlag. Nach jedem Deploy einmal manuell empfohlen.
+      durchsucht — keine Treffer (erwartbar, da keine Secrets existieren). Auch keine `.js.map`-
+      Dateien im Build-Output (kein Source-Map-Leak).
+- [x] Zusatzprüfung im Browser (Seitenquelltext auf publizierter URL) — am 2026-08-18 nachgeholt:
+      HTML-Quelltext von https://househeld-app.vercel.app/ direkt abgerufen und nach denselben
+      Mustern durchsucht — keine Treffer.
 
 ### 3. Login und Accounts nur über etablierte Mechanismen
 
@@ -411,24 +426,34 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
 
 ### 5. Jede API-Route prüft selbst
 
-- [x] **N/A für Session/Autorisierung/CORS** — es gibt keine `app/api`-Routen und keine Server
-      Actions; alle Seiten sind `"use client"` (bestätigt durch Durchsicht von `app/`).
+- [x] **N/A für Session/Autorisierung** — es gibt keine `app/api`-Routen und keine Server
+      Actions; alle Seiten sind `"use client"` (bestätigt durch Durchsicht von `app/[locale]/`,
+      inkl. der neuen i18n-Struktur).
 - [x] File-Uploads sind begrenzt: `lib/photos.ts` erzwingt max. 10 MB/Datei
       (`MAX_PHOTO_BYTES`) und `lib/types.ts` max. 10 Fotos/Aufgabe (`MAX_PHOTOS_PER_TASK`),
       Typprüfung über `isAcceptedFile()`. Dateien landen nicht in einem öffentlichen Ordner,
       sondern als Blob in IndexedDB — nicht ausführbar, nicht über eine URL erreichbar.
+- [ ] Neu geprüft (2026-08-18): Die Live-Antwort-Header enthalten `Access-Control-Allow-Origin: *`
+      auf allen geprüften Seiten. Kein `next.config.ts`/`vercel.json` setzt das aktiv — vermutlich
+      ein Vercel-Plattform-Default für prerendertes, statisches HTML. Da es keine API, keine
+      Cookies/Sessions und ohnehin nur öffentliche Inhalte gibt, ist das praktisch risikolos,
+      erfüllt aber wörtlich den Punkt "CORS steht nicht auf `*`" nicht. Identifiziert, nicht behoben.
 
 ### 6. Deployment-Schutz auf Vercel
 
 - [x] Deployment Protection aktiviert — vom Nutzer im Vercel-Dashboard geprüft: Steht auf
-      **"Standard Protection"**, das ist die von Vercel empfohlene Standardeinstellung (2026-08-08).
+      **"Standard Protection"**, das ist die von Vercel empfohlene Standardeinstellung
+      (2026-08-08, in der zweiten Prüfung nicht erneut verifiziert).
 - [x] Env-Variablen pro Umgebung getrennt — vom Nutzer geprüft: Unter Project Settings →
       Environments ist die Liste **leer**, es sind keine Variablen gesetzt. Das ist der erwartete
       Zustand, da die App laut CLAUDE.md keine Umgebungsvariablen benötigt (2026-08-08).
-- [ ] Publizierte URL im Inkognito-Fenster geprüft — nicht durchgeführt, keine URL bekannt.
+- [x] Publizierte URL geprüft — am 2026-08-18 unauthentifiziert per `curl` abgerufen (kein
+      Inkognito-Fenster verfügbar): Inhalt entspricht dem erwarteten öffentlichen Zustand.
 - [x] Admin-/Testseiten ohne Login erreichbar — es gibt keine Admin-Bereiche in der App; alle
-      Seiten (`/`, `/personen`, `/tags`, `/einstellungen`) sind bewusst öffentlich nutzbar
-      (kein Auth im Scope), das ist also kein Leck, sondern Design.
+      Seiten (`/`, `/personen`, `/tags`, `/einstellungen`, jeweils auch unter `/en/…`) sind
+      bewusst öffentlich nutzbar (kein Auth im Scope), das ist also kein Leck, sondern Design.
+      `robots.txt` und `sitemap.xml` live geprüft (2026-08-18): beide sauber, keine versehentlich
+      gelisteten internen/Test-Pfade, korrekte hreflang-Alternates DE/EN.
 
 ---
 
@@ -449,22 +474,31 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
       `eslint`, `eslint-config-next`, `tailwindcss`, `@tailwindcss/postcss`, `typescript`,
       `@types/*` — alles bekannte, plausible, weit verbreitete Pakete. Kein Slopsquatting-Verdacht.
 - [x] `package-lock.json` ist committed.
-- [ ] **`npm audit` liefert 3 High-Findings**: `sharp <0.35.0` (transitive Abhängigkeit von
-      `next`, für serverseitige Bildoptimierung) — CVE-2026-33327, CVE-2026-33328, CVE-2026-35590,
-      CVE-2026-35591 in libvips (GHSA-f88m-g3jw-g9cj). **Nur identifiziert, nicht behoben.**
-      Risiko dürfte in der Praxis gering sein, da die App laut CLAUDE.md bewusst `<img>` statt
-      `next/image` verwendet und den Next-Image-Optimizer damit nicht aktiv nutzt — `sharp` bleibt
-      aber als Dependency im Baum.
+- [ ] **`npm audit` liefert weiterhin 3 High-Findings**: `sharp <0.35.0` (transitive Abhängigkeit
+      von `next`, für serverseitige Bildoptimierung) — CVE-2026-33327, CVE-2026-33328,
+      CVE-2026-35590, CVE-2026-35591 in libvips (GHSA-f88m-g3jw-g9cj). Am 2026-08-18 mit frischem
+      `npm ci` + `npm audit` erneut bestätigt, unverändert seit der ersten Prüfung. Ein Fix wäre
+      nur über ein `next`-Major-Update (aktuell 16.3.1) verfügbar. **Nur identifiziert, nicht
+      behoben.** Risiko dürfte in der Praxis gering sein, da die App laut CLAUDE.md bewusst `<img>`
+      statt `next/image` verwendet und den Next-Image-Optimizer damit nicht aktiv nutzt — `sharp`
+      bleibt aber als Dependency im Baum.
 - [x] Dependabot Alerts / Security Updates aktiviert — vom Nutzer im Repo unter Settings →
-      Advanced Security eingeschaltet (2026-08-08). Die 3 High-Findings zu `sharp` (siehe oben)
-      bleiben davon unberührt bestehen, da Dependabot keinen Fix für eine transitive
-      `next`-Abhängigkeit automatisch bereitstellen kann, solange `next` selbst keine neue
-      Version mit gepatchtem `sharp` zieht.
+      Advanced Security eingeschaltet (2026-08-08, in der zweiten Prüfung nicht erneut verifiziert).
+      Die 3 High-Findings zu `sharp` (siehe oben) bleiben davon unberührt bestehen, da Dependabot
+      keinen Fix für eine transitive `next`-Abhängigkeit automatisch bereitstellen kann, solange
+      `next` selbst keine neue Version mit gepatchtem `sharp` zieht.
 
 ### 9. GitHub und Repo-Hygiene
 
-- [x] Force-Push auf `main` blockiert — ursprünglich **nicht konfiguriert** ("Classic branch
-      protections have not been configured"), vom Nutzer danach eingerichtet (2026-08-08).
+- [ ] Force-Push auf `main` blockiert — ursprünglich **nicht konfiguriert** ("Classic branch
+      protections have not been configured"), vom Nutzer am 2026-08-08 eingerichtet.
+      ⚠️ **Erneut geprüft am 2026-08-18** über die öffentliche GitHub-API (`/repos/…/rulesets`,
+      ohne Login abrufbar): Es existiert ein Ruleset namens `main` (erstellt 2026-08-08), aber sein
+      Status ist `"enforcement": "disabled"`. Die Regel ist also angelegt, aber gerade nicht aktiv —
+      Force-Push auf `main` ist damit faktisch wieder ungeschützt. Möglich, dass sie beim
+      Einrichten versehentlich im Modus "Disabled" statt "Active" gespeichert wurde. **Nicht
+      behoben, nur identifiziert**; zum Beheben im Repo unter Settings → Rules → Rulesets →
+      `main` öffnen und den Enforcement-Status auf "Active" stellen.
 - [x] Keine GitHub Actions im Repo (`.github/` existiert nicht) — Punkt zu gepinnten
       Third-Party-Actions entfällt damit vollständig.
 - [ ] Vercel-Integration / Repo-Zugriffsumfang — vom Nutzer geprüft: Auf GitHub unter
@@ -475,17 +509,22 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
 
 ### 10. Umgang mit fremden Eingaben
 
-- [x] Kein `dangerouslySetInnerHTML`, kein `eval(`, kein `innerHTML =` im gesamten Code gefunden
-      (Volltext-Grep über `app/`, `components/`, `lib/`).
+- [x] Seit der ersten Prüfung ist ein `dangerouslySetInnerHTML` dazugekommen:
+      `app/[locale]/layout.tsx` (Zeile 83), zum Einbetten des `SoftwareApplication`-JSON-LD-Skripts
+      fürs SEO. Geprüft (2026-08-18): Der eingebettete Inhalt (`JSON.stringify(jsonLd)`) besteht
+      ausschliesslich aus statischen, entwicklerkontrollierten Werten (Dictionary-Texte aus
+      `lib/i18n/dictionaries.ts`, die feste `SITE_URL`-Konstante, das über eine feste Liste
+      validierte `locale`) — keine Nutzereingaben fliessen hinein. Das ist das in Next.js übliche
+      Muster für JSON-LD und in dieser Form unkritisch. Kein `eval(`/`innerHTML =`-Einsatz sonst
+      im Code gefunden.
 - [x] Keine SQL-Strings — App nutzt die IndexedDB-Objekt-Store-API (`lib/db.ts`), kein SQL im
       Einsatz, damit auch keine Injection-Fläche dieser Art.
 - [ ] Verhalten bei leerer/sehr langer/HTML-haltiger Eingabe im UI **noch nicht aktiv
       durchgetestet**. Aus dem Code ersichtlich: Titel-Feld verlangt einen nicht-leeren,
-      getrimmten Wert (`TaskDialog.tsx:85`), React escaped alle Ausgaben automatisch (kein
-      `dangerouslySetInnerHTML` vorhanden), HTML-Injection ist damit strukturell ausgeschlossen.
-      Es gibt aber **keine Maximallänge** für Titel/Beschreibung — sehr lange Eingaben werden nicht
-      begrenzt. Auswirkung ist gering, da rein lokal (kein Server, der dadurch belastet würde),
-      aber als offener Punkt festgehalten.
+      getrimmten Wert (`TaskDialog.tsx:85`), React escaped alle Ausgaben automatisch, HTML-Injection
+      ist damit strukturell ausgeschlossen. Es gibt aber **keine Maximallänge** für
+      Titel/Beschreibung — sehr lange Eingaben werden nicht begrenzt. Auswirkung ist gering, da
+      rein lokal (kein Server, der dadurch belastet würde), aber als offener Punkt festgehalten.
 
 ### 11. Kosten- und Missbrauchsschutz
 
@@ -497,18 +536,32 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
 - [x] Vercel Spend Management / Usage Alerts — vom Nutzer geprüft: nicht konfiguriert, aber
       unkritisch, da das Projekt auf dem kostenlosen **Hobby-Plan** läuft. Spend Management ist
       ohnehin nur ein Pro/Enterprise-Feature; auf Hobby besteht kein nutzungsbasiertes
-      Abrechnungsrisiko wie im PDF beschrieben (2026-08-08).
+      Abrechnungsrisiko (2026-08-08, in der zweiten Prüfung nicht erneut verifiziert).
 - [x] Hartes Ausgabenlimit bei externen API-Anbietern — entfällt, es gibt keinen kostenpflichtigen
       externen API-Anbieter im Stack.
 
 ### 12. Security Headers
 
-- [ ] **Nicht gesetzt.** `next.config.ts` enthält nur `reactStrictMode: true`, keine
-      Headers-Konfiguration. Es existiert kein `vercel.json`. Damit fehlen aktuell CSP,
-      `X-Frame-Options`/`frame-ancestors`, `X-Content-Type-Options`, HSTS und `Referrer-Policy`.
-      **Identifiziert, nicht behoben.**
-- [ ] Gegenprüfung auf securityheaders.com — nicht durchgeführt (keine öffentliche URL Teil dieser
-      Prüfung).
+- [x] **✅ Behoben (2026-08-18):** `next.config.ts` setzt jetzt über `headers()` für alle Routen
+      `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
+      `Referrer-Policy: strict-origin-when-cross-origin` und `Permissions-Policy`
+      (`camera=(), microphone=(), geolocation=(), payment=(), usb=()` — die App nutzt keine
+      dieser Browser-APIs). `Strict-Transport-Security` war bereits vorher als Vercel-Plattform-
+      Default vorhanden. Die CSP wurde bewusst gegen die tatsächlich genutzten Ressourcen der App
+      geschnitten:
+      `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.openverse.org; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests`.
+      `'unsafe-inline'` bei `script-src` bleibt bewusst bestehen, weil Next.js' eigenes
+      Hydration-Bootstrap-Script auf statisch prerendertem HTML ohne Nonce ausgeliefert wird — ein
+      nonce-basiertes striktes CSP wäre mit dem prerendered/gecachten Static-HTML-Ansatz dieser App
+      nicht kompatibel (würde die Seiten auf dynamisches Rendering pro Request umstellen, im
+      Widerspruch zur in CLAUDE.md festgehaltenen Architektur-Entscheidung). Verifiziert gegen
+      einen lokalen Produktions-Build (`npm run build` + `npm start`): Header per `curl` bestätigt,
+      Aufgabe anlegen und Demo-Daten laden (inkl. Openverse-Netzwerkaufruf) funktionieren ohne
+      CSP-Verletzung in der Konsole, `npm run typecheck` und `npm run lint` bleiben grün.
+- [x] Gegenprüfung auf [securityheaders.com](https://securityheaders.com/?q=househeld-app.vercel.app)
+      — durchgeführt am 2026-08-18, nachdem der Nutzer den Fix deployt hat: **Note A**. Zwei Punkte
+      verhinderten A+: Permissions-Policy fehlte (daraufhin ergänzt, siehe oben) sowie eine Warnung,
+      dass `script-src` `'unsafe-inline'` enthält — der oben beschriebene, bewusste Trade-off.
 
 ### 13. Betrieb
 
@@ -530,29 +583,29 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
 
 ## Wenn die Zeit knapp ist — die 3 wichtigsten Punkte
 
-1. **Deployment Protection auf Vercel** — ✅ bestätigt: "Standard Protection" aktiv.
-2. **Kein Secret hinter `NEXT_PUBLIC_`** — ✅ bestätigt: Es gibt im gesamten Code keine einzige
-   Umgebungsvariable, und auf Vercel sind auch keine Environment Variables gesetzt.
+1. **Deployment Protection auf Vercel** — ✅ bestätigt am 2026-08-08: "Standard Protection" aktiv.
+2. **Kein Secret hinter `NEXT_PUBLIC_`** — ✅ erneut bestätigt am 2026-08-18: weder im Code noch im
+   Live-Bundle/HTML der publizierten App eine einzige Umgebungsvariable oder ein Secret gefunden.
 3. **Autorisierung pro API-Route** — entfällt: Es existieren keine API-Routen oder Server Actions.
 
 ---
 
-## Zusammenfassung: identifizierte offene Punkte (noch nicht behoben)
+## Zusammenfassung: identifizierte offene Punkte (Stand zweite Prüfung, 2026-08-18)
 
 | # | Punkt | Kategorie | Schweregrad (grob) | Status |
 |---|---|---|---|---|
-| 1 | `npm audit`: 3× High in `sharp` (transitiv über `next`, Bildoptimierung) | 8 | gering–mittel (Feature ungenutzt) | offen |
-| 2 | Keine Security-Headers (CSP, X-Frame-Options, HSTS, …) in `next.config.ts`/`vercel.json` | 12 | mittel | offen |
-| 3 | Vercel-GitHub-App hat Zugriff auf "All repositories" statt nur HOUSEHELD-APP | 9 | gering | offen |
-| 4 | Keine Maximallänge für Titel/Beschreibung von Aufgaben | 10 | gering | offen |
-| 5 | Kein dokumentierter Notfallablauf | 13 | gering | offen |
-| 6 | Kein Backup-Mechanismus für lokale Daten (bewusste Design-Entscheidung, aber Nutzer:innen sollten es wissen) | 13 | gering (bewusst) | offen (Design) |
-| ~~7~~ | ~~GitHub Secret Scanning/Push Protection~~ | 1 | — | ✅ erledigt 2026-08-08 |
-| ~~8~~ | ~~GitHub Dependabot Alerts/Security Updates~~ | 8 | — | ✅ erledigt 2026-08-08 |
-| ~~9~~ | ~~GitHub Branch Protection auf `main`~~ | 9 | — | ✅ erledigt 2026-08-08 |
-| ~~10~~ | ~~Vercel Deployment Protection~~ | 6 | — | ✅ bestätigt (Standard Protection) |
-| ~~11~~ | ~~Vercel Environment Variables~~ | 6 | — | ✅ bestätigt (leer, wie erwartet) |
-| ~~12~~ | ~~Vercel Spend Management~~ | 11 | — | ✅ unkritisch (Hobby-Plan) |
+| 1 | Branch-Protection-Ruleset `main` existiert, aber `enforcement` steht auf `disabled` — Force-Push auf `main` ist faktisch ungeschützt | 9 | mittel (Regression seit 2026-08-08) | offen — neu entdeckt |
+| 2 | `npm audit`: 3× High in `sharp` (transitiv über `next`, Bildoptimierung) | 8 | gering–mittel (Feature ungenutzt) | offen, erneut bestätigt |
+| 3 | `Access-Control-Allow-Origin: *` auf allen Live-Seiten (vermutlich Vercel-Plattform-Default) | 5 | gering (keine sensiblen Daten/Cookies betroffen) | offen — neu dokumentiert |
+| 4 | Vercel-GitHub-App hat Zugriff auf "All repositories" statt nur HOUSEHELD-APP | 9 | gering | offen |
+| 5 | Keine Maximallänge für Titel/Beschreibung von Aufgaben | 10 | gering | offen |
+| 6 | Kein dokumentierter Notfallablauf | 13 | gering | offen |
+| 7 | Kein Backup-Mechanismus für lokale Daten (bewusste Design-Entscheidung, aber Nutzer:innen sollten es wissen) | 13 | gering (bewusst) | offen (Design) |
+| 8 | CSP-Warnung: `'unsafe-inline'` in `script-src` ("dangerous") | 12 | gering–mittel, bewusst in Kauf genommen | offen (bewusste Design-Entscheidung, siehe Punkt 12) |
+| 9 | Vercel Deployment Protection, Environment Variables, Spend Management — in der zweiten Prüfung nicht erneut im Dashboard verifiziert | 6, 11 | zu klären | seit 2026-08-08 nicht mehr geprüft |
+| ~~10~~ | ~~GitHub Secret Scanning/Push Protection~~ | 1 | — | ✅ erledigt 2026-08-08 |
+| ~~11~~ | ~~GitHub Dependabot Alerts/Security Updates~~ | 8 | — | ✅ erledigt 2026-08-08 |
+| ~~12~~ | ~~CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy~~ | 12 | — | ✅ behoben und deployt, securityheaders.com-Note A (2026-08-18) |
 
 Alle anderen Punkte der Checkliste sind entweder erfüllt oder für diesen Stack (rein statische
 App ohne Server, ohne Datenbank, ohne Auth, ohne Secrets) strukturell nicht anwendbar.

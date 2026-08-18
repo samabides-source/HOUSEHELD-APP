@@ -21,6 +21,15 @@ const CONTENT_SECURITY_POLICY = [
   "upgrade-insecure-requests",
 ].join("; ");
 
+/** Die App nutzt keine dieser Browser-APIs (Fotos laufen über <input type="file">, nicht getUserMedia). */
+const PERMISSIONS_POLICY = [
+  "camera=()",
+  "microphone=()",
+  "geolocation=()",
+  "payment=()",
+  "usb=()",
+].join(", ");
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   async headers() {
@@ -32,6 +41,7 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: PERMISSIONS_POLICY },
         ],
       },
     ];
