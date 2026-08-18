@@ -23,6 +23,9 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Entwicklungsprozess APP](#entwicklungsprozess-app)
 - [Entwicklungsprozess SITE](#entwicklungsprozess-site)
 - [Reflexion](#reflexion)
+  - [Mein Aha-Moment](#mein-aha-moment)
+  - [Neu gewonnene Learnings](#neu-gewonnene-learnings)
+  - [Prompting-Strategien](#prompting-strategien)
 - [Beispielprompt](#beispielprompt)
 - [PRD-/SPEC-File](#prd-househeld--haushaltsaufgaben-tracker)
 - [Security-Checkliste](#security-checkliste-für-vibe-coded-apps--ausgefüllt-für-househeld)
@@ -179,17 +182,24 @@ Das Ergebnis ist als „Security-Checkliste (Selbst-Audit)“ im README der Mark
 Folgt noch... 
 Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sachen abcheckt, also mein Update im Readme. Denkt Fallback-Varianten mit (z.B. kein Internet, Datenbank lokal)
 
-### Mein Aha-Moment
+<a id="mein-aha-moment"></a>
+**Mein Aha-Moment**
+
 folgt noch
 
-### Neu gewonnene Learnings
+<a id="neu-gewonnene-learnings"></a>
+**Neu gewonnene Learnings**
 folgt noch
 
-### Prompting-Strategien
+<a id="prompting-strategien"></a>
+**Prompting-Strategien**
 folgt noch
 
 ## Beispielprompt
 "Ich habe noch einen Bug entdeckt. Angelegte Aufgaben werden nur in derjenigen Sprache erfasst und gespeichert, welche beim Anlegen aktiv war. Wird die Sprache nach Anlegen der Aufgaben gewechselt, bleiben die Aufgaben in der Ursprungssprache und werden auch von den Tag-Filtern nicht mehr erkannt. Beim einem Sprachwechsel müssten also auch bereits angelegte Aufgaben mit übersetzt werden. Kannst du mir das umsetzen?"
+
+
+
 
 # PRD: Househeld – Haushaltsaufgaben-Tracker
 
@@ -351,6 +361,8 @@ folgt noch
 - Zuweisung und Tags funktionieren wie beschrieben, inkl. Warnhinweis beim Löschen genutzter Tags
 - Design folgt der festgelegten Richtung "Verspielt & bunt" (Tag-Farben, Formen, Typografie gemäss Abschnitt 6)
 - Die App wird mit Testdaten durchgespielt (z. B. 5–10 Aufgaben, 2–3 Personen, mehrere Tags), um den Ablauf end-to-end zu prüfen
+
+
 
 
 # Security-Checkliste für Vibe-coded Apps — ausgefüllt für **Househeld**
