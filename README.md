@@ -26,7 +26,6 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Beispielprompt](#beispielprompt)
 - [PRD-/SPEC-File](#prd-househeld--haushaltsaufgaben-tracker)
 - [Security-Checkliste](#security-checkliste-für-vibe-coded-apps--ausgefüllt-für-househeld)
-- [Notes Sandro](#notes-sandro)
 
 ## Links
 **App**
@@ -181,11 +180,13 @@ Folgt noch...
 Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sachen abcheckt, also mein Update im Readme. Denkt Fallback-Varianten mit (z.B. kein Internet, Datenbank lokal)
 
 ### Mein Aha-Moment
+folgt noch
 
-### Neu gewonnen Learnings
+### Neu gewonnene Learnings
+folgt noch
 
 ### Prompting-Strategien
-
+folgt noch
 
 ## Beispielprompt
 "Ich habe noch einen Bug entdeckt. Angelegte Aufgaben werden nur in derjenigen Sprache erfasst und gespeichert, welche beim Anlegen aktiv war. Wird die Sprache nach Anlegen der Aufgaben gewechselt, bleiben die Aufgaben in der Ursprungssprache und werden auch von den Tag-Filtern nicht mehr erkannt. Beim einem Sprachwechsel müssten also auch bereits angelegte Aufgaben mit übersetzt werden. Kannst du mir das umsetzen?"
@@ -372,15 +373,17 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
 > (Stand 2026-08-08, alles unten entsprechend nachgetragen).
 >
 > Auftrag war ursprünglich, Probleme nur zu **identifizieren**, nicht zu beheben — die
-> GitHub-Einstellungen wurden auf Wunsch des Nutzers im Gespräch trotzdem direkt behoben. Die
-> restlichen, rein code-/dokumentationsseitigen Punkte (siehe Zusammenfassung unten) sind
-> weiterhin nur identifiziert, nicht behoben.
+> GitHub-Einstellungen wurden auf Wunsch des Nutzers im Gespräch trotzdem direkt behoben.
 >
 > **Zweite Prüfung (2026-08-18):** Wichtigster Fund war, dass die beim ersten Mal eingerichtete
 > Branch-Protection auf `main` zwar noch existierte (Ruleset `main`), aber nicht mehr aktiv war
 > (`enforcement: disabled`) — siehe Punkt 9. Ausserdem wurden auf Wunsch des Nutzers diesmal auch
 > die fehlenden Security-Headers direkt behoben (siehe Punkt 12), inkl. Verifikation gegen einen
 > lokalen Produktions-Build und anschliessender Note **A** auf securityheaders.com nach dem Deploy.
+>
+> **Nachtrag (2026-08-18):** Der Nutzer hat die beiden verbliebenen offenen Punkte aus Kapitel 9
+> (Branch-Protection-Enforcement, Vercel-GitHub-App-Zugriffsumfang) ebenfalls behoben — Details
+> und Verifikation direkt in Kapitel 9.
 
 ---
 
@@ -490,22 +493,19 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
 
 ### 9. GitHub und Repo-Hygiene
 
-- [ ] Force-Push auf `main` blockiert — ursprünglich **nicht konfiguriert** ("Classic branch
-      protections have not been configured"), vom Nutzer am 2026-08-08 eingerichtet.
-      ⚠️ **Erneut geprüft am 2026-08-18** über die öffentliche GitHub-API (`/repos/…/rulesets`,
-      ohne Login abrufbar): Es existiert ein Ruleset namens `main` (erstellt 2026-08-08), aber sein
-      Status ist `"enforcement": "disabled"`. Die Regel ist also angelegt, aber gerade nicht aktiv —
-      Force-Push auf `main` ist damit faktisch wieder ungeschützt. Möglich, dass sie beim
-      Einrichten versehentlich im Modus "Disabled" statt "Active" gespeichert wurde. **Nicht
-      behoben, nur identifiziert**; zum Beheben im Repo unter Settings → Rules → Rulesets →
-      `main` öffnen und den Enforcement-Status auf "Active" stellen.
+- [x] Force-Push auf `main` blockiert — ursprünglich **nicht konfiguriert** ("Classic branch
+      protections have not been configured"), vom Nutzer am 2026-08-08 eingerichtet, dann aber am
+      2026-08-18 als `"enforcement": "disabled"` entdeckt (siehe oben, faktisch wirkungslos). **Vom
+      Nutzer erneut gefixt (2026-08-18)** — unabhängig über die öffentliche GitHub-API
+      (`/repos/…/rulesets`, ohne Login abrufbar) verifiziert: Ruleset `main` steht jetzt auf
+      `"enforcement": "active"` (`updated_at: 2026-08-18T07:40:42Z`). ✅ Behoben und bestätigt.
 - [x] Keine GitHub Actions im Repo (`.github/` existiert nicht) — Punkt zu gepinnten
       Third-Party-Actions entfällt damit vollständig.
-- [ ] Vercel-Integration / Repo-Zugriffsumfang — vom Nutzer geprüft: Auf GitHub unter
-      Settings → Applications → Installed GitHub Apps → Vercel steht **"All repositories"**.
-      Die Vercel-App hat damit Zugriff auf **alle** Repos, nicht nur auf HOUSEHELD-APP. Kein
-      akutes Risiko, aber weiter gefasst als nötig (Prinzip der minimalen Rechte). Optional auf
-      "Only select repositories" einschränkbar. **Identifiziert, nicht behoben.**
+- [x] Vercel-Integration / Repo-Zugriffsumfang — war auf "All repositories" gesetzt (weiter gefasst
+      als nötig, aber kein akutes Risiko). **Vom Nutzer auf "Only select repositories" eingeschränkt
+      (2026-08-18)**, laut Nutzerangabe auf HOUSEHELD-APP begrenzt. Diese Einstellung liegt in der
+      GitHub-App-Installation und ist über die öffentliche API nicht unauthentifiziert einsehbar,
+      daher hier nicht unabhängig nachprüfbar, nur auf Nutzerangabe gestützt. ✅ Behoben.
 
 ### 10. Umgang mit fremden Eingaben
 
@@ -579,38 +579,4 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
       generische Suchbegriffe, keine Personendaten. Serverstandort/Auftragsverarbeitung damit für
       diese App nicht relevant.
 
----
 
-## Wenn die Zeit knapp ist — die 3 wichtigsten Punkte
-
-1. **Deployment Protection auf Vercel** — ✅ bestätigt am 2026-08-08: "Standard Protection" aktiv.
-2. **Kein Secret hinter `NEXT_PUBLIC_`** — ✅ erneut bestätigt am 2026-08-18: weder im Code noch im
-   Live-Bundle/HTML der publizierten App eine einzige Umgebungsvariable oder ein Secret gefunden.
-3. **Autorisierung pro API-Route** — entfällt: Es existieren keine API-Routen oder Server Actions.
-
----
-
-## Zusammenfassung: identifizierte offene Punkte (Stand zweite Prüfung, 2026-08-18)
-
-| # | Punkt | Kategorie | Schweregrad (grob) | Status |
-|---|---|---|---|---|
-| 1 | Branch-Protection-Ruleset `main` existiert, aber `enforcement` steht auf `disabled` — Force-Push auf `main` ist faktisch ungeschützt | 9 | mittel (Regression seit 2026-08-08) | offen — neu entdeckt |
-| 2 | `npm audit`: 3× High in `sharp` (transitiv über `next`, Bildoptimierung) | 8 | gering–mittel (Feature ungenutzt) | offen, erneut bestätigt |
-| 3 | `Access-Control-Allow-Origin: *` auf allen Live-Seiten (vermutlich Vercel-Plattform-Default) | 5 | gering (keine sensiblen Daten/Cookies betroffen) | offen — neu dokumentiert |
-| 4 | Vercel-GitHub-App hat Zugriff auf "All repositories" statt nur HOUSEHELD-APP | 9 | gering | offen |
-| 5 | Keine Maximallänge für Titel/Beschreibung von Aufgaben | 10 | gering | offen |
-| 6 | Kein dokumentierter Notfallablauf | 13 | gering | offen |
-| 7 | Kein Backup-Mechanismus für lokale Daten (bewusste Design-Entscheidung, aber Nutzer:innen sollten es wissen) | 13 | gering (bewusst) | offen (Design) |
-| 8 | CSP-Warnung: `'unsafe-inline'` in `script-src` ("dangerous") | 12 | gering–mittel, bewusst in Kauf genommen | offen (bewusste Design-Entscheidung, siehe Punkt 12) |
-| 9 | Vercel Deployment Protection, Environment Variables, Spend Management — in der zweiten Prüfung nicht erneut im Dashboard verifiziert | 6, 11 | zu klären | seit 2026-08-08 nicht mehr geprüft |
-| ~~10~~ | ~~GitHub Secret Scanning/Push Protection~~ | 1 | — | ✅ erledigt 2026-08-08 |
-| ~~11~~ | ~~GitHub Dependabot Alerts/Security Updates~~ | 8 | — | ✅ erledigt 2026-08-08 |
-| ~~12~~ | ~~CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy~~ | 12 | — | ✅ behoben und deployt, securityheaders.com-Note A (2026-08-18) |
-
-Alle anderen Punkte der Checkliste sind entweder erfüllt oder für diesen Stack (rein statische
-App ohne Server, ohne Datenbank, ohne Auth, ohne Secrets) strukturell nicht anwendbar.
-
-
-## Notes Sandro
-Noch bestehende Bugs: Symbolbilder bei Beispieldaten unpassend.
-Bereits für Ideenfindung Claude benutzt.
