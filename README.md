@@ -1,7 +1,7 @@
 # Dokumentation "HOUSEHELD"
 CAS AIMP - Viben und Coden / FS26
 
-Sandro Müntener / 17. August 2026
+Sandro Müntener / 18. August 2026
 
 
 ### App-Beschrieb: ###
