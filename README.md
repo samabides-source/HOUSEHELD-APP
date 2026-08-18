@@ -133,6 +133,14 @@ PageSpeed-Insights-Berichts, der zusätzlich noch unter dem Radar gebliebene
 Kontrastprobleme sowie ein nicht spezifikationskonformes `llms.txt` aufdeckte – beides wurde im
 Anschluss behoben und erneut verifiziert.
 
+Als Abschluss haben wir die Marketing-Seite anhand einer Security-Checkliste geprüft – lokal,
+im Git-Verlauf und live gegen Deployment und GitHub-Repo. Da die Seite rein statisch ist
+(kein Backend, keine DB, kein Login), entfielen die meisten kritischen Punkte;
+als echte Lücke fehlten Security-Header und drei npm-Audit-Funde in Next.js-Abhängigkeiten.
+Die Header wurden ergänzt und verifiziert, ein Next.js-Update gegen die Audit-Funde aber
+wieder verworfen, da es die ESLint-Konfiguration brach.
+Das Ergebnis ist als „Security-Checkliste (Selbst-Audit)“ im README der Marketing-Seite dokumentiert.
+
 **Wichtige Anpassungen**
 
 - Das Home-Foto wurde mehrfach ausgetauscht, bis ein passendes Motiv gefunden war – die Lizenz
@@ -170,8 +178,15 @@ Anschluss behoben und erneut verifiziert.
 Folgt noch... 
 Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sachen abcheckt, also mein Update im Readme. Denkt Fallback-Varianten mit (z.B. kein Internet, Datenbank lokal)
 
+### Mein Aha-Moment
+
+### Neu gewonnen Learnings
+
+### Prompting-Strategien
+
+
 ## Beispielprompt
-"Ich muss die auf Vercel deployte App meinem Dozenten schicken. Dieser wird sie via URL aufrufen und anschauen. Nun erhält er aktuell eine "leere" App, ohne Aufgaben und ohne Personen. Ist es nicht doch irgendwie möglich, dass von mir erfasste Aufgaben und Personen an neue User weitergegeben werden? Mach mir Vorschläge, die für mich mit keinen Kosten verbunden sind."
+"Ich habe noch einen Bug entdeckt. Angelegte Aufgaben werden nur in derjenigen Sprache erfasst und gespeichert, welche beim Anlegen aktiv war. Wird die Sprache nach Anlegen der Aufgaben gewechselt, bleiben die Aufgaben in der Ursprungssprache und werden auch von den Tag-Filtern nicht mehr erkannt. Beim einem Sprachwechsel müssten also auch bereits angelegte Aufgaben mit übersetzt werden. Kannst du mir das umsetzen?"
 
 # PRD: Househeld – Haushaltsaufgaben-Tracker
 
