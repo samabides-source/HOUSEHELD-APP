@@ -47,137 +47,78 @@ Folgt noch. Aufzeichnung mit Teams. samuel@codecrush.ch einladen.
 
 ## Ideenfindung & Entwicklung PRD
 
-**Ausgangslage & Ideenfindung**
-
-Im Rahmen einer Vibe-Coding-Einführung sollte eine einfache, lokal hostbare App ohne KI-Funktionen entstehen – rein zu Ausbildungszwecken, ohne Veröffentlichung. Aus einer ersten Liste von fünf App-Vorschlägen (u. a. Habit-Tracker, Rezeptbuch, Pomodoro-Timer, Haushaltsbuch, Kanban-Board) entstand die konkrete Idee für einen Haushaltsaufgaben-Tracker: Aufgaben erfassen, mit Fotos dokumentieren, Personen zuweisen und mit Tags kategorisieren.
+Im Rahmen der Vibe-Coding-Einführung entstand aus einer ersten Liste von fünf App-Ideen (u. a. Habit-Tracker, Rezeptbuch, Pomodoro-Timer, Haushaltsbuch, Kanban-Board) die konkrete Idee für einen Haushaltsaufgaben-Tracker.
 
 **Meilensteine**
-- Konzeption: Aus der Grundidee wurde ein ausführlicher App-Beschrieb mit Kern-Features (Aufgaben, Fotos, Zuweisung, Tags, Filter) sowie möglichen späteren Erweiterungen entwickelt.
-- Erstes PRD: Daraus entstand ein erstes, strukturiertes PRD-Dokument.
-- Tag-System: Eine vordefinierte Tag-Liste wurde erarbeitet und iterativ verfeinert (Räume, Aussenbereich, Aufgabentyp, Technik & Geräte, Sonstiges) – am Ende 32 vordefinierte Tags, ergänzbar durch frei erstellbare.
-- Zweite Iteration: Eine parallel mit ChatGPT erstellte, feinere PRD-Version brachte weitere Präzisierungen, die ins PRD übernommen wurden.
-- Technische Ausrichtung: Als Tech-Stack wurde Node.js + Express mit lowdb (kostenlose, JSON-Datei-basierte Datenbank ohne SQL) festgelegt.
-- Design: Aus fünf vorgeschlagenen Design-Richtungen wurde "Verspielt & bunt" gewählt: farbcodierte Tag-Kategorien, ein davon getrenntes Prioritäts-Farbsystem, abgerundete Formen, Avatar-Kreise für Personen.
-- Ergebnis: Ein finales, in sich konsistentes PRD sowie zwei Agenten-Kontextdateien (CLAUDE.md für Claude Code, AGENTS.md für Cursor), die alle Business-Regeln, den Tech-Stack und die Design-Vorgaben zusammenfassen – bereit für die praktische Umsetzung mit Claude Code.
+- Aus der Grundidee liess ich mir von Claude einen ausführlichen App-Beschrieb und ein erstes PRD erstellen, inkl. vordefinierter Tag-Liste (32 Tags in 5 Kategorien: Räume, Aussenbereich, Aufgabentyp, Technik & Geräte, Sonstiges).
+- Eine parallel mit ChatGPT erstellte PRD-Version diente als Gegenprüfung und brachte weitere Präzisierungen (Foto-Limits, Filter-Logik, Standardsortierung u. a.).
+- Tech-Stack (Node.js + Express mit lowdb) und Design-Richtung ("Verspielt & bunt": farbcodierte Tag-Kategorien, eigenes Prioritäts-Farbsystem, abgerundete Formen) wurden festgelegt.
+- Ergebnis: ein finales PRD sowie zwei Agenten-Kontextdateien (CLAUDE.md für Claude Code, AGENTS.md für Cursor) als Grundlage für die Umsetzung.
 
 **Wichtige Anpassungen**
 
-- Mehrere Fotos statt nur eines pro Aufgabe, jederzeit austauschbar oder entfernbar
-- Verhalten beim Löschen von Personen: Aufgaben bleiben bestehen und werden automatisch "nicht zugewiesen"
-- Warnhinweis beim Löschen noch verwendeter Tags, statt sie kommentarlos zu entfernen
+- Mehrere, jederzeit austauschbare Fotos statt nur eines pro Aufgabe
+- Personen löschen entfernt nur die Zuweisung, Aufgaben bleiben als "nicht zugewiesen" bestehen
+- Warnhinweis statt stillschweigendem Löschen bei noch verwendeten Tags
 - Klare Trennung zwischen Priorität "dringend" und Tags (kein Doppel-Konzept)
-- Bestätigung per zweitem Klick beim Löschen von Aufgaben (kein versehentliches Löschen, kein Papierkorb)
-- Präzisierungen aus der ChatGPT-Iteration: Foto-Formate/-Limits, Verhalten bei fehlenden Dateien, UND/ODER-Logik bei Filtern, Standardsortierung, Seed-Daten-Verhalten der Tags
-- Wechsel von SQLite auf lowdb als einfachere, lizenzkostenfreie Datenbank-Lösung für das Lernprojekt
+- Zweiter Klick als Löschbestätigung für Aufgaben (kein Papierkorb)
+- Wechsel von SQLite auf lowdb als einfachere, lizenzkostenfreie Lösung fürs Lernprojekt
 
 ## Entwicklungsprozess APP
 
 **Meilensteine**
 
-Nach dem finalen PRD liess ich die App in einer ersten Session vollständig mit Claude Code umsetzen: Next.js 15 (App Router), React 19, Tailwind CSS v4, TypeScript. Dabei wich Claude bewusst vom PRD ab, das ein Backend mit Node.js/Express und der Datenbank lowdb vorsah – da die App auf Vercel (serverless, read-only Dateisystem) deployt werden sollte, wurde die Persistenz clientseitig über IndexedDB umgesetzt. Konsequenz, die von Anfang an transparent kommuniziert wurde: Der Datenbestand liegt pro Browser/Gerät, nicht geräteübergreifend geteilt. Alle PRD-Kernfunktionen (Aufgaben, Fotos, Personen, Tags, Filter, Löschbestätigung) wurden anschliessend im Browser end-to-end durchgetestet, inkl. Build/Lint/Typecheck.
+Claude Code setzte die App in einer ersten Session komplett um: Next.js 15, React 19, Tailwind CSS v4, TypeScript. Dabei wich Claude bewusst vom PRD ab – statt Node.js/Express + lowdb wurde die Persistenz clientseitig über IndexedDB gelöst, weil Vercel (serverless, read-only Dateisystem) kein PRD-konformes Backend erlaubt. Konsequenz, von Anfang an transparent kommuniziert: Der Datenbestand liegt pro Browser/Gerät. Alle Kernfunktionen wurden danach im Browser end-to-end durchgetestet.
 
-In einer späteren, grösseren Session wurde die App auf SEO/AEO/GEO geprüft und auf Wunsch zusätzlich vollständig zweisprachig gemacht (DE/EN). Umgesetzt wurden u. a. robots.ts, sitemap.ts (mit hreflang-Alternates), ein Web App Manifest, JSON-LD (SoftwareApplication) pro Sprache, dynamische Open-Graph-/Apple-Touch-Icons sowie llms.txt für generative Suchmaschinen. Für die Übersetzung entstand ein eigenes i18n-System (lib/i18n/): Deutsch bleibt ohne URL-Präfix erreichbar, Englisch liegt unter /en/…, intern per middleware.ts umgeschrieben, damit bestehende Links gültig bleiben.
+In einer grösseren Folgesession wurde die App auf SEO/AEO/GEO geprüft und zusätzlich vollständig zweisprachig gemacht (DE/EN), inkl. eigenem i18n-System, robots.ts/sitemap.ts, JSON-LD und dynamischen Vorschaubildern.
 
-Zum Abschluss wurde in einer separaten Session eine vorgegebene Security-Checkliste für vibe-gecodete Apps durchgearbeitet (siehe eigener Abschnitt weiter unten im Dokument). Ergebnis: keine Secrets im Code, kein Server-/API-Code, der klassische Angriffsflächen böte; im Gespräch wurden zusätzlich GitHub-Repo-Einstellungen (Secret Scanning, Push Protection, Dependabot, Branch Protection) und die Vercel-Konfiguration (Deployment Protection, Environment Variables) gemeinsam geprüft und gehärtet.
+Danach wurde die App zweimal komplett gegen eine vorgegebene Security-Checkliste geprüft (siehe eigener Abschnitt weiter unten) – einmal lokal am Code, ein zweites Mal live gegen die deployte App und über die GitHub-API. Dabei kam u. a. ans Licht, dass eine zuvor eingerichtete Branch-Protection-Regel inaktiv war. Fehlende Security-Headers (CSP, HSTS u. a.) wurden ergänzt und mit securityheaders.com auf Note A verifiziert.
 
-In einer weiteren Session wurde ein manueller PageSpeed-Insights-Test (Mobile) auf der produktiven App ausgewertet: Performance 98, Accessibility 92, Best Practices 100, SEO 100, Agentisches Browsing 3/3. Die Auswertung der aufgelisteten „fehlerhaften Elemente" deckte dabei einen produktiv ausgelieferten Navigationsbug auf und führte ausserdem zu gezielten Barrierefreiheits-Korrekturen (siehe Bugfixes).
-
-Nach den DE/EN- und SEO-Änderungen wurde die Security-Checkliste in einer weiteren Session ein zweites Mal komplett durchgearbeitet — diesmal zusätzlich live gegen die deployte App und über die öffentliche GitHub-API, nicht nur gegen den lokalen Code. Dabei kam ans Licht, dass das beim ersten Security-Durchgang eingerichtete Branch-Protection-Ruleset auf `main` zwar noch existierte, aber auf „disabled" stand und damit faktisch wirkungslos war. Als konkreter Fix wurden ausserdem die fehlenden Security-Headers ergänzt: `next.config.ts` setzt jetzt Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy und Permissions-Policy für alle Routen, mit einer CSP, die gezielt auf die tatsächlich verwendeten Ressourcen zugeschnitten ist (u. a. `blob:` für Foto-Vorschauen, `api.openverse.org` für die Demo-Bildersuche). Der Fix wurde vor dem Deploy gegen einen lokalen Produktions-Build verifiziert (Header per `curl` geprüft, Aufgabe anlegen und Demo-Daten laden inkl. Openverse-Aufruf im Browser getestet, keine CSP-Verletzung), nach dem Deploy bestätigte securityheaders.com die Note A. Bewusst nicht verschärft wurde die verbleibende `'unsafe-inline'`-Direktive im CSP-`script-src`: Eine strengere, nonce-basierte CSP hätte erfordert, die aktuell statisch prerenderten Seiten auf dynamisches Rendering pro Request umzustellen — ein Zielkonflikt mit der bestehenden Architektur-Entscheidung für statisches, gecachtes Prerendering, den der Nutzer bewusst zugunsten der Performance aufgelöst hat.
+Ein manueller PageSpeed-Insights-Test deckte zusätzlich einen produktiv ausgelieferten Navigationsbug sowie Kontrast-/Bedienbarkeits-Probleme auf (siehe Bugfixes).
 
 **Wichtige Anpassungen**
 
-Über mehrere Feedbackrunden hinweg wurden u. a. folgende Änderungen umgesetzt:
-- Tag-Farben im Dialog „Neue Aufgabe" an die Kategorie-Farben aus der Tag-Verwaltung angeglichen (vorher nur einheitliches Grau).
-- Fotos in der Aufgabenübersicht (Liste und Board) anklickbar/vergrösserbar gemacht (Modal), analog zur bereits bestehenden Ansicht im Bearbeiten-Dialog.
-- Ein abgeschnittenes Filter-Label („Aussenbereich") behoben: Ursache war eine feste Breite kombiniert mit overflow-hidden des Einklapp-Containers; das Label steht seither auf einer eigenen Zeile.
-- Beispieldaten von 3 Personen/8 Aufgaben auf 6 Personen/14 Aufgaben erweitert und um Symbolbilder ergänzt. Die erste Version suchte dafür live über die kostenlose, keyless Openverse-API und nahm automatisch den ersten Treffer – das lieferte in der Praxis zu oft thematisch unpassende oder gar unangemessene Bilder. In einer späteren Session darum gemeinsam durch mehrere Bildergalerien pro Aufgabe von Hand kuratiert (inkl. Lizenzprüfung: CC0/BY/BY-SA, keine ND-Bilder, da die Upload-Pipeline jedes Foto verkleinert – lizenzrechtlich eine Bearbeitung) und die Live-Suche durch feste Bild-Links ersetzt, weiterhin mit automatischem Fallback auf ein generiertes Farb-Platzhalterbild, falls ein Bild nicht mehr erreichbar ist.
-- Die Seite „Meine Aufgaben" wurde nach kurzer Rückfrage entfernt (redundant zum Personen-Filter auf der Aufgaben-Seite); stattdessen merkt sich die Aufgaben-Seite die zuletzt gewählte Person jetzt selbst lokal im Browser. Die Navigation wurde gleichzeitig so angepasst, dass „Aufgaben" optisch präsenter ist als „Personen", „Tags" und „Einstellungen".
-- Texte auf der Einstellungen-Seite mehrfach gekürzt bzw. entfernt (u. a. der ganze Abschnitt „Speicherort" inkl. Speicherplatzanzeige), um die Seite schlanker zu halten.
-- Das README wurde zwischendurch für Endnutzer:innen der App deutlich gekürzt (separat von diesem Kursdokumentations-Abschnitt).
+- Tag-Farben im Dialog „Neue Aufgabe" an die Kategorie-Farben angeglichen; Fotos in der Aufgabenübersicht anklickbar/vergrösserbar gemacht
+- Layout-Fix für ein abgeschnittenes Filter-Label
+- Beispieldaten auf 6 Personen/14 Aufgaben erweitert; die Symbolbilder liefen zunächst über eine automatische Live-Bildsuche, die zu oft thematisch unpassende Treffer lieferte – ersetzt durch von Hand kuratierte, lizenzgeprüfte Bild-Links (CC0/BY/BY-SA)
+- Redundante Seite „Meine Aufgaben" entfernt zugunsten eines gespeicherten Personen-Filters auf der Aufgaben-Seite; Navigation entsprechend angepasst
+- Diverse Textkürzungen (Einstellungen-Seite, README für Endnutzer:innen)
 
 **Bugfixes**
 
-- Performance/Robustheit bei den Beispieldaten: Der erste Versuch, alle Symbolbilder gleichzeitig von Openverse zu laden, schlug in der Praxis grösstenteils fehl (zu viele parallele Verbindungen). Fix: Downloads auf maximal 3 gleichzeitige Anfragen begrenzt – dadurch zuverlässig und sogar schneller als der ursprüngliche Ansatz.
-- Tags wurden beim Sprachwechsel nicht übersetzt: Ursache war, dass Next.js beim Sprachwechsel die Client-Komponenten neu mountet, wodurch ein zur Erkennung genutzter useRef jedes Mal zurückgesetzt wurde. Fix: Die zuletzt aktive Sprache wird seither in IndexedDB gespeichert (meta.lastLocale) statt im React-State, wodurch die Übersetzung der 31 vordefinierten Tags zuverlässig bei jedem Sprachwechsel greift.
-- Folgebug, entdeckt nach dem ersten Fix: Nach „Alle Daten löschen" wurde auch der lastLocale-Marker gelöscht, wodurch der nächste Sprachwechsel die Tags nicht mehr übersetzte (erst der übernächste Wechsel „reparierte" es wieder) – reproduziert sowohl im Dev- als auch im Produktions-Build. Fix: resetEverything() setzt den Marker nach dem Neu-Seeding jetzt explizit wieder.
-- Geprüft, aber bewusst nicht umgesetzt: eine echte automatische Übersetzung von frei eingegebenen Aufgaben-Titeln/-Beschreibungen. Recherchiert wurden die neue, rein lokale „Built-in Translator API" von Chrome/Edge (nur Desktop-Chrome/Edge) sowie externe Dienste wie MyMemory und LibreTranslate. Verworfen, weil externe Dienste Aufgabendaten an Dritte senden würden – ein Widerspruch zum Kernprinzip „alle Daten bleiben lokal im Browser". Als bekannte Einschränkung im README dokumentiert.
-- PageSpeed-Insights-Audit deckte einen produktiv ausgelieferten Bug im Sprachumschalter auf: Ein Klick auf „EN" von einer deutschen Seite führte auf eine nicht existierende Route (z. B. `/en/de/personen` statt `/en/personen`) – 404. Ursache: `usePathname()` liefert nach dem Locale-Rewrite in `middleware.ts` den intern aufgelösten Pfad (z. B. `/de/personen`), nicht die sichtbare, präfixlose URL; die Pfad-Bereinigungsfunktion ging fälschlich davon aus, Deutsch habe nie ein Präfix, und hat es deshalb nur für Englisch entfernt. Als Nebeneffekt war dadurch auch die aktive Hervorhebung in der Navigation auf allen deutschen Seiten dauerhaft kaputt (nie markiert). Beide Symptome mit derselben Korrektur behoben und per DE↔EN-Roundtrip nachgetestet.
-- Barrierefreiheit (PageSpeed-Score 92) korrigiert: Das Kontrastverhältnis von gedämpftem Sekundärtext (Fusszeile, Filterlabels, Zeitangaben u. a., 34 Stellen app-weit) lag mit `text-slate-400`/`text-slate-500` unter dem WCAG-AA-Mindestwert von 4,5:1; app-weit auf `text-slate-600` (~7:1) vereinheitlicht. Ausserdem waren einzelne Berührungszielbereiche (Filter-Chips, „Alle Tags anzeigen", Tag entfernen, „Alle Zuweisungen entfernen") mit rund 24 px zu knapp bemessen; Tap-Fläche per zusätzlichem Padding samt kompensierendem Negativ-Margin vergrössert, ohne das sichtbare Layout zu verschieben.
-- Beim Umstellen der Beispielfotos auf feste Bild-Links (siehe oben) fiel danach jedes einzelne Foto lautlos auf den Platzhalter zurück: Die im Security-Durchgang gehärtete Content-Security-Policy erlaubt `connect-src` nur für `api.openverse.org`, die neu kuratierten Bilder lagen aber direkt auf ihren Ursprungs-Hosts (Flickr, WordPress) und wurden dadurch blockiert – ohne sichtbaren Fehler in der App selbst. Fix: Die Bilder werden seither über Openverses eigenen Thumbnail-Proxy (`api.openverse.org/v1/images/{id}/thumb/`) eingebunden statt über die Original-URL, bleibt damit innerhalb der bestehenden CSP, ohne für jeden Bild-Anbieter eine neue Domain freizugeben. Gegen einen lokalen Produktions-Build verifiziert: Beispieldaten geladen und die Bildmasse direkt in IndexedDB geprüft (13 echte Fotos mit individuellen Massen statt der einheitlichen 800×600-Platzhaltergrösse, keine CSP-Fehler mehr in der Konsole).
+- Beispieldaten-Downloads auf maximal 3 parallele Anfragen begrenzt, nachdem volle Parallelität in der Praxis grösstenteils fehlschlug
+- Tags wurden beim Sprachwechsel nicht zuverlässig übersetzt (verlorener State beim Komponenten-Remount); gelöst über einen persistenten Marker in IndexedDB, inkl. eines Folgebugs nach „Alle Daten löschen"
+- Automatische Freitext-Übersetzung geprüft, aber aus Datenschutzgründen bewusst nicht umgesetzt (als bekannte Einschränkung dokumentiert)
+- Sprachumschalter führte von deutschen Seiten auf eine falsche, nicht existierende Route (404) und liess die Navigations-Hervorhebung auf Deutsch dauerhaft inaktiv – beides mit derselben Korrektur behoben
+- Kontrastwerte und Berührungszielbereiche unter dem WCAG-AA-Minimum korrigiert
+- Kuratierte Beispielfotos (siehe oben) fielen wegen der neu gehärteten CSP still auf den Platzhalter zurück, da sie direkt von Fremd-Hosts geladen wurden; gelöst über Openverses eigenen, bereits erlaubten Thumbnail-Proxy
 
 ## Entwicklungsprozess SITE
 
 **Meilensteine**
 
-Die Marketingseite entstand als Grundgerüst mit fünf Seiten (Home, Features, FAQ, About, App
-testen), im gleichen Design wie die App. Danach kamen eine Kontaktadresse auf der About-Seite
-sowie Fotos auf Home und Features dazu, und die About-Seite wurde neu strukturiert: Projekt,
-Technik und Hintergrundentscheide sind seither in einer aufklappbaren Kachel zusammengefasst.
+Die Marketingseite entstand als Grundgerüst mit fünf Seiten (Home, Features, FAQ, About, App testen) im Design der App, danach ergänzt um Kontaktangaben, Fotos und eine neu strukturierte About-Seite.
 
-Der grösste Schritt war eine vollständige SEO-, AEO- und GEO-Überarbeitung kombiniert mit dem
-Aufbau einer kompletten englischen Sprachversion. Die Inhalte wurden dafür in getrennte deutsche
-und englische Dateien mit gemeinsamer Struktur aufgeteilt, Deutsch ohne Präfix, Englisch unter
-eigenem Pfad. Ergänzt wurden strukturierte Daten für Suchmaschinen und Sprachassistenten,
-dynamisch generierte Vorschaubilder, eine maschinenlesbare Zusammenfassung für KI-Crawler sowie
-Sprachverweise auf jeder Seite.
+Der grösste Schritt war eine vollständige SEO-/AEO-/GEO-Überarbeitung samt kompletter englischer Version: getrennte, sprachspezifische Content-Dateien, strukturierte Daten, dynamische Vorschaubilder und eine maschinenlesbare Zusammenfassung für KI-Crawler. Die Verlinkung zur App wurde anschliessend ebenfalls sprachabhängig gemacht.
 
-Zum Schluss wurde die Verlinkung zur App sprachabhängig gemacht, nachdem auch die App selbst eine
-englische Version erhielt: Alle Links sowie das App-Mockup zeigen seither je nach gewählter
-Sprache auf die passende Version.
+Ein eigenständiger GEO-Audit prüfte danach jeden Punkt einzeln, teils mit externen Werkzeugen statt blosser Einschätzung (u. a. Schema-Validierung bei validator.schema.org gegen die produktive URL). Dabei kam ein seit Langem falscher Domain-Tippfehler in den Metadaten ans Licht, der Canonical-URLs, Open-Graph und alle strukturierten Daten betraf. Ein anschliessender PageSpeed-Insights-Bericht deckte zusätzlich Kontrastprobleme und ein nicht spezifikationskonformes `llms.txt` auf.
 
-Danach folgte ein eigenständiger GEO-Audit anhand einer vorgegebenen Checkliste (siehe Abschnitt
-oben). Jeder Punkt wurde einzeln geprüft – Code-Durchsicht, Live-Tests im Browser und, wo
-sinnvoll, echte externe Werkzeuge statt blosser Einschätzung: die Schema-Markups wurden bei
-validator.schema.org gegen die produktive URL validiert, nicht nur gegen lokal eingefügten Code.
-Dabei kam ans Licht, dass die in den Metadaten hinterlegte Domain die ganze Zeit falsch war
-(`hausheld-page` statt `househeld-page`) – ein reiner Tippfehler, der aber Canonical-URLs,
-Open-Graph-Tags, Sitemap und sämtliche strukturierten Daten betraf und ohne den Audit
-wahrscheinlich unentdeckt geblieben wäre. Nach der Korrektur und einem manuellen Deployment durch
-den Nutzer liess sich die Seite erstmals vollständig live testen, inklusive eines
-PageSpeed-Insights-Berichts, der zusätzlich noch unter dem Radar gebliebene
-Kontrastprobleme sowie ein nicht spezifikationskonformes `llms.txt` aufdeckte – beides wurde im
-Anschluss behoben und erneut verifiziert.
-
-Als Abschluss haben wir die Marketing-Seite anhand einer Security-Checkliste geprüft – lokal,
-im Git-Verlauf und live gegen Deployment und GitHub-Repo. Da die Seite rein statisch ist
-(kein Backend, keine DB, kein Login), entfielen die meisten kritischen Punkte;
-als echte Lücke fehlten Security-Header und drei npm-Audit-Funde in Next.js-Abhängigkeiten.
-Die Header wurden ergänzt und verifiziert, ein Next.js-Update gegen die Audit-Funde aber
-wieder verworfen, da es die ESLint-Konfiguration brach.
-Das Ergebnis ist als „Security-Checkliste (Selbst-Audit)“ im README der Marketing-Seite dokumentiert.
+Zum Abschluss wurde auch die Marketing-Seite gegen dieselbe Security-Checkliste geprüft (lokal, im Git-Verlauf, live gegen Deployment und Repo). Als echte Lücken fanden sich fehlende Security-Header und drei npm-Audit-Funde; die Header wurden ergänzt, ein Next.js-Update gegen die Audit-Funde aber wieder verworfen, da es die ESLint-Konfiguration brach. Dokumentiert als „Security-Checkliste (Selbst-Audit)" im README der Marketing-Seite.
 
 **Wichtige Anpassungen**
 
-- Das Home-Foto wurde mehrfach ausgetauscht, bis ein passendes Motiv gefunden war – die Lizenz
-  wurde dabei sauber pro Bild dokumentiert.
-- Die Inhalte wurden von einer einzelnen Content-Datei auf getrennte, sprachspezifische Dateien
-  mit gemeinsamer Struktur umgestellt, als Grundlage für die Zweisprachigkeit.
-- Die App-Verlinkung wurde von einer festen URL auf eine sprachabhängige Zuordnung umgebaut,
-  ebenso das App-Mockup, das seither je nach Sprache passende Texte zeigt.
-- Die Produktdefinition stand bisher nur in Meta-Daten und strukturierten Daten, nie im
-  sichtbaren Seitentext – auf Home und About wurde je ein Satz ergänzt, der das direkt und
-  eigenständig lesbar macht.
-- Auf der Features-Seite wurde eine Zwischenüberschrift vor dem Funktions-Raster ergänzt, damit
-  die Überschriftenhierarchie keinen Sprung mehr macht.
-- `llms.txt` wurde vom reinen Fliesstext-Format auf das offiziell erwartete Markdown-Format mit
-  echten Links umgestellt.
+- Home-Foto mehrfach ausgetauscht, Lizenz sauber pro Bild dokumentiert
+- Inhalte von einer Content-Datei auf getrennte, sprachspezifische Dateien umgestellt (Grundlage für die Zweisprachigkeit)
+- App-Verlinkung und -Mockup auf sprachabhängige Inhalte umgebaut
+- Produktdefinition zusätzlich als lesbarer Fliesstext auf Home/About ergänzt (vorher nur in Meta-/strukturierten Daten)
+- `llms.txt` vom Fliesstext- aufs offiziell erwartete Markdown-Format umgestellt
 
 **Bugfixes**
 
-- Ein bei jedem Build neu gesetztes, bedeutungsloses Datum in der Sitemap wurde fest gesetzt.
-- Die Sprachangabe des Dokuments wurde korrigiert.
-- Überflüssige Screenreader-Ausgaben bei den Logo-Symbolen wurden unterdrückt.
-- Verwaiste Verweise auf die alte Content-Datei wurden bereinigt.
-- Eine überholte Aussage zur App-Oberfläche wurde im Leitfaden korrigiert.
-- Eine falsche Platzhalter-Domain in den Metadaten wurde korrigiert – betraf Canonical-URLs,
-  Open-Graph-Tags, Sitemap und alle strukturierten Daten der ganzen Seite.
-- Mehrere Text/Hintergrund-Kombinationen mit zu geringem Kontrast (teils nur 2.5:1) wurden auf
-  das WCAG-AA-Minimum von 4.5:1 angehoben.
-- Der Produktname war – vermutlich aus der DE/EN-Aufteilung der Inhalte hervorgegangen – auf der
-  gesamten Seite als „Hausheld" statt „Househeld" gelandet (Titel, Meta-Description, OG-Bilder,
-  JSON-LD, sämtliche Fliesstexte in beiden Sprachen, `llms.txt`). Auf GitHub-Repo-Namen, Live-
-  Domain und die verlinkte App als Referenz durchgehend auf „Househeld" korrigiert; die App selbst
-  wurde dabei nicht angefasst.
+- Bedeutungsloses, bei jedem Build neu gesetztes Sitemap-Datum fest gesetzt; Sprachangabe des Dokuments korrigiert; überflüssige Screenreader-Ausgaben unterdrückt
+- Falsche Platzhalter-Domain in allen Metadaten und strukturierten Daten korrigiert
+- Kontrastarme Text/Hintergrund-Kombinationen auf das WCAG-AA-Minimum angehoben
+- Produktname war durchgehend als „Hausheld" statt „Househeld" gelandet (Titel, Meta-Daten, JSON-LD, Fliesstexte) – global korrigiert; die App selbst war davon nicht betroffen
 
 ## Reflexion (handgeschrieben ;-))
 Beim ganzen Prozess - Ideenfindung, App-Entwicklung, Deployment, Checklisten - war ich immer wieder überrascht, als wie "menschlich" ich Claude wahrnahm. Die Kommunikation war sehr transparent: Gedankengänge, Auffälligkeiten oder Widersprüche hat mir Claude aktive mitgeteilt und wichtige Rückfragen direkt gestellt und mir die Entscheidung überlassen. Also exakt genau so, wie ich mir die Zusammenarbeit mit menschlichen Fachexpert:innen auch wünsche.
@@ -194,6 +135,7 @@ Und zweitens: Ich kann auch schreiben, warum mir eine Umsetzung / ein verwendete
 
 <a id="neu-gewonnene-learnings"></a>
 **Neu gewonnene Learnings**
+
 Ich brauche keine Vorkenntnisse und muss nicht in Fachsprache kommunizieren. Ganz grundsätzlich war ich überrascht, dass ich Wünsche, Problemeoder Anmerkungen in meiner "Laien-Sprache" beschreiben konnte und Claude hat die richtigen Schlüsse daraus gezogen. Und dasselbe galt auch umgekehrt: Ich schaue Claude beim Denkprozess zu und sehe ganz viele technische Begriffe und Beschreibungen, aber die Schlussantwort ist dann auch für mich mehrheitlich verständlich und nachvollziehbar. Einzig bei der Security-Checkliste habe ich mehrmals nicht mehr verstanden, was genau das Problem war und wie das jetzt gelöst wurde.
 
 <a id="prompting-strategien"></a>
