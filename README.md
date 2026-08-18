@@ -508,7 +508,7 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
 
 ### 12. Security Headers
 
-- [x] **✅ Behoben (2026-08-18):** `next.config.ts` setzt jetzt über `headers()` für alle Routen
+- [x] **Behoben (2026-08-18):** `next.config.ts` setzt jetzt über `headers()` für alle Routen
       `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
       `Referrer-Policy: strict-origin-when-cross-origin` und `Permissions-Policy`
       (`camera=(), microphone=(), geolocation=(), payment=(), usb=()` — die App nutzt keine
