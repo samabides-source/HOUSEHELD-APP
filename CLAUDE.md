@@ -28,14 +28,14 @@ Typ von `de` geprüft wird).
 
 ## Architektur
 
-Next.js 15 (App Router) + React 19 + Tailwind CSS v4 + TypeScript. **Es gibt keinen eigenen
+Next.js 16 (App Router) + React 19 + Tailwind CSS v4 + TypeScript. **Es gibt keinen eigenen
 Backend-/API-Code** – die gesamte fachliche Logik läuft im Browser, IndexedDB ist der einzige
 Datenspeicher. Für Mehrsprachigkeit und SEO-Metadaten kommen Next-eigene Edge-Mechanismen zum
-Einsatz (`middleware.ts`, dynamische `opengraph-image`/`apple-icon`) – das sind Next.js-Bordmittel
+Einsatz (`proxy.ts`, dynamische `opengraph-image`/`apple-icon`) – das sind Next.js-Bordmittel
 ohne eigene Server-/Datenbank-Anbindung, kein Widerspruch zur „kein Backend“-Regel.
 
 ```
-middleware.ts           Locale-Rewrite: "/" (ohne Präfix) → intern "/de", "/en/…" bleibt explizit
+proxy.ts                 Locale-Rewrite: "/" (ohne Präfix) → intern "/de", "/en/…" bleibt explizit
 app/
   [locale]/              Seiten je Sprache (de = kein Präfix, en = "/en/…"), alle "use client"
     layout.tsx           Root-Layout: <html lang>, Metadata/JSON-LD, I18nProvider, StoreProvider
@@ -68,7 +68,7 @@ lib/
 ### Mehrsprachigkeit (DE/EN)
 
 - Deutsch bleibt ohne URL-Präfix erreichbar (`/`, `/personen`, …), Englisch liegt explizit unter
-  `/en/…`. `middleware.ts` schreibt präfixlose Pfade intern auf `/de/…` um (Rewrite, keine
+  `/en/…`. `proxy.ts` schreibt präfixlose Pfade intern auf `/de/…` um (Rewrite, keine
   sichtbare Weiterleitung) – bestehende Links/Bookmarks bleiben gültig.
 - Jede Route liegt unter `app/[locale]/…`; Seiten sind Client-Komponenten und lesen Texte über
   `useT()` (liefert das Dictionary der aktuellen Sprache) bzw. `useLocale()`.
@@ -182,7 +182,7 @@ gedämpft. Bewusst keine Google-Font, damit der Build ohne Netzwerkzugriff funkt
 
 Vercel, Framework-Preset „Next.js“, keine Umgebungsvariablen, kein Build-Override nötig, Domain
 `https://househeld-app.vercel.app/`. Fachliche Seiten werden statisch prerendert (pro Locale, via
-`generateStaticParams`); `middleware.ts` läuft als Edge-Function nur für das Locale-Rewriting,
+`generateStaticParams`); `proxy.ts` läuft als Edge-Function nur für das Locale-Rewriting,
 `opengraph-image.tsx`/`apple-icon.tsx` generieren Bilder on-demand. Es gibt weiterhin **keine
 Datenbank-Anbindung und keine eigene API** – diese Next-Mechanismen ersetzen keine
 Server-Fachlogik, die bleibt vollständig im Client.

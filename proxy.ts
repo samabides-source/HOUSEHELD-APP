@@ -9,7 +9,7 @@ import { DEFAULT_LOCALE, LOCALES } from "@/lib/i18n/config";
  * auf `/de/…` umgeschrieben, damit beide Sprachen auf derselben
  * `app/[locale]/…`-Routenstruktur laufen.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const hasLocalePrefix = LOCALES.some(
