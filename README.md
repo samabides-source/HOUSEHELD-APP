@@ -76,6 +76,8 @@ Danach wurde die App zweimal komplett gegen eine vorgegebene Security-Checkliste
 
 Ein manueller PageSpeed-Insights-Test deckte zusätzlich einen produktiv ausgelieferten Navigationsbug sowie Kontrast-/Bedienbarkeits-Probleme auf (siehe Bugfixes).
 
+Nach einem Dependabot-Merge auf Next.js 16 wurde in einer kurzen Session geprüft, ob Build/Lint/Typecheck weiterhin sauber laufen: `tsconfig.json` musste dabei zwingend auf `jsx: react-jsx` angepasst und `middleware.ts` auf die neue `proxy.ts`-Konvention migriert werden (per offiziellem Codemod, Logik unverändert).
+
 **Wichtige Anpassungen**
 
 - Tag-Farben im Dialog „Neue Aufgabe" an die Kategorie-Farben angeglichen; Fotos in der Aufgabenübersicht anklickbar/vergrösserbar gemacht
@@ -92,6 +94,7 @@ Ein manueller PageSpeed-Insights-Test deckte zusätzlich einen produktiv ausgeli
 - Sprachumschalter führte von deutschen Seiten auf eine falsche, nicht existierende Route (404) und liess die Navigations-Hervorhebung auf Deutsch dauerhaft inaktiv – beides mit derselben Korrektur behoben
 - Kontrastwerte und Berührungszielbereiche unter dem WCAG-AA-Minimum korrigiert
 - Kuratierte Beispielfotos (siehe oben) fielen wegen der neu gehärteten CSP still auf den Platzhalter zurück, da sie direkt von Fremd-Hosts geladen wurden; gelöst über Openverses eigenen, bereits erlaubten Thumbnail-Proxy
+- Über GitHub direkt angelegte `SECURITY.md` enthielt noch unausgefüllten Platzhaltertext mit fiktivem Versionsschema; durch eine zum Projekt passende Policy ersetzt
 
 ## Entwicklungsprozess SITE
 
