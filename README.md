@@ -90,7 +90,7 @@ Nach den DE/EN- und SEO-Änderungen wurde die Security-Checkliste in einer weite
 - Tag-Farben im Dialog „Neue Aufgabe" an die Kategorie-Farben aus der Tag-Verwaltung angeglichen (vorher nur einheitliches Grau).
 - Fotos in der Aufgabenübersicht (Liste und Board) anklickbar/vergrösserbar gemacht (Modal), analog zur bereits bestehenden Ansicht im Bearbeiten-Dialog.
 - Ein abgeschnittenes Filter-Label („Aussenbereich") behoben: Ursache war eine feste Breite kombiniert mit overflow-hidden des Einklapp-Containers; das Label steht seither auf einer eigenen Zeile.
-- Beispieldaten von 3 Personen/8 Aufgaben auf 6 Personen/14 Aufgaben erweitert und um thematisch passende Symbolbilder ergänzt: Diese werden beim Laden der Beispieldaten über die kostenlose, keyless Openverse-API gesucht, mit automatischem Fallback auf ein generiertes Farb-Platzhalterbild, falls kein Internet verfügbar ist oder die Suche nichts liefert.
+- Beispieldaten von 3 Personen/8 Aufgaben auf 6 Personen/14 Aufgaben erweitert und um Symbolbilder ergänzt. Die erste Version suchte dafür live über die kostenlose, keyless Openverse-API und nahm automatisch den ersten Treffer – das lieferte in der Praxis zu oft thematisch unpassende oder gar unangemessene Bilder. In einer späteren Session darum gemeinsam durch mehrere Bildergalerien pro Aufgabe von Hand kuratiert (inkl. Lizenzprüfung: CC0/BY/BY-SA, keine ND-Bilder, da die Upload-Pipeline jedes Foto verkleinert – lizenzrechtlich eine Bearbeitung) und die Live-Suche durch feste Bild-Links ersetzt, weiterhin mit automatischem Fallback auf ein generiertes Farb-Platzhalterbild, falls ein Bild nicht mehr erreichbar ist.
 - Die Seite „Meine Aufgaben" wurde nach kurzer Rückfrage entfernt (redundant zum Personen-Filter auf der Aufgaben-Seite); stattdessen merkt sich die Aufgaben-Seite die zuletzt gewählte Person jetzt selbst lokal im Browser. Die Navigation wurde gleichzeitig so angepasst, dass „Aufgaben" optisch präsenter ist als „Personen", „Tags" und „Einstellungen".
 - Texte auf der Einstellungen-Seite mehrfach gekürzt bzw. entfernt (u. a. der ganze Abschnitt „Speicherort" inkl. Speicherplatzanzeige), um die Seite schlanker zu halten.
 - Das README wurde zwischendurch für Endnutzer:innen der App deutlich gekürzt (separat von diesem Kursdokumentations-Abschnitt).
@@ -103,6 +103,7 @@ Nach den DE/EN- und SEO-Änderungen wurde die Security-Checkliste in einer weite
 - Geprüft, aber bewusst nicht umgesetzt: eine echte automatische Übersetzung von frei eingegebenen Aufgaben-Titeln/-Beschreibungen. Recherchiert wurden die neue, rein lokale „Built-in Translator API" von Chrome/Edge (nur Desktop-Chrome/Edge) sowie externe Dienste wie MyMemory und LibreTranslate. Verworfen, weil externe Dienste Aufgabendaten an Dritte senden würden – ein Widerspruch zum Kernprinzip „alle Daten bleiben lokal im Browser". Als bekannte Einschränkung im README dokumentiert.
 - PageSpeed-Insights-Audit deckte einen produktiv ausgelieferten Bug im Sprachumschalter auf: Ein Klick auf „EN" von einer deutschen Seite führte auf eine nicht existierende Route (z. B. `/en/de/personen` statt `/en/personen`) – 404. Ursache: `usePathname()` liefert nach dem Locale-Rewrite in `middleware.ts` den intern aufgelösten Pfad (z. B. `/de/personen`), nicht die sichtbare, präfixlose URL; die Pfad-Bereinigungsfunktion ging fälschlich davon aus, Deutsch habe nie ein Präfix, und hat es deshalb nur für Englisch entfernt. Als Nebeneffekt war dadurch auch die aktive Hervorhebung in der Navigation auf allen deutschen Seiten dauerhaft kaputt (nie markiert). Beide Symptome mit derselben Korrektur behoben und per DE↔EN-Roundtrip nachgetestet.
 - Barrierefreiheit (PageSpeed-Score 92) korrigiert: Das Kontrastverhältnis von gedämpftem Sekundärtext (Fusszeile, Filterlabels, Zeitangaben u. a., 34 Stellen app-weit) lag mit `text-slate-400`/`text-slate-500` unter dem WCAG-AA-Mindestwert von 4,5:1; app-weit auf `text-slate-600` (~7:1) vereinheitlicht. Ausserdem waren einzelne Berührungszielbereiche (Filter-Chips, „Alle Tags anzeigen", Tag entfernen, „Alle Zuweisungen entfernen") mit rund 24 px zu knapp bemessen; Tap-Fläche per zusätzlichem Padding samt kompensierendem Negativ-Margin vergrössert, ohne das sichtbare Layout zu verschieben.
+- Beim Umstellen der Beispielfotos auf feste Bild-Links (siehe oben) fiel danach jedes einzelne Foto lautlos auf den Platzhalter zurück: Die im Security-Durchgang gehärtete Content-Security-Policy erlaubt `connect-src` nur für `api.openverse.org`, die neu kuratierten Bilder lagen aber direkt auf ihren Ursprungs-Hosts (Flickr, WordPress) und wurden dadurch blockiert – ohne sichtbaren Fehler in der App selbst. Fix: Die Bilder werden seither über Openverses eigenen Thumbnail-Proxy (`api.openverse.org/v1/images/{id}/thumb/`) eingebunden statt über die Original-URL, bleibt damit innerhalb der bestehenden CSP, ohne für jeden Bild-Anbieter eine neue Domain freizugeben. Gegen einen lokalen Produktions-Build verifiziert: Beispieldaten geladen und die Bildmasse direkt in IndexedDB geprüft (13 echte Fotos mit individuellen Massen statt der einheitlichen 800×600-Platzhaltergrösse, keine CSP-Fehler mehr in der Konsole).
 
 ## Entwicklungsprozess SITE
 
@@ -178,22 +179,28 @@ Das Ergebnis ist als „Security-Checkliste (Selbst-Audit)“ im README der Mark
   Domain und die verlinkte App als Referenz durchgehend auf „Househeld" korrigiert; die App selbst
   wurde dabei nicht angefasst.
 
-## Reflexion
-Folgt noch... 
-Positiv überrascht über die transparente Kommunikation. Und wie es Claude Sachen abcheckt, also mein Update im Readme. Denkt Fallback-Varianten mit (z.B. kein Internet, Datenbank lokal)
+## Reflexion (handgeschrieben ;-))
+Beim ganzen Prozess - Ideenfindung, App-Entwicklung, Deployment, Checklisten - war ich immer wieder überrascht, als wie "menschlich" ich Claude wahrnahm. Die Kommunikation war sehr transparent: Gedankengänge, Auffälligkeiten oder Widersprüche hat mir Claude aktive mitgeteilt und wichtige Rückfragen direkt gestellt und mir die Entscheidung überlassen. Also exakt genau so, wie ich mir die Zusammenarbeit mit menschlichen Fachexpert:innen auch wünsche.
+Besonders positiv überrascht hat mich, wie Claude im Repository auch selbständig Sachen gegencheckt oder updatet und sogar (technische) Fallback-Varianten für die App oder die Marketing-Seite für mich mitdenkt. Auch die live deployte Website hat Claude immer wieder geprüft.
+
+Kritisch sehe ich, dass ich mit meinen quasi inexistenten Programmier-Kenntnissen lediglich das Endprodukt testen und beurteilen kann. Natürlich habe im Entwicklungsprozess gewisse Aspekte gelernt und zu verstehen gelernt (z.B. Design-Entwicklung oder GEO-optmierte Formatierung). Aber der ganze technische Hintergrund ist für mich eine riesige Blackbox.
 
 <a id="mein-aha-moment"></a>
 **Mein Aha-Moment**
 
-folgt noch
+CLAUDE.md ist die Referenz für die ganze Entwicklung. Das habe ich lange nicht verstanden, wahrscheinlich auch, weil es ein eher technisches Dokument ist. Gerade bei der Sicherheitsprüfung wie auch bei der GEO-Optimierung hat mich Claude mehrmals auf Konflikte/Widersprüche mit den ursprünglich definierten Parametern im CLAUDE.md-File hingewiesen.
+
+Und zweitens: Ich kann auch schreiben, warum mir eine Umsetzung / ein verwendetes Bild / etc. nicht gefällt. Lange habe ich jeweils nur geantwortet, "mach mir neue Vorschläge". Wenn ich meine Unzufriedenheit aber begründe, liefert Claude viel schneller bessere Ergebnisse.
 
 <a id="neu-gewonnene-learnings"></a>
 **Neu gewonnene Learnings**
-folgt noch
+Ich brauche keine Vorkenntnisse und muss nicht in Fachsprache kommunizieren. Ganz grundsätzlich war ich überrascht, dass ich Wünsche, Problemeoder Anmerkungen in meiner "Laien-Sprache" beschreiben konnte und Claude hat die richtigen Schlüsse daraus gezogen. Und dasselbe galt auch umgekehrt: Ich schaue Claude beim Denkprozess zu und sehe ganz viele technische Begriffe und Beschreibungen, aber die Schlussantwort ist dann auch für mich mehrheitlich verständlich und nachvollziehbar. Einzig bei der Security-Checkliste habe ich mehrmals nicht mehr verstanden, was genau das Problem war und wie das jetzt gelöst wurde.
 
 <a id="prompting-strategien"></a>
 **Prompting-Strategien**
-folgt noch
+
+Ich habe bei den Iterationen lange unterschätzt, wie stark Claude mit Screenshots umgehen kann. Im fortgeschrittenen Entwicklungsstadium habe ich darum vermehrt damit gearbeitet und auch immer stark darauf geachtet, dass ich von Claude das exakte Wording übernehme, um z.B. ein Problem zu beschreiben.
+Was auch sehr geholfen hat, war mein eigener klarer Rollenbeschrieb gleich zu Beginn. Claude wusste von Beginn weg, dass ich ein Laie bin und diese App bzw. Marketing-Site im Rahmen einer Weiterbildung entwickle. Auch du als Dozent spielst eine Rolle. Claude hat das mehrmals, vor allem bei der Dokumentation und dazugehöriger Kommunikation, mitgedacht.
 
 ## Beispielprompt
 "Ich habe noch einen Bug entdeckt. Angelegte Aufgaben werden nur in derjenigen Sprache erfasst und gespeichert, welche beim Anlegen aktiv war. Wird die Sprache nach Anlegen der Aufgaben gewechselt, bleiben die Aufgaben in der Ursprungssprache und werden auch von den Tag-Filtern nicht mehr erkannt. Beim einem Sprachwechsel müssten also auch bereits angelegte Aufgaben mit übersetzt werden. Kannst du mir das umsetzen?"

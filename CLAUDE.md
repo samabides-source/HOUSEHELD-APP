@@ -93,9 +93,18 @@ lib/
 - Neue UI-Texte: Key zuerst in `de` (lib/i18n/dictionaries.ts) ergänzen, TypeScript zeigt dank
   `const en: typeof de = {…}` sofort, wo `en` nachgezogen werden muss.
 
-**Demo-Daten und Netzwerk:** `demo-data.ts` versucht für jedes Beispielfoto ein passendes,
-offen lizenziertes Bild über die Openverse-API (kostenlos, kein Key) zu laden. Schlägt das fehl
-(offline, keine Treffer, Timeout) fällt die jeweilige Aufgabe automatisch auf ein generiertes
+**Demo-Daten und Netzwerk:** `demo-data.ts` lädt für jedes Beispielfoto ein von Hand kuratiertes,
+offen lizenziertes Openverse-Bild über eine fest hinterlegte URL (`PhotoSpec.photoUrl`, kostenlos,
+kein Key). Eine frühere Version nutzte stattdessen eine freie Live-Textsuche (Top-1-Treffer) – das
+lieferte zu oft thematisch unpassende oder gar unangemessene Bilder, weil die Suche unkuratiert
+ist und nur das erste Ergebnis verwendet wurde. Die `photoUrl`s zeigen bewusst auf Openverse's
+eigenen Thumbnail-Proxy (`api.openverse.org/v1/images/{id}/thumb/`) statt auf den jeweiligen
+Original-Host (Flickr, WordPress, …), damit der Abruf innerhalb der bestehenden CSP bleibt
+(`connect-src` erlaubt nur `api.openverse.org`, siehe `next.config.ts`) und nicht pro Bild-Provider
+eine neue Domain freigegeben werden muss. Die Bilder sind ausserdem bewusst mit CC0/BY/BY-SA-Lizenz
+gewählt (keine ND-Klausel), weil die Upload-Pipeline jedes Bild verkleinert/komprimiert – das zählt
+lizenzrechtlich als Bearbeitung. Schlägt der Abruf fehl (offline, Bild entfernt, Timeout) oder ist
+keine `photoUrl` gesetzt, fällt die jeweilige Aufgabe automatisch auf ein generiertes
 Farb-Platzhalterbild zurück – der Demo-Button darf dadurch nie hängen bleiben oder fehlschlagen.
 Das ist die **einzige** Stelle in der App, die einen externen Netzwerkaufruf macht; die reguläre
 Nutzung (eigene Aufgaben, eigene Fotos) bleibt vollständig lokal/offline-fähig.

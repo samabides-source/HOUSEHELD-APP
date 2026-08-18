@@ -6,11 +6,13 @@ import { isoDateInDays, newId, normalizeTagName, nowIso } from "./utils";
 
 /**
  * Beispieldaten für den End-to-End-Durchlauf (PRD 10): 6 Personen, 14 Aufgaben,
- * gemischte Tags/Prioritäten/Status. Fotos werden – wo ein Suchbegriff hinterlegt
- * ist – über die kostenlose, keyless Openverse-Bildersuche geladen; schlägt das
- * fehl (kein Netz, keine Treffer, Rate-Limit), fällt die jeweilige Aufgabe auf
- * ein generiertes Farb-Platzhalterbild zurück. Die Daten werden ergänzt, nichts
- * wird überschrieben.
+ * gemischte Tags/Prioritäten/Status. Fotos verwenden – wo eine `photoUrl`
+ * hinterlegt ist – ein von Hand kuratiertes, offen lizenziertes Openverse-Bild
+ * (keine Live-Suche mehr: die Top-1-Trefferauswahl einer freien Textsuche war
+ * zu unzuverlässig, siehe PhotoSpec unten). Schlägt der Abruf fehl (kein Netz,
+ * Bild entfernt, Timeout) oder ist keine `photoUrl` gesetzt, fällt die
+ * jeweilige Aufgabe auf ein generiertes Farb-Platzhalterbild zurück. Die
+ * Daten werden ergänzt, nichts wird überschrieben.
  *
  * Es gibt eine Aufgaben-/Tag-Liste je Sprache; die Tag-Namen in `tags` müssen
  * exakt mit `PREDEFINED_TAGS` (lib/seed.ts) derselben Sprache übereinstimmen,
@@ -18,9 +20,17 @@ import { isoDateInDays, newId, normalizeTagName, nowIso } from "./utils";
  */
 
 interface PhotoSpec {
-  /** Suchbegriff für die Online-Bildersuche (Englisch liefert bessere Treffer). */
-  query: string;
-  /** Beschriftung auf dem Platzhalterbild, falls kein Online-Foto gefunden wird. */
+  /**
+   * Link auf den Openverse-Thumbnail-Proxy (`api.openverse.org/v1/images/{id}/thumb/`)
+   * eines kuratierten, offen lizenzierten Bilds (CC0/BY/BY-SA, bewusst ohne ND-Klausel,
+   * weil die Upload-Pipeline das Bild verkleinert/komprimiert – das zählt lizenzrechtlich
+   * als Bearbeitung). Bewusst der Proxy statt der Original-Host-URL (Flickr, WordPress,
+   * …): so bleibt der Abruf innerhalb der bestehenden CSP (`connect-src` erlaubt nur
+   * `api.openverse.org`), ohne für jeden Bild-Provider eine eigene Domain freizugeben.
+   * Fehlt `photoUrl`, wird direkt das Platzhalterbild verwendet.
+   */
+  photoUrl?: string;
+  /** Beschriftung auf dem Platzhalterbild, falls kein Online-Foto verwendet wird. */
   label: string;
   hue: number;
 }
@@ -48,8 +58,12 @@ const DEMO_TASKS_DE: DemoTask[] = [
     assignees: ["Sandro"],
     tags: ["Bad EG", "Reparatur", "Sanitär/Wasser"],
     photos: [
-      { query: "leaking faucet dripping tap", label: "Wasserhahn", hue: 205 },
-      { query: "rubber washer plumbing seal", label: "Dichtung", hue: 262 },
+      {
+        photoUrl: "https://api.openverse.org/v1/images/87702f17-2435-408e-b17b-6ffb27df94b6/thumb/",
+        label: "Wasserhahn",
+        hue: 205,
+      },
+      { label: "Dichtung", hue: 262 },
     ],
   },
   {
@@ -60,7 +74,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "in_arbeit",
     assignees: ["Mira"],
     tags: ["Keller", "Wäsche"],
-    photos: [{ query: "laundry basket folded clothes", label: "Waesche", hue: 280 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/d2fb3ca7-df0e-483b-b14c-927ed5ab8d82/thumb/",
+        label: "Waesche",
+        hue: 280,
+      },
+    ],
   },
   {
     title: "Grosseinkauf fürs Wochenende",
@@ -70,7 +90,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: ["Mira", "Jonas"],
     tags: ["Einkauf", "Küche"],
-    photos: [{ query: "grocery shopping paper bags", label: "Einkauf", hue: 35 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/50ff8224-1d23-48d9-860f-86dc18259ed7/thumb/",
+        label: "Einkauf",
+        hue: 35,
+      },
+    ],
   },
   {
     title: "Heizung entlüften",
@@ -80,7 +106,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: [],
     tags: ["Wohnzimmer", "Heizung", "Wartung"],
-    photos: [{ query: "radiator heater bleed valve", label: "Heizung", hue: 15 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/e907d624-6e4c-48f1-a9b8-b3066ea88ddb/thumb/",
+        label: "Heizung",
+        hue: 15,
+      },
+    ],
   },
   {
     title: "Zimmerpflanzen giessen",
@@ -90,7 +122,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: ["Jonas"],
     tags: ["Balkon OG", "Pflanzenpflege"],
-    photos: [{ query: "watering can houseplant", label: "Pflanzen", hue: 110 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/6fc3b8c2-183d-4d6e-bf44-d3afa195aa53/thumb/",
+        label: "Pflanzen",
+        hue: 110,
+      },
+    ],
   },
   {
     title: "Altglas und Karton entsorgen",
@@ -100,7 +138,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: ["Sandro"],
     tags: ["Garage", "Entsorgung"],
-    photos: [{ query: "glass bottle recycling bin", label: "Altglas", hue: 145 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/873ca172-fd21-4106-bc28-f169bec41c27/thumb/",
+        label: "Altglas",
+        hue: 145,
+      },
+    ],
   },
   {
     title: "Regal im Büro montieren",
@@ -110,7 +154,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: [],
     tags: ["Büro", "Möbel"],
-    photos: [{ query: "flat pack shelf assembly furniture", label: "Regal", hue: 200 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/7f89daa2-7663-4319-90fb-7822361f646f/thumb/",
+        label: "Regal",
+        hue: 200,
+      },
+    ],
   },
   {
     title: "Termin Kaminfeger bestätigen",
@@ -129,7 +179,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: ["Noah"],
     tags: ["Garten", "Reparatur"],
-    photos: [{ query: "bicycle tire repair", label: "Velo", hue: 20 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/37799140-0427-4c37-a60b-7ec558b91883/thumb/",
+        label: "Velo",
+        hue: 20,
+      },
+    ],
   },
   {
     title: "Katzenklo reinigen",
@@ -139,7 +195,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: ["Lea"],
     tags: ["Tiere", "Reinigung"],
-    photos: [{ query: "cat litter box", label: "Katzenklo", hue: 30 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/f8a4e9ea-c490-4402-9a60-3f8f0234a8d8/thumb/",
+        label: "Katzenklo",
+        hue: 30,
+      },
+    ],
   },
   {
     title: "Rasen mähen",
@@ -149,7 +211,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: ["Fabienne"],
     tags: ["Garten", "Pflanzenpflege"],
-    photos: [{ query: "lawn mower mowing grass", label: "Rasen", hue: 100 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/fb8ee7e1-cc15-43b5-abbc-448e10ba4f7b/thumb/",
+        label: "Rasen",
+        hue: 100,
+      },
+    ],
   },
   {
     title: "Waschmaschine reinigen",
@@ -159,7 +227,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: ["Fabienne"],
     tags: ["Keller", "Reinigung", "Geräte/Elektronik"],
-    photos: [{ query: "washing machine laundry room", label: "Waschmaschine", hue: 210 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/7150c7fd-639b-45b1-8982-fcd694c385f3/thumb/",
+        label: "Waschmaschine",
+        hue: 210,
+      },
+    ],
   },
   {
     title: "Lampe im Kinderzimmer 1 austauschen",
@@ -169,7 +243,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "offen",
     assignees: ["Noah"],
     tags: ["Kinderzimmer 1", "Elektro", "Reparatur"],
-    photos: [{ query: "light bulb ceiling lamp", label: "Lampe", hue: 50 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/6787a34f-4f0b-4905-b609-4cd236a1e6e2/thumb/",
+        label: "Lampe",
+        hue: 50,
+      },
+    ],
   },
   {
     title: "Fenster putzen im Wohnzimmer",
@@ -179,7 +259,13 @@ const DEMO_TASKS_DE: DemoTask[] = [
     status: "in_arbeit",
     assignees: ["Lea"],
     tags: ["Wohnzimmer", "Reinigung"],
-    photos: [{ query: "window cleaning squeegee", label: "Fenster", hue: 195 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/c23a5a32-6272-45e6-a083-414b559aa665/thumb/",
+        label: "Fenster",
+        hue: 195,
+      },
+    ],
   },
 ];
 
@@ -193,8 +279,12 @@ const DEMO_TASKS_EN: DemoTask[] = [
     assignees: ["Sandro"],
     tags: ["Bathroom (Ground Floor)", "Repair", "Plumbing/Water"],
     photos: [
-      { query: "leaking faucet dripping tap", label: "Faucet", hue: 205 },
-      { query: "rubber washer plumbing seal", label: "Washer", hue: 262 },
+      {
+        photoUrl: "https://api.openverse.org/v1/images/87702f17-2435-408e-b17b-6ffb27df94b6/thumb/",
+        label: "Faucet",
+        hue: 205,
+      },
+      { label: "Washer", hue: 262 },
     ],
   },
   {
@@ -205,7 +295,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "in_arbeit",
     assignees: ["Mira"],
     tags: ["Basement", "Laundry"],
-    photos: [{ query: "laundry basket folded clothes", label: "Laundry", hue: 280 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/d2fb3ca7-df0e-483b-b14c-927ed5ab8d82/thumb/",
+        label: "Laundry",
+        hue: 280,
+      },
+    ],
   },
   {
     title: "Big grocery shop for the weekend",
@@ -215,7 +311,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: ["Mira", "Jonas"],
     tags: ["Shopping", "Kitchen"],
-    photos: [{ query: "grocery shopping paper bags", label: "Groceries", hue: 35 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/50ff8224-1d23-48d9-860f-86dc18259ed7/thumb/",
+        label: "Groceries",
+        hue: 35,
+      },
+    ],
   },
   {
     title: "Bleed the radiators",
@@ -225,7 +327,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: [],
     tags: ["Living Room", "Heating", "Maintenance"],
-    photos: [{ query: "radiator heater bleed valve", label: "Radiator", hue: 15 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/e907d624-6e4c-48f1-a9b8-b3066ea88ddb/thumb/",
+        label: "Radiator",
+        hue: 15,
+      },
+    ],
   },
   {
     title: "Water the houseplants",
@@ -235,7 +343,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: ["Jonas"],
     tags: ["Balcony (Upper Floor)", "Plant Care"],
-    photos: [{ query: "watering can houseplant", label: "Plants", hue: 110 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/6fc3b8c2-183d-4d6e-bf44-d3afa195aa53/thumb/",
+        label: "Plants",
+        hue: 110,
+      },
+    ],
   },
   {
     title: "Take glass and cardboard to recycling",
@@ -245,7 +359,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: ["Sandro"],
     tags: ["Garage", "Disposal"],
-    photos: [{ query: "glass bottle recycling bin", label: "Glass recycling", hue: 145 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/873ca172-fd21-4106-bc28-f169bec41c27/thumb/",
+        label: "Glass recycling",
+        hue: 145,
+      },
+    ],
   },
   {
     title: "Assemble the shelf in the home office",
@@ -255,7 +375,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: [],
     tags: ["Home Office", "Furniture"],
-    photos: [{ query: "flat pack shelf assembly furniture", label: "Shelf", hue: 200 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/7f89daa2-7663-4319-90fb-7822361f646f/thumb/",
+        label: "Shelf",
+        hue: 200,
+      },
+    ],
   },
   {
     title: "Confirm chimney sweep appointment",
@@ -274,7 +400,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: ["Noah"],
     tags: ["Garden", "Repair"],
-    photos: [{ query: "bicycle tire repair", label: "Bike", hue: 20 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/37799140-0427-4c37-a60b-7ec558b91883/thumb/",
+        label: "Bike",
+        hue: 20,
+      },
+    ],
   },
   {
     title: "Clean the litter box",
@@ -284,7 +416,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: ["Lea"],
     tags: ["Pets", "Cleaning"],
-    photos: [{ query: "cat litter box", label: "Litter box", hue: 30 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/f8a4e9ea-c490-4402-9a60-3f8f0234a8d8/thumb/",
+        label: "Litter box",
+        hue: 30,
+      },
+    ],
   },
   {
     title: "Mow the lawn",
@@ -294,7 +432,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: ["Fabienne"],
     tags: ["Garden", "Plant Care"],
-    photos: [{ query: "lawn mower mowing grass", label: "Lawn", hue: 100 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/fb8ee7e1-cc15-43b5-abbc-448e10ba4f7b/thumb/",
+        label: "Lawn",
+        hue: 100,
+      },
+    ],
   },
   {
     title: "Clean the washing machine",
@@ -304,7 +448,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: ["Fabienne"],
     tags: ["Basement", "Cleaning", "Appliances/Electronics"],
-    photos: [{ query: "washing machine laundry room", label: "Washing machine", hue: 210 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/7150c7fd-639b-45b1-8982-fcd694c385f3/thumb/",
+        label: "Washing machine",
+        hue: 210,
+      },
+    ],
   },
   {
     title: "Replace the lamp in Kids' Room 1",
@@ -314,7 +464,13 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "offen",
     assignees: ["Noah"],
     tags: ["Kids' Room 1", "Electrical", "Repair"],
-    photos: [{ query: "light bulb ceiling lamp", label: "Lamp", hue: 50 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/6787a34f-4f0b-4905-b609-4cd236a1e6e2/thumb/",
+        label: "Lamp",
+        hue: 50,
+      },
+    ],
   },
   {
     title: "Clean the living room windows",
@@ -324,13 +480,18 @@ const DEMO_TASKS_EN: DemoTask[] = [
     status: "in_arbeit",
     assignees: ["Lea"],
     tags: ["Living Room", "Cleaning"],
-    photos: [{ query: "window cleaning squeegee", label: "Window", hue: 195 }],
+    photos: [
+      {
+        photoUrl: "https://api.openverse.org/v1/images/c23a5a32-6272-45e6-a083-414b559aa665/thumb/",
+        label: "Window",
+        hue: 195,
+      },
+    ],
   },
 ];
 
 const DEMO_TASKS: Record<Locale, DemoTask[]> = { de: DEMO_TASKS_DE, en: DEMO_TASKS_EN };
 
-const OPENVERSE_SEARCH_URL = "https://api.openverse.org/v1/images/";
 const FETCH_TIMEOUT_MS = 5000;
 
 async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
@@ -344,26 +505,17 @@ async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Respons
 }
 
 /**
- * Sucht ein thematisch passendes, offen lizenziertes Foto über die
- * Openverse-API (kostenlos, ohne API-Key). Gibt `null` zurück, wenn die Suche
- * fehlschlägt, nichts findet oder das Bild nicht geladen werden kann – der
- * Aufrufer fällt dann auf das generierte Platzhalterbild zurück.
+ * Lädt das für ein Beispielfoto kuratierte Openverse-Bild direkt über seine
+ * URL (keine Live-Suche mehr, siehe PhotoSpec). Gibt `null` zurück, wenn der
+ * Abruf fehlschlägt oder kein Bild liefert – der Aufrufer fällt dann auf das
+ * generierte Platzhalterbild zurück.
  */
-async function fetchStockPhoto(query: string): Promise<Blob | null> {
+async function fetchPinnedPhoto(url: string): Promise<Blob | null> {
   try {
-    const searchUrl = `${OPENVERSE_SEARCH_URL}?q=${encodeURIComponent(query)}&page_size=1&mature=false`;
-    const searchRes = await fetchWithTimeout(searchUrl, FETCH_TIMEOUT_MS);
-    if (!searchRes.ok) return null;
+    const res = await fetchWithTimeout(url, FETCH_TIMEOUT_MS);
+    if (!res.ok) return null;
 
-    const data = (await searchRes.json()) as { results?: Array<{ url?: string; thumbnail?: string }> };
-    const result = data.results?.[0];
-    const imageUrl = result?.thumbnail ?? result?.url;
-    if (!imageUrl) return null;
-
-    const imageRes = await fetchWithTimeout(imageUrl, FETCH_TIMEOUT_MS);
-    if (!imageRes.ok) return null;
-
-    const blob = await imageRes.blob();
+    const blob = await res.blob();
     return blob.size > 0 && blob.type.startsWith("image/") ? blob : null;
   } catch {
     return null;
@@ -402,7 +554,8 @@ interface ResolvedPhoto {
 
 /** Lädt ein Online-Symbolbild und komprimiert es über dieselbe Pipeline wie echte Uploads. */
 async function resolvePhotoOnline(spec: PhotoSpec): Promise<ResolvedPhoto | null> {
-  const online = await fetchStockPhoto(spec.query);
+  if (!spec.photoUrl) return null;
+  const online = await fetchPinnedPhoto(spec.photoUrl);
   if (!online) return null;
 
   try {
@@ -425,15 +578,18 @@ async function resolvePhotoPlaceholder(spec: PhotoSpec): Promise<ResolvedPhoto> 
 }
 
 /**
- * Löst ein Foto auf: Online-Suche mit hartem Gesamt-Timeout, sonst
- * Platzhalterbild. Das äussere Timeout ist zusätzlich zu den Timeouts in
- * `fetchStockPhoto` gedacht – falls eine Anfrage aus irgendeinem Grund doch
- * hängen bleibt, darf das nie das ganze Beispieldaten-Laden blockieren.
+ * Löst ein Foto auf: fehlt `photoUrl`, direkt das Platzhalterbild; sonst
+ * Abruf mit hartem Gesamt-Timeout, sonst ebenfalls Platzhalterbild. Das
+ * äussere Timeout ist zusätzlich zum Timeout in `fetchPinnedPhoto` gedacht –
+ * falls eine Anfrage aus irgendeinem Grund doch hängen bleibt, darf das nie
+ * das ganze Beispieldaten-Laden blockieren.
  */
 async function resolvePhoto(spec: PhotoSpec): Promise<ResolvedPhoto> {
+  if (!spec.photoUrl) return resolvePhotoPlaceholder(spec);
+
   const online = await Promise.race([
     resolvePhotoOnline(spec),
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), FETCH_TIMEOUT_MS * 2 + 1000)),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), FETCH_TIMEOUT_MS + 1000)),
   ]);
   return online ?? resolvePhotoPlaceholder(spec);
 }
