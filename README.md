@@ -22,7 +22,7 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Ideenfindung & Entwicklung PRD](#ideenfindung--entwicklung-prd)
 - [Entwicklungsprozess APP](#entwicklungsprozess-app)
 - [Entwicklungsprozess SITE](#entwicklungsprozess-site)
-- [Reflexion](#Reflexion (handgeschrieben ;-)))
+- [Reflexion](#reflexion)
   - [Mein Aha-Moment](#mein-aha-moment)
   - [Neu gewonnene Learnings](#neu-gewonnene-learnings)
   - [Prompting-Strategien](#prompting-strategien)
@@ -120,7 +120,9 @@ Zum Abschluss wurde auch die Marketing-Seite gegen dieselbe Security-Checkliste 
 - Kontrastarme Text/Hintergrund-Kombinationen auf das WCAG-AA-Minimum angehoben
 - Produktname war durchgehend als „Hausheld" statt „Househeld" gelandet (Titel, Meta-Daten, JSON-LD, Fliesstexte) – global korrigiert; die App selbst war davon nicht betroffen
 
-## Reflexion (handgeschrieben ;-))
+## Reflexion
+handgeschrieben ;-)
+
 Beim ganzen Prozess - Ideenfindung, App-Entwicklung, Deployment, Checklisten - war ich immer wieder überrascht, als wie "menschlich" ich Claude wahrnahm. Die Kommunikation war sehr transparent: Gedankengänge, Auffälligkeiten oder Widersprüche hat mir Claude aktive mitgeteilt und wichtige Rückfragen direkt gestellt und mir die Entscheidung überlassen. Also exakt genau so, wie ich mir die Zusammenarbeit mit menschlichen Fachexpert:innen auch wünsche.
 Besonders positiv überrascht hat mich, wie Claude im Repository auch selbständig Sachen gegencheckt oder updatet und sogar (technische) Fallback-Varianten für die App oder die Marketing-Seite für mich mitdenkt. Auch die live deployte Website hat Claude immer wieder geprüft.
 
