@@ -136,7 +136,9 @@ Kritisch sehe ich, dass ich mit meinen quasi inexistenten Programmier-Kenntnisse
 
 CLAUDE.md ist die Referenz für die ganze Entwicklung. Das habe ich lange nicht verstanden, wahrscheinlich auch, weil es ein eher technisches Dokument ist. Gerade bei der Sicherheitsprüfung wie auch bei der GEO-Optimierung hat mich Claude mehrmals auf Konflikte/Widersprüche mit den ursprünglich definierten Parametern im CLAUDE.md-File hingewiesen.
 
-Und zweitens: Ich kann auch schreiben, warum mir eine Umsetzung / ein verwendetes Bild / etc. nicht gefällt. Lange habe ich jeweils nur geantwortet, "mach mir neue Vorschläge". Wenn ich meine Unzufriedenheit aber begründe, liefert Claude viel schneller bessere Ergebnisse.
+Zweitens: Ich kann auch schreiben, warum mir eine Umsetzung / ein verwendetes Bild / etc. nicht gefällt. Lange habe ich jeweils nur geantwortet, "mach mir neue Vorschläge". Wenn ich meine Unzufriedenheit aber begründe, liefert Claude viel schneller bessere Ergebnisse.
+
+Und drittens: langes Denken oder eine lange Antwort von Claude bedeutet nicht automatisch, dass auch der Code stark verändert wurde. Manchmal konnte ich in den Änderungen auf Github-Desktop erkennen, dass nur zwei neue Wörter im Code dazugekommen sind, um ein (in meinem Verständnis) grosses Problem zu lösen. Das war aus meiner Sicht sehr faszinierend. 
 
 <a id="neu-gewonnene-learnings"></a>
 **Neu gewonnene Learnings**
