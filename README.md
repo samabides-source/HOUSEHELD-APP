@@ -22,7 +22,7 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Ideenfindung & Entwicklung PRD](#ideenfindung--entwicklung-prd)
 - [Entwicklungsprozess APP](#entwicklungsprozess-app)
 - [Entwicklungsprozess SITE](#entwicklungsprozess-site)
-- [Reflexion](#reflexion)
+- [Reflexion](#Reflexion (handgeschrieben ;-)))
   - [Mein Aha-Moment](#mein-aha-moment)
   - [Neu gewonnene Learnings](#neu-gewonnene-learnings)
   - [Prompting-Strategien](#prompting-strategien)
