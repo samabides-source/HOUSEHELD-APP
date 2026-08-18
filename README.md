@@ -76,7 +76,7 @@ Danach wurde die App zweimal komplett gegen eine vorgegebene Security-Checkliste
 
 Ein manueller PageSpeed-Insights-Test deckte zusätzlich einen produktiv ausgelieferten Navigationsbug sowie Kontrast-/Bedienbarkeits-Probleme auf (siehe Bugfixes).
 
-Nach einem Dependabot-Merge auf Next.js 16 wurde in einer kurzen Session geprüft, ob Build/Lint/Typecheck weiterhin sauber laufen: `tsconfig.json` musste dabei zwingend auf `jsx: react-jsx` angepasst und `middleware.ts` auf die neue `proxy.ts`-Konvention migriert werden (per offiziellem Codemod, Logik unverändert).
+Nach einem Dependabot-Merge auf Next.js 16 wurde in einer kurzen Session geprüft, ob Build/Lint/Typecheck weiterhin sauber laufen: tsconfig.json musste dabei zwingend auf jsx: react-jsx angepasst und middleware.ts auf die neue proxy.ts-Konvention migriert werden (per offiziellem Codemod, Logik unverändert).
 
 **Wichtige Anpassungen**
 
@@ -94,7 +94,7 @@ Nach einem Dependabot-Merge auf Next.js 16 wurde in einer kurzen Session geprüf
 - Sprachumschalter führte von deutschen Seiten auf eine falsche, nicht existierende Route (404) und liess die Navigations-Hervorhebung auf Deutsch dauerhaft inaktiv – beides mit derselben Korrektur behoben
 - Kontrastwerte und Berührungszielbereiche unter dem WCAG-AA-Minimum korrigiert
 - Kuratierte Beispielfotos (siehe oben) fielen wegen der neu gehärteten CSP still auf den Platzhalter zurück, da sie direkt von Fremd-Hosts geladen wurden; gelöst über Openverses eigenen, bereits erlaubten Thumbnail-Proxy
-- Über GitHub direkt angelegte `SECURITY.md` enthielt noch unausgefüllten Platzhaltertext mit fiktivem Versionsschema; durch eine zum Projekt passende Policy ersetzt
+- Über GitHub direkt angelegte SECURITY.md enthielt noch unausgefüllten Platzhaltertext mit fiktivem Versionsschema; durch eine zum Projekt passende Policy ersetzt
 
 ## Entwicklungsprozess SITE
 
@@ -104,7 +104,7 @@ Die Marketingseite entstand als Grundgerüst mit fünf Seiten (Home, Features, F
 
 Der grösste Schritt war eine vollständige SEO-/AEO-/GEO-Überarbeitung samt kompletter englischer Version: getrennte, sprachspezifische Content-Dateien, strukturierte Daten, dynamische Vorschaubilder und eine maschinenlesbare Zusammenfassung für KI-Crawler. Die Verlinkung zur App wurde anschliessend ebenfalls sprachabhängig gemacht.
 
-Ein eigenständiger GEO-Audit prüfte danach jeden Punkt einzeln, teils mit externen Werkzeugen statt blosser Einschätzung (u. a. Schema-Validierung bei validator.schema.org gegen die produktive URL). Dabei kam ein seit Langem falscher Domain-Tippfehler in den Metadaten ans Licht, der Canonical-URLs, Open-Graph und alle strukturierten Daten betraf. Ein anschliessender PageSpeed-Insights-Bericht deckte zusätzlich Kontrastprobleme und ein nicht spezifikationskonformes `llms.txt` auf.
+Ein eigenständiger GEO-Audit prüfte danach jeden Punkt einzeln, teils mit externen Werkzeugen statt blosser Einschätzung (u. a. Schema-Validierung bei validator.schema.org gegen die produktive URL). Dabei kam ein seit Langem falscher Domain-Tippfehler in den Metadaten ans Licht, der Canonical-URLs, Open-Graph und alle strukturierten Daten betraf. Ein anschliessender PageSpeed-Insights-Bericht deckte zusätzlich Kontrastprobleme und ein nicht spezifikationskonformes llms.txt auf.
 
 Zum Abschluss wurde auch die Marketing-Seite gegen dieselbe Security-Checkliste geprüft (lokal, im Git-Verlauf, live gegen Deployment und Repo). Als echte Lücken fanden sich fehlende Security-Header und drei npm-Audit-Funde; die Header wurden ergänzt, ein Next.js-Update gegen die Audit-Funde aber wieder verworfen, da es die ESLint-Konfiguration brach. Dokumentiert als „Security-Checkliste (Selbst-Audit)" im README der Marketing-Seite.
 
@@ -114,7 +114,7 @@ Zum Abschluss wurde auch die Marketing-Seite gegen dieselbe Security-Checkliste 
 - Inhalte von einer Content-Datei auf getrennte, sprachspezifische Dateien umgestellt (Grundlage für die Zweisprachigkeit)
 - App-Verlinkung und -Mockup auf sprachabhängige Inhalte umgebaut
 - Produktdefinition zusätzlich als lesbarer Fliesstext auf Home/About ergänzt (vorher nur in Meta-/strukturierten Daten)
-- `llms.txt` vom Fliesstext- aufs offiziell erwartete Markdown-Format umgestellt
+- llms.txt vom Fliesstext- aufs offiziell erwartete Markdown-Format umgestellt
 
 **Bugfixes**
 
