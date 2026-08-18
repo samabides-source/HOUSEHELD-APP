@@ -1,21 +1,19 @@
 # Security Policy
 
-## Supported Versions
+Househeld ist ein Übungsprojekt (Modul „Viben und Coden“) ohne eigenes Backend: Die gesamte
+fachliche Logik läuft im Browser, IndexedDB ist der einzige Datenspeicher. Es gibt keine
+Benutzerkonten, keine serverseitige Datenhaltung und keine Zahlungs- oder Auth-Funktionen.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+## Unterstützte Versionen
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+Es gibt keine parallel gepflegten Versionen. Sicherheitsrelevante Korrekturen erfolgen
+ausschliesslich auf dem `main`-Branch und werden über Vercel automatisch deployt
+(https://househeld-app.vercel.app/).
 
-## Reporting a Vulnerability
+## Eine Schwachstelle melden
 
-Use this section to tell people how to report a vulnerability.
-
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Bitte über ein [GitHub Issue](https://github.com/samabides-source/HOUSEHELD-APP/issues) oder
+per E-Mail an samabides@gmail.com melden, mit einer kurzen Beschreibung und – falls möglich –
+Schritten zur Reproduktion. Da es sich um ein nicht-kommerzielles Lernprojekt ohne festes Team
+handelt, gibt es keine garantierte Reaktionszeit; Meldungen werden aber ernst genommen und nach
+bestem Wissen zeitnah geprüft und behoben.
