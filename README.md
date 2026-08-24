@@ -42,7 +42,8 @@ https://househeld-page.vercel.app/
 https://github.com/samabides-source/HOUSEHELD-PAGE
 
 **Video-Walkthrough**  
-[Househeld-VideoWalkthrough_SandroMuentener.mp4](https://srgssr-my.sharepoint.com/:v:/g/personal/sandro_muentener_srf_ch/IQAvw2ltNJXxR7OcpVt3BV-5AVdFW_9X8Kt385pX_vOkWuc?e=w9RV9L)
+[Househeld-VideoWalkthrough_SandroMuentener.mp4](https://srgssr-my.sharepoint.com/:v:/g/personal/sandro_muentener_srf_ch/IQAvw2ltNJXxR7OcpVt3BV-5AVdFW_9X8Kt385pX_vOkWuc?e=w9RV9L)  
+Hinweis: Der Link zum Video läuft am 3. September ab.
 
 ## Ideenfindung & Entwicklung PRD
 
