@@ -1,8 +1,6 @@
-# Dokumentation "HOUSEHELD"
-CAS AIMP - Viben und Coden / FS26
-
-Sandro Müntener / 18. August 2026
-
+# Dokumentation "HOUSEHELD"  
+CAS AIMP - Viben und Coden / FS26  
+Sandro Müntener / 24. August 2026
 
 ### App-Beschrieb: ###
 Househeld ist ein Haushaltsaufgaben-Tracker für Familien/WGs. Aufgaben können mit mehreren Fotos dokumentiert, Personen zugewiesen und mit Tags kategorisiert werden.
