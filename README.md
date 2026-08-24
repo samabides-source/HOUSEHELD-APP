@@ -21,7 +21,7 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Entwicklungsprozess APP](#entwicklungsprozess-app)
 - [Entwicklungsprozess SITE](#entwicklungsprozess-site)
 - [Reflexion (handgeschrieben ;-))](#reflexion)
-  - [Mein Aha-Moment](#mein-aha-moment)
+  - [Meine Aha-Momente](#meine-aha-momente)
   - [Neu gewonnene Learnings](#neu-gewonnene-learnings)
   - [Prompting-Strategien](#prompting-strategien)
 - [Beispielprompt](#beispielprompt)
@@ -45,12 +45,12 @@ Hinweis: Der Link zum Video läuft am 3. September ab.
 
 ## Ideenfindung & Entwicklung PRD
 
-Im Rahmen der Vibe-Coding-Einführung entstand aus einer ersten Liste von fünf App-Ideen (u. a. Habit-Tracker, Rezeptbuch, Pomodoro-Timer, Haushaltsbuch, Kanban-Board) die konkrete Idee für einen Haushaltsaufgaben-Tracker.
+Ich beschrieb Claude (dem LLM) meinen Kontext und meine Aufgabe, daraus entstand aus einer ersten Liste von fünf App-Ideen die konkrete Idee für einen Haushaltsaufgaben-Tracker.
 
 **Meilensteine**
-- Aus der Grundidee liess ich mir von Claude einen ausführlichen App-Beschrieb und ein erstes PRD erstellen, inkl. vordefinierter Tag-Liste (32 Tags in 5 Kategorien: Räume, Aussenbereich, Aufgabentyp, Technik & Geräte, Sonstiges).
-- Eine parallel mit ChatGPT erstellte PRD-Version diente als Gegenprüfung und brachte weitere Präzisierungen (Foto-Limits, Filter-Logik, Standardsortierung u. a.).
-- Tech-Stack (Node.js + Express mit lowdb) und Design-Richtung ("Verspielt & bunt": farbcodierte Tag-Kategorien, eigenes Prioritäts-Farbsystem, abgerundete Formen) wurden festgelegt.
+- Aus der Grundidee liess ich mir von Claude einen ausführlichen App-Beschrieb und ein erstes PRD erstellen, inkl. vordefinierter Tag-Liste.
+- Eine parallel mit ChatGPT erstellte PRD-Version diente als Gegenprüfung und brachte weitere Präzisierungen.
+- Tech-Stack und Design-Richtung wurden festgelegt.
 - Ergebnis: ein finales PRD sowie zwei Agenten-Kontextdateien (CLAUDE.md für Claude Code, AGENTS.md für Cursor) als Grundlage für die Umsetzung.
 
 **Wichtige Anpassungen**
@@ -58,7 +58,7 @@ Im Rahmen der Vibe-Coding-Einführung entstand aus einer ersten Liste von fünf 
 - Mehrere, jederzeit austauschbare Fotos statt nur eines pro Aufgabe
 - Personen löschen entfernt nur die Zuweisung, Aufgaben bleiben als "nicht zugewiesen" bestehen
 - Warnhinweis statt stillschweigendem Löschen bei noch verwendeten Tags
-- Klare Trennung zwischen Priorität "dringend" und Tags (kein Doppel-Konzept)
+- Trennung zwischen zeitlicher Priorität (z.B. "dringend") und inhaltlichen Tags.
 - Zweiter Klick als Löschbestätigung für Aufgaben (kein Papierkorb)
 - Wechsel von SQLite auf lowdb als einfachere, lizenzkostenfreie Lösung fürs Lernprojekt
 
@@ -102,7 +102,7 @@ Die Marketingseite entstand als Grundgerüst mit fünf Seiten (Home, Features, F
 
 Der grösste Schritt war eine vollständige SEO-/AEO-/GEO-Überarbeitung samt kompletter englischer Version: getrennte, sprachspezifische Content-Dateien, strukturierte Daten, dynamische Vorschaubilder und eine maschinenlesbare Zusammenfassung für KI-Crawler. Die Verlinkung zur App wurde anschliessend ebenfalls sprachabhängig gemacht.
 
-Ein eigenständiger GEO-Audit prüfte danach jeden Punkt einzeln, teils mit externen Werkzeugen statt blosser Einschätzung (u. a. Schema-Validierung bei validator.schema.org gegen die produktive URL). Dabei kam ein seit Langem falscher Domain-Tippfehler in den Metadaten ans Licht, der Canonical-URLs, Open-Graph und alle strukturierten Daten betraf. Ein anschliessender PageSpeed-Insights-Bericht deckte zusätzlich Kontrastprobleme und ein nicht spezifikationskonformes llms.txt auf.
+Ein eigenständiger GEO-Audit prüfte danach jeden Punkt einzeln, teils mit externen Werkzeugen statt blosser Einschätzung (u. a. Schema-Validierung bei validator.schema.org gegen die produktive URL). Dabei kam ein seit Langem falscher Domain-Tippfehler in den Metadaten ans Licht ("househeld" vs. "hausheld", der Canonical-URLs, Open-Graph und alle strukturierten Daten betraf. Ein anschliessender PageSpeed-Insights-Bericht deckte zusätzlich Kontrastprobleme und ein nicht spezifikationskonformes llms.txt auf.
 
 Zum Abschluss wurde auch die Marketing-Seite gegen dieselbe Security-Checkliste geprüft (lokal, im Git-Verlauf, live gegen Deployment und Repo). Als echte Lücken fanden sich fehlende Security-Header und drei npm-Audit-Funde; die Header wurden ergänzt, ein Next.js-Update gegen die Audit-Funde aber wieder verworfen, da es die ESLint-Konfiguration brach. Dokumentiert als „Security-Checkliste (Selbst-Audit)" im README der Marketing-Seite.
 
@@ -125,26 +125,26 @@ Zum Abschluss wurde auch die Marketing-Seite gegen dieselbe Security-Checkliste 
 
 
 ## Reflexion
-handgeschrieben ;-)
+komplett handgeschrieben ;-)
 
-Beim ganzen Prozess - Ideenfindung, App-Entwicklung, Deployment, Checklisten - war ich immer wieder überrascht, als wie "menschlich" ich Claude wahrnahm. Die Kommunikation war sehr transparent: Gedankengänge, Auffälligkeiten oder Widersprüche hat mir Claude aktive mitgeteilt und wichtige Rückfragen direkt gestellt und mir die Entscheidung überlassen. Also exakt genau so, wie ich mir die Zusammenarbeit mit menschlichen Fachexpert:innen auch wünsche.
+Beim ganzen Prozess - Ideenfindung, App-Entwicklung, Deployment, Checklisten - war ich immer wieder überrascht, als wie "menschlich" ich Claude wahrnahm. Die Kommunikation war sehr transparent: Gedankengänge, Auffälligkeiten oder Widersprüche hat mir Claude aktiv mitgeteilt und wichtige Rückfragen direkt gestellt und mir die Entscheidung überlassen. Also exakt genau so, wie ich mir die Zusammenarbeit mit menschlichen Fachexpert:innen auch wünsche.
 Besonders positiv überrascht hat mich, wie Claude im Repository auch selbständig Sachen gegencheckt oder updatet und sogar (technische) Fallback-Varianten für die App oder die Marketing-Seite für mich mitdenkt. Auch die live deployte Website hat Claude immer wieder geprüft und mir auch bei grösseren Problemen geholfen. (plötzlich ganze Marketing-Site weiss -> siehe Entwciklungsprozess SITE)
 
-Kritisch sehe ich, dass ich mit meinen quasi inexistenten Programmier-Kenntnissen lediglich das Endprodukt testen und beurteilen kann. Natürlich habe im Entwicklungsprozess gewisse Aspekte gelernt und zu verstehen gelernt (z.B. Design-Entwicklung oder GEO-optmierte Formatierung). Aber der ganze technische Hintergrund ist für mich eine riesige Blackbox.
+Kritisch sehe ich, dass ich mit meinen quasi inexistenten Programmier-Kenntnissen lediglich das Endprodukt testen und beurteilen kann. Natürlich habe im Entwicklungsprozess gewisse Aspekte zu verstehen gelernt (z.B. Design-Entwicklung oder GEO-optmierte Formatierung). Aber der ganze technische Hintergrund ist für mich eine riesige Blackbox.
 
 <a id="mein-aha-moment"></a>
-**Mein Aha-Moment**
+**Meine Aha-Momente**
 
-CLAUDE.md ist die Referenz für die ganze Entwicklung. Das habe ich lange nicht verstanden, wahrscheinlich auch, weil es ein eher technisches Dokument ist. Gerade bei der Sicherheitsprüfung wie auch bei der GEO-Optimierung hat mich Claude mehrmals auf Konflikte/Widersprüche mit den ursprünglich definierten Parametern im CLAUDE.md-File hingewiesen.
+1. CLAUDE.md ist die Referenz für die ganze Entwicklung. Das habe ich lange nicht verstanden, wahrscheinlich auch, weil es ein eher technisches Dokument ist. Gerade bei der Sicherheitsprüfung wie auch bei der GEO-Optimierung hat mich Claude mehrmals auf Konflikte/Widersprüche mit den ursprünglich definierten Parametern im CLAUDE.md-File hingewiesen.
 
-Zweitens: Ich kann auch schreiben, warum mir eine Umsetzung / ein verwendetes Bild / etc. nicht gefällt. Lange habe ich jeweils nur geantwortet, "mach mir neue Vorschläge". Wenn ich meine Unzufriedenheit aber begründe, liefert Claude viel schneller bessere Ergebnisse.
+2. Ich kann auch schreiben, warum mir eine Umsetzung / ein verwendetes Bild / etc. nicht gefällt. Lange habe ich jeweils nur geantwortet, "mach mir neue Vorschläge". Wenn ich meine Unzufriedenheit aber begründe, liefert Claude viel schneller bessere Ergebnisse.
 
-Und drittens: langes Denken oder eine lange Antwort von Claude bedeutet nicht automatisch, dass auch der Code stark verändert wurde. Manchmal konnte ich in den Änderungen auf Github-Desktop erkennen, dass nur zwei neue Wörter im Code dazugekommen sind, um ein (in meinem Verständnis) grosses Problem zu lösen. Das war aus meiner Sicht sehr faszinierend. 
+3. Langes Denken oder eine lange Antwort von Claude bedeutet nicht automatisch, dass auch der Code stark verändert wurde. Manchmal konnte ich in den Änderungen auf Github-Desktop erkennen, dass nur zwei neue Wörter im Code dazugekommen sind, um ein (in meinem Verständnis) grosses Problem zu lösen. Das war aus meiner Sicht sehr faszinierend. 
 
 <a id="neu-gewonnene-learnings"></a>
 **Neu gewonnene Learnings**
 
-Ich brauche keine Vorkenntnisse und muss nicht in Fachsprache kommunizieren. Ganz grundsätzlich war ich überrascht, dass ich Wünsche, Problemeoder Anmerkungen in meiner "Laien-Sprache" beschreiben konnte und Claude hat die richtigen Schlüsse daraus gezogen. Und dasselbe galt auch umgekehrt: Ich schaue Claude beim Denkprozess zu und sehe ganz viele technische Begriffe und Beschreibungen, aber die Schlussantwort ist dann auch für mich mehrheitlich verständlich und nachvollziehbar. Einzig bei der Security-Checkliste habe ich mehrmals nicht mehr verstanden, was genau das Problem war und wie das jetzt gelöst wurde.
+Ich brauche keine Vorkenntnisse und muss nicht in Fachsprache kommunizieren. Ganz grundsätzlich war ich überrascht, dass ich Wünsche, Probleme oder Anmerkungen in meiner "Laien-Sprache" beschreiben konnte und Claude hat die richtigen Schlüsse daraus gezogen. Und dasselbe galt auch umgekehrt: Ich schaue Claude beim Denkprozess zu und sehe ganz viele technische Begriffe und Beschreibungen, aber die Schlussantwort ist dann auch für mich mehrheitlich verständlich und nachvollziehbar. Einzig bei der Security-Checkliste habe ich mehrmals nicht mehr verstanden, was genau das Problem war und wie das jetzt gelöst wurde.
 
 <a id="prompting-strategien"></a>
 **Prompting-Strategien**
@@ -155,8 +155,7 @@ Was auch sehr geholfen hat, war mein eigener klarer Rollenbeschrieb gleich zu Be
 ## Beispielprompt
 "Ich habe noch einen Bug entdeckt. Angelegte Aufgaben werden nur in derjenigen Sprache erfasst und gespeichert, welche beim Anlegen aktiv war. Wird die Sprache nach Anlegen der Aufgaben gewechselt, bleiben die Aufgaben in der Ursprungssprache und werden auch von den Tag-Filtern nicht mehr erkannt. Beim einem Sprachwechsel müssten also auch bereits angelegte Aufgaben mit übersetzt werden. Kannst du mir das umsetzen?"
 
-
-
+So richtig habe ich den Bug nicht rausgekriegt... ;-) -> siehe Video-Walkthrough.
 
 # PRD: Househeld – Haushaltsaufgaben-Tracker
 
@@ -246,7 +245,8 @@ Was auch sehr geholfen hat, war mein eigener klarer Rollenbeschrieb gleich zu Be
 | Technik & Geräte | Elektro, Sanitär/Wasser, Heizung, Geräte/Elektronik |
 | Sonstiges | Termine/Verwaltung, Kinder, Tiere, Sonstiges |
 
-*(32 vordefinierte Tags total; die Liste ist nicht abschliessend, weitere Tags können frei erstellt werden.)*
+*(32 vordefinierte Tags total; die Liste ist nicht abschliessend, weitere Tags können frei erstellt werden.)*  
+Bemerkung Sandro: Claude hat dann richtig erkannt, dass oben nur 31 Tags stehen.
 
 ### 5.5 Übersicht & Filter
 - Standardansicht ist die Listenansicht; zusätzlich kann eine Board-Ansicht verwendet werden
