@@ -122,12 +122,15 @@ Zum Abschluss wurde auch die Marketing-Seite gegen dieselbe Security-Checkliste 
 - Falsche Platzhalter-Domain in allen Metadaten und strukturierten Daten korrigiert
 - Kontrastarme Text/Hintergrund-Kombinationen auf das WCAG-AA-Minimum angehoben
 - Produktname war durchgehend als „Hausheld" statt „Househeld" gelandet (Titel, Meta-Daten, JSON-LD, Fliesstexte) – global korrigiert; die App selbst war davon nicht betroffen
+- CSP-Header (`script-src 'self'`) aus der Security-Header-Ergänzung blockierte Next.js' eigene Inline-Hydration-Scripts vollständig – die Live-Seite zeigte nur einen weissen Screen. Behoben durch Ergänzen von `unsafe-inline` in `script-src` ([next.config.ts](next.config.ts))
+- Automatischer Vercel-Deploy blieb nach einem Push zunächst über eine Stunde aus (kein Eintrag im Deployment-Verlauf, GitHub-Webhook-Log leer). Fix zunächst über einen manuell ausgelösten Deploy Hook live gebracht; anschliessend mit einem Testcommit bestätigt, dass die automatische GitHub→Vercel-Synchronisation wieder greift
+
 
 ## Reflexion
 handgeschrieben ;-)
 
 Beim ganzen Prozess - Ideenfindung, App-Entwicklung, Deployment, Checklisten - war ich immer wieder überrascht, als wie "menschlich" ich Claude wahrnahm. Die Kommunikation war sehr transparent: Gedankengänge, Auffälligkeiten oder Widersprüche hat mir Claude aktive mitgeteilt und wichtige Rückfragen direkt gestellt und mir die Entscheidung überlassen. Also exakt genau so, wie ich mir die Zusammenarbeit mit menschlichen Fachexpert:innen auch wünsche.
-Besonders positiv überrascht hat mich, wie Claude im Repository auch selbständig Sachen gegencheckt oder updatet und sogar (technische) Fallback-Varianten für die App oder die Marketing-Seite für mich mitdenkt. Auch die live deployte Website hat Claude immer wieder geprüft.
+Besonders positiv überrascht hat mich, wie Claude im Repository auch selbständig Sachen gegencheckt oder updatet und sogar (technische) Fallback-Varianten für die App oder die Marketing-Seite für mich mitdenkt. Auch die live deployte Website hat Claude immer wieder geprüft und mir auch bei grösseren Problemen geholfen. (plötzlich ganze Marketing-Site weiss -> siehe Entwciklungsprozess SITE)
 
 Kritisch sehe ich, dass ich mit meinen quasi inexistenten Programmier-Kenntnissen lediglich das Endprodukt testen und beurteilen kann. Natürlich habe im Entwicklungsprozess gewisse Aspekte gelernt und zu verstehen gelernt (z.B. Design-Entwicklung oder GEO-optmierte Formatierung). Aber der ganze technische Hintergrund ist für mich eine riesige Blackbox.
 
