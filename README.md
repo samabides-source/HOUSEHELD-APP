@@ -446,19 +446,17 @@ Datenbank, kein Auth — alle Daten liegen clientseitig in IndexedDB. Kein Supab
       `eslint`, `eslint-config-next`, `tailwindcss`, `@tailwindcss/postcss`, `typescript`,
       `@types/*` — alles bekannte, plausible, weit verbreitete Pakete. Kein Slopsquatting-Verdacht.
 - [x] `package-lock.json` ist committed.
-- [ ] **`npm audit` liefert weiterhin 3 High-Findings**: `sharp <0.35.0` (transitive Abhängigkeit
-      von `next`, für serverseitige Bildoptimierung) — CVE-2026-33327, CVE-2026-33328,
-      CVE-2026-35590, CVE-2026-35591 in libvips (GHSA-f88m-g3jw-g9cj). Am 2026-08-18 mit frischem
-      `npm ci` + `npm audit` erneut bestätigt, unverändert seit der ersten Prüfung. Ein Fix wäre
-      nur über ein `next`-Major-Update (aktuell 16.3.1) verfügbar. **Nur identifiziert, nicht
-      behoben.** Risiko dürfte in der Praxis gering sein, da die App laut CLAUDE.md bewusst `<img>`
-      statt `next/image` verwendet und den Next-Image-Optimizer damit nicht aktiv nutzt — `sharp`
-      bleibt aber als Dependency im Baum.
+- [x] **✅ Behoben:** `npm audit` zeigte am 2026-08-18 (Stand Commit `7adb95d`) noch 3 High-Findings
+      zu `sharp <0.35.0` (transitive Abhängigkeit von `next`, für serverseitige Bildoptimierung) —
+      CVE-2026-33327, CVE-2026-33328, CVE-2026-35590, CVE-2026-35591 in libvips
+      (GHSA-f88m-g3jw-g9cj). Ein Fix war nur über ein `next`-Major-Update verfügbar. Genau das
+      erledigte **Dependabot vollautomatisch**: Commit `7761a0d` ("Bump postcss and next", Autor
+      `dependabot[bot]`) hob `next` auf 16.3.1 an. Frisch nachgeprüft: `npm ci` + `npm audit` liefert
+      jetzt **0 Findings**, `npm run typecheck` und `npm run lint` bleiben grün. Ein guter Beleg
+      dafür, dass die in Punkt 1 aktivierten Dependabot Security Updates tatsächlich wirken.
 - [x] Dependabot Alerts / Security Updates aktiviert — vom Nutzer im Repo unter Settings →
-      Advanced Security eingeschaltet (2026-08-08, in der zweiten Prüfung nicht erneut verifiziert).
-      Die 3 High-Findings zu `sharp` (siehe oben) bleiben davon unberührt bestehen, da Dependabot
-      keinen Fix für eine transitive `next`-Abhängigkeit automatisch bereitstellen kann, solange
-      `next` selbst keine neue Version mit gepatchtem `sharp` zieht.
+      Advanced Security eingeschaltet (2026-08-08). Wirksamkeit bestätigt: Die automatische
+      `next`-16.3.1-Bump-PR (siehe oben) ist ein direktes Ergebnis dieser Einstellung.
 
 ### 9. GitHub und Repo-Hygiene
 
