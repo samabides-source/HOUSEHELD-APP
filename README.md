@@ -22,7 +22,7 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Ideenfindung & Entwicklung PRD](#ideenfindung--entwicklung-prd)
 - [Entwicklungsprozess APP](#entwicklungsprozess-app)
 - [Entwicklungsprozess SITE](#entwicklungsprozess-site)
-- [Reflexion](#reflexion)
+- [Reflexion (handgeschrieben ;-))](#reflexion)
   - [Mein Aha-Moment](#mein-aha-moment)
   - [Neu gewonnene Learnings](#neu-gewonnene-learnings)
   - [Prompting-Strategien](#prompting-strategien)
@@ -42,7 +42,7 @@ https://househeld-page.vercel.app/
 https://github.com/samabides-source/HOUSEHELD-PAGE
 
 **Video-Walkthrough**  
-Folgt noch. Aufzeichnung mit Teams. samuel@codecrush.ch einladen.
+[Househeld-VideoWalkthrough_SandroMuentener.mp4](https://srgssr-my.sharepoint.com/:v:/g/personal/sandro_muentener_srf_ch/IQAvw2ltNJXxR7OcpVt3BV-5AVdFW_9X8Kt385pX_vOkWuc?e=w9RV9L)
 
 ## Ideenfindung & Entwicklung PRD
 
