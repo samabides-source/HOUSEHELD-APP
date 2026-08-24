@@ -31,18 +31,17 @@ Eine einfache Web-App, in der Aufgaben mit Fotos, Zuweisung und Tags erfasst und
 - [Security-Checkliste](#security-checkliste-für-vibe-coded-apps--ausgefüllt-für-househeld)
 
 ## Links
-**App**
-https://househeld-app.vercel.app/
-
+**App**  
+https://househeld-app.vercel.app/  
 Hinweis: Die App speichert alle Daten nur lokal im jeweiligen Browser. Damit du nicht mit einer leeren App startest: Rechts oben auf „Einstellungen" klicken und „Beispieldaten laden" drücken – dann sind Aufgaben, Personen und Fotos zum Ausprobieren da.
 
-**Marketing-Seite**
+**Marketing-Seite**  
 https://househeld-page.vercel.app/
 
-**Marketing-Seite: Github Repository**
+**Marketing-Seite: Github Repository**  
 https://github.com/samabides-source/HOUSEHELD-PAGE
 
-**Video-Walkthrough**
+**Video-Walkthrough**  
 Folgt noch. Aufzeichnung mit Teams. samuel@codecrush.ch einladen.
 
 ## Ideenfindung & Entwicklung PRD
